@@ -11,17 +11,19 @@ const googleButtonOptions = {
 };
 
 export default function GoogleSignIn () {
-  const { setUser } = useContext(UserContext);
+  const { setUser, setLoading } = useContext(UserContext);
   const ref = useRef(null);
 
   const callback = async (res: any, error: any) => {
     if (error) {
       alert('Something went wrong sorry!');
     } else {
-      console.log(res);
+      setLoading(true);
+
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      setUser({ name: 'John', lastName: 'Doe' });
+      setLoading(false);
+      setUser({ name: 'Albano', lastName: 'Xhafaj' });
     }
   };
 

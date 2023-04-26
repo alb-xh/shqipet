@@ -37,7 +37,7 @@ export const messagesButtonPanelStyle: CSSProperties = {
   alignItems: 'center',
   position: "absolute",
   bottom: 10,
-  left: 5,
+  left: 12,
 };
 
 export const textFieldStyle: CSSProperties = {
