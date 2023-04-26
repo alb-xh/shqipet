@@ -1,7 +1,6 @@
 import { Canvas } from '@react-three/fiber';
 
 import LocationMarker, { Location } from './location-marker.component';
-import Logo from '../common/logo.component';
 import Earth from './earth.component';
 import GroupChat from './group-chat.component';
 
@@ -18,7 +17,6 @@ function MainPage() {
 
   return (
     <div style={pageStyle}>
-      <Logo />
       <Canvas camera={{ position: [0, 0, 15], fov: 75 }}>
         <ambientLight intensity={0.5} />
         <directionalLight intensity={0.5} position={[0, 1, 1]} />

@@ -3,6 +3,9 @@ import MainPage from "./main";
 import LoginPage from "./login";
 import UserContext from "./common/user.context";
 import UserStorage, { User } from "./common/user.storage";
+import Logo from './common/logo.component';
+import Logout from "./common/logout.component";
+
 import { useState, useMemo } from "react";
 import { USER_LOCAL_STORAGE_KEY } from "./constants";
 
@@ -21,11 +24,9 @@ function App() {
 
   return (
     <UserContext.Provider value={value as any}>
-      {
-        !user
-          ? <LoginPage />
-          : <MainPage />
-      }
+      <Logo />
+      { user && <Logout /> }
+      { user ? <MainPage /> : <LoginPage /> }
     </UserContext.Provider>
   );
 }
