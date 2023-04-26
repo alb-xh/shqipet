@@ -1,7 +1,10 @@
 import { useRef, useEffect, useContext } from 'react';
+import { faker } from '@faker-js/faker';
+
 import { googleSignInPanel } from './styles';
 import UserContext from '../common/user.context';
 import { GOOGLE_CLIENT_ID } from '../constants';
+
 
 const googleButtonOptions = {
   shape: 'circle',
@@ -23,7 +26,7 @@ export default function GoogleSignIn () {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       setLoading(false);
-      setUser({ name: 'Albano', lastName: 'Xhafaj' });
+      setUser({ name: 'Albano', lastName: 'Xhafaj', avatar: faker.image.avatar() });
     }
   };
 

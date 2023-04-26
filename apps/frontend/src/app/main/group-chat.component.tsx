@@ -1,6 +1,6 @@
 import Avatar from '@mui/material/Avatar';
 import { Button, Paper, TextField } from '@mui/material';
-import { KeyboardEventHandler, useEffect, useState } from 'react';
+import { KeyboardEventHandler, useContext, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
 import {
@@ -15,15 +15,18 @@ import {
   textFieldElementsStyle,
   messagesButtonStyle,
 } from './styles';
+import UserContext from '../common/user.context';
 
 export interface Message {
   sender: string;
   text: string;
+  avatar: string;
 }
 
 const messagesPanelId = v4();
 
 const GroupChat = () => {
+  const { user } = useContext(UserContext);
   const [isVisible, setIsVisible] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
@@ -36,8 +39,10 @@ const GroupChat = () => {
   }, [ messages ]);
 
   const handleSend = () => {
-    if (newMessage) {
-      setMessages([...messages, { sender: 'You', text: newMessage }]);
+    if (newMessage && user) {
+      const message = { sender: 'You', avatar: user.avatar, text: newMessage };
+
+      setMessages([ ...messages, message ]);
       setNewMessage('');
     }
   };
@@ -67,7 +72,7 @@ const GroupChat = () => {
         {
           (messages).map((message, i) => (
             <div key={i} style={messageStyle}>
-              <Avatar sx={avatarStyle}>{message.sender.charAt(0)}</Avatar>
+              <Avatar sx={avatarStyle} src={message.avatar} alt={`${message.sender} avatar`} / >
               <div>
                 <div>{message.sender}</div>
                 <div>{message.text}</div>
