@@ -1,29 +1,32 @@
 
 import MainPage from "./main";
 import LoginPage from "./login";
-import { useState } from "react";
+import UserContext from "./common/user.context";
+import UserStorage, { User } from "./common/user.storage";
+import { useState, useMemo } from "react";
+import { USER_LOCAL_STORAGE_KEY } from "./constants";
+
+const storage = new UserStorage(USER_LOCAL_STORAGE_KEY);
 
 function App() {
-  const [ user, setUser ] = useState(null);
+  const [user, setUser] = useState(storage.get());
 
-  if (!user) {
-    const userStr = localStorage.getItem('user');
-    const newUser = userStr ? JSON.parse(userStr): null;
-
-    console.log(newUser);
-
-    if (newUser) {
-      setUser(newUser)
-
-      return null;
-    }
-
-    return <LoginPage />;
-  }
-
+  const value = useMemo(() => ({
+    setUser: (user: User) => {
+      storage.set(user);
+      setUser(user);
+    },
+    user,
+  }),[user]);
 
   return (
-    <MainPage />
+    <UserContext.Provider value={value as any}>
+      {
+        !user
+          ? <LoginPage />
+          : <MainPage />
+      }
+    </UserContext.Provider>
   );
 }
 
