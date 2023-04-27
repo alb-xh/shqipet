@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { config } from './config';
+import { MeController, GoogleTokenManagerService } from './me';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [ ConfigModule.forRoot({ load: [ config ]}) ],
+  controllers: [ MeController ],
+  providers: [ GoogleTokenManagerService],
 })
 export class AppModule {}

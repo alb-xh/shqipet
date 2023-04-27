@@ -1,10 +1,9 @@
 import { useRef, useEffect, useContext } from 'react';
-import { faker } from '@faker-js/faker';
+import axios from 'axios';
 
 import { googleSignInPanel } from './styles';
 import UserContext from '../common/user.context';
-import { GOOGLE_CLIENT_ID } from '../constants';
-
+import { GOOGLE_CLIENT_ID, USER_INFO_ENDPOINT_URL } from '../constants';
 
 const googleButtonOptions = {
   shape: 'circle',
@@ -23,10 +22,15 @@ export default function GoogleSignIn () {
     } else {
       setLoading(true);
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const { data } = await axios.request({
+        method: 'POST',
+        url: USER_INFO_ENDPOINT_URL,
+        data: { token: res.credential },
+        withCredentials: true,
+      });
 
       setLoading(false);
-      setUser({ name: 'Albano', lastName: 'Xhafaj', avatar: faker.image.avatar() });
+      setUser(data);
     }
   };
 

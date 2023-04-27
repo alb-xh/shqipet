@@ -66,13 +66,18 @@ const GroupChat = () => {
     );
   }
 
+  console.log(messages);
+
   return (
     <Paper sx={groupChatStyle}>
       <div id={messagesPanelId} style={messagesPanelStyle}>
         {
           (messages).map((message, i) => (
             <div key={i} style={messageStyle}>
-              <Avatar sx={avatarStyle} src={message.avatar} alt={`${message.sender} avatar`} / >
+              <Avatar sx={avatarStyle}
+                src={`data:image/jpeg;base64,${message.avatar}`}
+                alt={`${message.sender} avatar`}
+              />
               <div>
                 <div>{message.sender}</div>
                 <div>{message.text}</div>
