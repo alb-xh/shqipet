@@ -1,9 +1,9 @@
 import { useRef, useEffect, useContext } from 'react';
-import axios from 'axios';
 
 import { googleSignInPanel } from './styles';
 import UserContext from '../common/user.context';
-import { GOOGLE_CLIENT_ID, USER_INFO_ENDPOINT_URL } from '../constants';
+import authClient from '../common/authClient';
+import { GOOGLE_CLIENT_ID } from '../constants';
 
 const googleButtonOptions = {
   shape: 'circle',
@@ -22,15 +22,10 @@ export default function GoogleSignIn () {
     } else {
       setLoading(true);
 
-      const { data } = await axios.request({
-        method: 'POST',
-        url: USER_INFO_ENDPOINT_URL,
-        data: { token: res.credential },
-        withCredentials: true,
-      });
+      const user = await authClient.signIn(res.credential);
 
       setLoading(false);
-      setUser(data);
+      setUser(user);
     }
   };
 

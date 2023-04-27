@@ -6,8 +6,9 @@ import App from "./app/app";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+const disableStringMode = true;
 root.render(
-  <StrictMode>
-    <App />
-  </StrictMode>
+  disableStringMode
+    ? <App />
+    : <StrictMode><App /></StrictMode>
 );

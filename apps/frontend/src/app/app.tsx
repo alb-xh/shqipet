@@ -1,30 +1,34 @@
+import { useState, useMemo, useEffect } from "react";
 
 import MainPage from "./main";
 import LoginPage from "./login";
 import UserContext from "./common/user.context";
-import UserStorage, { User } from "./common/user.storage";
 import Logo from './common/logo.component';
 import Logout from "./common/logout.component";
-
-import { useState, useMemo } from "react";
-import { USER_LOCAL_STORAGE_KEY } from "./constants";
 import Loading from "./common/loading.component";
-
-const storage = new UserStorage(USER_LOCAL_STORAGE_KEY);
+import authClient from "./common/authClient";
 
 function App() {
-  const [user, setUser] = useState(storage.get());
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const value = useMemo(() => ({
-    setUser: (user: User) => {
-      storage.set(user);
-      setUser(user);
-    },
-    user,
-    loading,
-    setLoading,
-  }),[user]);
+  useEffect(() => {
+    if (!user) {
+      setLoading(true);
+
+      authClient.getMe()
+        .then((user: any) => {
+          setUser(user);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+        });
+    }
+  }, [user]);
+
+  const value = useMemo(() => ({ user, setUser, loading, setLoading }),[ user, loading ]);
 
   return (
     <UserContext.Provider value={value as any}>

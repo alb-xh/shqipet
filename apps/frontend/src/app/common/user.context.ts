@@ -1,5 +1,6 @@
 import { createContext } from "react";
-import { User } from './user.storage';
+
+import { User } from "./authClient";
 
 export interface UserContextInterface {
   loading: boolean,
