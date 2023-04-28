@@ -21,7 +21,7 @@ function MainPage() {
         <ambientLight intensity={0.5} />
         <directionalLight intensity={0.5} position={[0, 1, 1]} />
         <Earth />
-        {markers.map((location, index) => (<LocationMarker key={index} location={location} />))}
+        {/* {markers.map((location, index) => (<LocationMarker key={index} location={location} />))} */}
       </Canvas>
       <GroupChat />
     </div>
