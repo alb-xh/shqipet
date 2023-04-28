@@ -8,6 +8,30 @@ import spaceTexture from '../../assets/space.png';
 
 extend({ OrbitControls });
 
+const Marker: React.FC<{ lat: number; long: number }> = ({ lat, long }) => {
+  const markerRef = useRef<THREE.Mesh>(null);
+
+  useEffect(() => {
+    const phi = (90 - lat) * Math.PI / 180;
+    const theta = (long + 180) * Math.PI / 180;
+
+    const x = Math.sin(phi) * Math.cos(theta) * 7;
+    const y = Math.cos(phi) * 7;
+    const z = Math.sin(phi) * Math.sin(theta) * 7;
+
+    if (markerRef.current) {
+      markerRef.current.position.set(x, y, z);
+    }
+  }, [lat, long]);
+
+  return (
+    <mesh ref={markerRef}>
+      <sphereGeometry args={[0.2, 16, 16]} />
+      <meshStandardMaterial color="red" />
+    </mesh>
+  );
+};
+
 const Earth: React.FC = () => {
   const { camera, gl } = useThree();
 
@@ -48,6 +72,11 @@ const Earth: React.FC = () => {
 
       {/* Space background */}
       <mesh geometry={spaceGeometry} material={spaceMaterial} />
+
+      {/* Location markers */}
+      <Marker lat={37.7749} long={-122.4194} /> {/* San Francisco */}
+      <Marker lat={40.7128} long={-74.0060} /> {/* New York */}
+      <Marker lat={51.5074} long={-0.1278} /> {/* London */}
 
       {/* Rotate the group based on the Earth's rotation */}
       {groupRef.current && (
