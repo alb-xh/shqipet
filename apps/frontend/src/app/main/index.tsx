@@ -18,8 +18,8 @@ function MainPage() {
   return (
     <div style={pageStyle}>
       <Canvas camera={{ position: [0, 0, 15], fov: 75 }}>
-        <ambientLight intensity={0.5} />
-        <directionalLight intensity={0.5} position={[0, 1, 1]} />
+        <ambientLight intensity={1} />
+        <directionalLight intensity={1} position={[0, 1, 1]} />
         <Earth />
         {/* {markers.map((location, index) => (<LocationMarker key={index} location={location} />))} */}
       </Canvas>
