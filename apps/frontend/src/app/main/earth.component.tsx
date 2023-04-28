@@ -1,13 +1,15 @@
 import * as THREE from 'three';
-import { useThree } from '@react-three/fiber';
+import { useThree, extend } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import earthTexture from '../../assets/earth-texture.jpg';
 import spaceTexture from '../../assets/space.png';
 
+extend({ OrbitControls });
+
 const Earth: React.FC = () => {
-  const { scene, camera, gl } = useThree();
+  const { camera, gl } = useThree();
 
   // Create a group that will contain both the Earth and the background
   const groupRef = useRef<THREE.Group>(null);
@@ -17,7 +19,10 @@ const Earth: React.FC = () => {
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.rotateSpeed = 0.5;
-    controls.zoomSpeed = 1.2;
+
+    // Restrict the zoom-in and zoom-out functionality
+    controls.minDistance = 10;
+    controls.maxDistance = 100;
 
     return () => {
       controls.dispose();
