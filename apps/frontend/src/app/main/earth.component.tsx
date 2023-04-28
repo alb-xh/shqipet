@@ -1,89 +1,49 @@
-import * as THREE from 'three';
-import { useThree, extend } from '@react-three/fiber';
-import { useEffect, useRef } from 'react';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import world from 'cities.json';
+import sample from 'lodash/sample';
+import random from 'lodash/random';
+import Globe from 'react-globe.gl';
 
-import earthTexture from '../../assets/earth-texture.jpg';
-import spaceTexture from '../../assets/space.png';
+import earth from '../../assets/earth-texture.jpg';
+import space from '../../assets/space.png';
+import { useState } from 'react';
 
-extend({ OrbitControls });
+const getRandomItems = (items, nrItems = random(5, 20)) => [ ...Array(nrItems) ].map(() => sample(items));
 
-const Marker: React.FC<{ lat: number; long: number }> = ({ lat, long }) => {
-  const markerRef = useRef<THREE.Mesh>(null);
+const markerSvg = `<svg viewBox="-4 0 36 36">
+    <path fill="currentColor" d="M14,0 C21.732,0 28,5.641 28,12.6 C28,23.963 14,36 14,36 C14,36 0,24.064 0,12.6 C0,5.641 6.268,0 14,0 Z"></path>
+    <circle fill="black" cx="14" cy="14" r="7"></circle>
+  </svg>`;
 
-  useEffect(() => {
-    const phi = (90 - lat) * Math.PI / 180;
-    const theta = (long + 180) * Math.PI / 180;
-
-    const x = Math.sin(phi) * Math.cos(theta) * 7;
-    const y = Math.cos(phi) * 7;
-    const z = Math.sin(phi) * Math.sin(theta) * 7;
-
-    if (markerRef.current) {
-      markerRef.current.position.set(x, y, z);
-    }
-  }, [lat, long]);
+export default function Earth () {
+  const [ cities ] = useState(getRandomItems(world));
 
   return (
-    <mesh ref={markerRef}>
-      <sphereGeometry args={[0.2, 16, 16]} />
-      <meshStandardMaterial color="red" />
-    </mesh>
-  );
-};
+    <Globe
+        width={window.innerWidth * 0.995}
+        height={window.innerHeight * 0.8}
+        globeImageUrl={earth}
+        backgroundImageUrl={space}
+        htmlElementsData={cities}
+        htmlLat={(d: any) => d.lat}
+        htmlLng={(d: any) => d.lng}
+        htmlElement={(d: any) => {
+          const el = document.createElement('div');
+          el.className="tooltip";
+          el.innerHTML= markerSvg;
+          el.style.color = 'red';
+          el.style.width = `30px`;
+          el.style['pointer-events'] = 'auto';
+          el.style.cursor = 'pointer';
+          el.onclick = () => { alert(`Clicked ${d.name}`) };
 
-const Earth: React.FC = () => {
-  const { camera, gl } = useThree();
+          const tooltip = document.createElement('span');
+          tooltip.className = "tooltiptext";
+          tooltip.innerText = d.name;
 
-  // Create a group that will contain both the Earth and the background
-  const groupRef = useRef<THREE.Group>(null);
+          el.appendChild(tooltip);
 
-  useEffect(() => {
-    const controls = new OrbitControls(camera, gl.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.rotateSpeed = 0.5;
-
-    // Restrict the zoom-in and zoom-out functionality
-    controls.minDistance = 10;
-    controls.maxDistance = 100;
-
-    return () => {
-      controls.dispose();
-    };
-  }, [camera, gl]);
-
-  const earthTextureLoader = new THREE.TextureLoader();
-  const earthTextureMap = earthTextureLoader.load(earthTexture);
-  const earthMaterial = new THREE.MeshBasicMaterial({ map: earthTextureMap });
-  const earthGeometry = new THREE.SphereGeometry(7, 64, 64);
-
-  const spaceTextureLoader = new THREE.TextureLoader();
-  const spaceTextureMap = spaceTextureLoader.load(spaceTexture);
-  const spaceMaterial = new THREE.MeshBasicMaterial({ map: spaceTextureMap, side: THREE.BackSide });
-  const spaceGeometry = new THREE.SphereGeometry(100, 64, 64);
-
-  return (
-    <group ref={groupRef}>
-      {/* Earth */}
-      <mesh geometry={earthGeometry} material={earthMaterial}>
-        <meshPhongMaterial attach="material" map={earthTextureMap} />
-      </mesh>
-
-      {/* Space background */}
-      <mesh geometry={spaceGeometry} material={spaceMaterial} />
-
-      {/* Location markers */}
-      <Marker lat={37.7749} long={-122.4194} /> {/* San Francisco */}
-      <Marker lat={40.7128} long={-74.0060} /> {/* New York */}
-      <Marker lat={51.5074} long={-0.1278} /> {/* London */}
-
-      {/* Rotate the group based on the Earth's rotation */}
-      {groupRef.current && (
-        groupRef.current.rotation.y = -0.5 * Math.PI // Change this value to adjust the rotation
-      )}
-    </group>
-  );
-};
-
-export default Earth;
+          return el;
+        }}
+      />
+  )
+}
