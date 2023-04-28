@@ -66,8 +66,6 @@ const GroupChat = () => {
     );
   }
 
-  console.log(messages);
-
   return (
     <Paper sx={groupChatStyle}>
       <div id={messagesPanelId} style={messagesPanelStyle}>

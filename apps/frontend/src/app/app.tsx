@@ -21,8 +21,7 @@ function App() {
           setUser(user);
           setLoading(false);
         })
-        .catch((err) => {
-          console.log(err);
+        .catch(() => {
           setLoading(false);
         });
     }
