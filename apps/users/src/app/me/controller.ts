@@ -17,8 +17,8 @@ export class MeController {
     this.cookieName = configService.getOrThrow('COOKIE_NAME');
     this.cookieOptions = {
       domain: configService.getOrThrow('DOMAIN'),
+      secure: configService.getOrThrow('SECURE'),
       path: configService.getOrThrow('COOKIE_PATH'),
-      secure: configService.getOrThrow('COOKIE_SECURE'),
       httpOnly: configService.getOrThrow('COOKIE_HTTP_ONLY'),
     };
   }

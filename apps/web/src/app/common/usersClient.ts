@@ -8,20 +8,23 @@ export interface User {
 }
 
 class UsersClient {
-  constructor (private readonly usersEndpoint: string) {};
+  private readonly meEndpoint: string;
+  constructor (usersEndpoint: string) {
+    this.meEndpoint = `${usersEndpoint}/me`;
+  };
 
   async signIn (token: string): Promise<User> {
-    const { data } = await axios.post(this.usersEndpoint, { token }, { withCredentials: true });
+    const { data } = await axios.post(this.meEndpoint, { token }, { withCredentials: true });
     return data;
   }
 
   async getMe (): Promise<User> {
-    const { data } = await axios.get(this.usersEndpoint, { withCredentials: true })
+    const { data } = await axios.get(this.meEndpoint, { withCredentials: true })
     return data;
   }
 
   async logOut (): Promise<void> {
-    await axios.delete(this.usersEndpoint, { withCredentials: true });
+    await axios.delete(this.meEndpoint, { withCredentials: true });
   }
 }
 
