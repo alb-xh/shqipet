@@ -12,6 +12,7 @@ jobs:
         host: ${{ vars.SHQIPET_HOST_IP }}
         username: deploy
         key: ${{ secrets.SHQIPET_SERVER_SSH_KEY }}
+        passphrase: ""
         port: 22
         script: |
           docker kill $(docker ps -q) || true
