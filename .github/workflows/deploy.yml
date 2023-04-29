@@ -1,0 +1,20 @@
+name: Deployment workflow
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: appleboy/ssh-action@master
+      with:
+        host: ${{ vars.SHQIPET_HOST_IP }}
+        username: deploy
+        key: ${{ secrets.SHQIPET_SHQIPET_SERVER_SSH_KEY }}
+        port: 22
+        script: |
+          docker kill $(docker ps -q) || true
+          cd projects
+          rm -rf shqipet
+          git pull origin master
