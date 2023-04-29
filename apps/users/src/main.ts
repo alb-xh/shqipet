@@ -13,10 +13,11 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const port = 3000;
+  const prefix = 'users';
+
   const configService = app.get(ConfigService);
   const origin = configService.getOrThrow('DOMAIN');
-  const prefix = configService.getOrThrow('USERS_PREFIX');
-  const port = configService.getOrThrow('USERS_PORT');
 
   app.enableCors({ credentials: true, origin: new RegExp(origin) });
   app.use(cookieParser());

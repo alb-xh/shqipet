@@ -1,5 +1,7 @@
-export const USERS_ENDPOINT_URL = process.env['DOMAIN'] === 'localhost'
-  ? `http://localhost:${process.env['USERS_PORT']}/${process.env['USERS_PREFIX']}`
-  : `https://${process.env['DOMAIN']}/${process.env['USERS_PREFIX']}`;
+const isProd = process.env['NODE_ENV'] === 'production';
+
+export const USERS_ENDPOINT_URL = isProd
+  ? `https://${process.env['DOMAIN']}/users`
+  : 'http://localhost:3000/users';
 
 export const GOOGLE_CLIENT_ID = process.env['GOOGLE_CLIENT_ID'];
