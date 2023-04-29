@@ -23,7 +23,7 @@ export interface Message {
   avatar: string;
 }
 
-const messagesPanelId = v4();
+const messagesPanelId = 'message-panel';
 
 const GroupChat = () => {
   const { user } = useContext(UserContext);
