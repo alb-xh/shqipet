@@ -1,7 +1,6 @@
 import Avatar from '@mui/material/Avatar';
 import { Button, Paper, TextField } from '@mui/material';
 import { KeyboardEventHandler, useContext, useEffect, useState } from 'react';
-import { v4 } from 'uuid';
 
 import {
   showButtonStyle,
