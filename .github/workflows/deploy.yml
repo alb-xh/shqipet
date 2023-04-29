@@ -1,6 +1,6 @@
 name: Deployment workflow
 on:
-  push:
+  workflow_dispatch:
     branches: [ main ]
 
 jobs:
