@@ -2,7 +2,7 @@ import { useRef, useEffect, useContext } from 'react';
 
 import { googleSignInPanel } from './styles';
 import UserContext from '../common/user.context';
-import authClient from '../common/authClient';
+import usersClient from '../common/usersClient';
 import { GOOGLE_CLIENT_ID } from '../constants';
 
 const googleButtonOptions = {
@@ -22,7 +22,7 @@ export default function GoogleSignIn () {
     } else {
       setLoading(true);
 
-      const user = await authClient.signIn(res.credential);
+      const user = await usersClient.signIn(res.credential);
 
       setLoading(false);
       setUser(user);

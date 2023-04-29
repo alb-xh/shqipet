@@ -2,7 +2,7 @@ import { Button } from "@mui/material";
 import { CSSProperties, useContext } from "react";
 
 import UserContext from "./user.context";
-import authClient from "./authClient";
+import usersClient from "./usersClient";
 
 const style: CSSProperties = {
   position: 'absolute',
@@ -15,7 +15,7 @@ export default function Logout () {
   const onClick = async () => {
     setLoading(true);
 
-    await authClient.logOut();
+    await usersClient.logOut();
 
     setUser(null);
   }

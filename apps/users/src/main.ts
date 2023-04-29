@@ -11,7 +11,7 @@ import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
-  const globalPrefix = 'auth';
+  const globalPrefix = 'users';
 
   const app = await NestFactory.create(AppModule);
 

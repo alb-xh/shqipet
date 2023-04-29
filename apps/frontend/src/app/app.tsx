@@ -6,7 +6,7 @@ import UserContext from "./common/user.context";
 import Logo from './common/logo.component';
 import Logout from "./common/logout.component";
 import Loading from "./common/loading.component";
-import authClient from "./common/authClient";
+import usersClient from "./common/usersClient";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -16,7 +16,7 @@ function App() {
     if (!user) {
       setLoading(true);
 
-      authClient.getMe()
+      usersClient.getMe()
         .then((user: any) => {
           setUser(user);
           setLoading(false);
