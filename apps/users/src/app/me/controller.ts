@@ -7,20 +7,21 @@ import { GoogleTokenManagerService } from './google-token-manager.service';
 
 @Controller('/me')
 export class MeController {
-  private readonly cookieName: string;
-  private readonly cookieOptions: CookieOptions;
+  private readonly cookieName = 'me';
+  private readonly cookieOptions: CookieOptions = {
+    path: '/users',
+    httpOnly: true,
+    sameSite: true,
+  }
 
   constructor(
     private readonly googleTokenManagerService: GoogleTokenManagerService,
     configService: ConfigService,
   ) {
-    this.cookieName = configService.getOrThrow('COOKIE_NAME');
-    this.cookieOptions = {
-      domain: configService.getOrThrow('DOMAIN'),
-      secure: configService.getOrThrow('SECURE'),
-      path: configService.getOrThrow('COOKIE_PATH'),
-      httpOnly: configService.getOrThrow('COOKIE_HTTP_ONLY'),
-    };
+    const domain = configService.getOrThrow('DOMAIN')
+
+    this.cookieOptions.domain = domain;
+    this.cookieOptions.secure = domain !== 'localhost';
   }
 
   @Get()

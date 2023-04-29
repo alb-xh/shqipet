@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { USERS_ENDPOINT_URL } from '../constants';
+import { USERS_ENDPOINT_URL } from '../config';
 
 export interface User {
   avatar: string,

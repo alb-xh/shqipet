@@ -3,7 +3,7 @@ import { useRef, useEffect, useContext } from 'react';
 import { googleSignInPanel } from './styles';
 import UserContext from '../common/user.context';
 import usersClient from '../common/usersClient';
-import { GOOGLE_CLIENT_ID } from '../constants';
+import { GOOGLE_CLIENT_ID } from '../config';
 
 const googleButtonOptions = {
   shape: 'circle',
