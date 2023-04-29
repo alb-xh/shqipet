@@ -13,7 +13,7 @@ export class GoogleTokenManagerService {
   private readonly clientId: string;
   private readonly oAuthClient: OAuth2Client;
   constructor (configService: ConfigService) {
-    const clientId = configService.getOrThrow('clientId');
+    const clientId = configService.getOrThrow('GOOGLE_CLIENT_ID');
 
     this.clientId = clientId;
     this.oAuthClient = new OAuth2Client(clientId);

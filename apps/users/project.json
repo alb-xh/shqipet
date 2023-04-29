@@ -34,7 +34,9 @@
           "buildTarget": "users:build:development"
         },
         "production": {
-          "buildTarget": "users:build:production"
+          "buildTarget": "users:build:production",
+          "watch": false,
+          "inspect": false
         }
       }
     },

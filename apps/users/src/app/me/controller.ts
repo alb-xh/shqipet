@@ -14,8 +14,13 @@ export class MeController {
     private readonly googleTokenManagerService: GoogleTokenManagerService,
     configService: ConfigService,
   ) {
-    this.cookieName = configService.getOrThrow('cookieName');
-    this.cookieOptions = configService.getOrThrow('cookieOptions');
+    this.cookieName = configService.getOrThrow('COOKIE_NAME');
+    this.cookieOptions = {
+      domain: configService.getOrThrow('DOMAIN'),
+      path: configService.getOrThrow('COOKIE_PATH'),
+      secure: configService.getOrThrow('COOKIE_SECURE'),
+      httpOnly: configService.getOrThrow('COOKIE_HTTP_ONLY'),
+    };
   }
 
   @Get()
