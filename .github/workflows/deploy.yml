@@ -9,9 +9,9 @@ jobs:
     steps:
     - uses: appleboy/ssh-action@master
       with:
-        host: ${{ vars.SHQIPET_HOST_IP }}
-        username: deploy
-        password: ${{ secrets.DEPLOY_USER_PASSWORD }}
+        username: ${{ vars.USERNAME }}
+        host: ${{ vars.HOST }}
+        password: ${{ secrets.PASSWORD }}
         port: 22
         script: |
           docker kill $(docker ps -q) 2>&1 >/dev/null || true
