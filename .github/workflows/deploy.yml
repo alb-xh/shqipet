@@ -13,7 +13,7 @@ jobs:
         username: deploy
         password: ${{ secrets.DEPLOY_USER_PASSWORD }}
         port: 22
-        timeout: 180s
+        timeout: 300s
         script: |
           docker kill $(docker ps -q) 2>&1 >/dev/null || true
           cd projects
@@ -24,3 +24,4 @@ jobs:
           nvm install
           npm install --omit=dev
           docker compose up -d
+          exit 0
