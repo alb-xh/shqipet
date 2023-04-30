@@ -22,4 +22,4 @@ jobs:
           echo "${{ vars.PROD_CONFIG }}" >> .prod.env
           nvm install
           npm install --omit=dev
-          docker compose udp -d
+          docker compose up -d
