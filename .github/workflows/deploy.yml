@@ -13,9 +13,6 @@ jobs:
         username: deploy
         password: ${{ secrets.DEPLOY_USER_PASSWORD }}
         port: 22
-        timeout: 300s
-        debug: true
-        script_stop: true
         script: |
           docker kill $(docker ps -q) 2>&1 >/dev/null || true
           cd projects
@@ -23,4 +20,3 @@ jobs:
           git clone git@github.com:alb-xh/shqipet.git
           cd shqipet
           echo "${{ vars.PROD_CONFIG }}" >> .prod.env
-          echo "DONE"
