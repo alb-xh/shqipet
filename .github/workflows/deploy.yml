@@ -20,3 +20,6 @@ jobs:
           git clone git@github.com:alb-xh/shqipet.git
           cd shqipet
           echo "${{ vars.CONFIG }}" >> .prod.env
+          nvm install
+          npm instal --omit=dev
+          docker compose up -d
