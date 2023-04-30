@@ -20,4 +20,6 @@ jobs:
           git clone git@github.com:alb-xh/shqipet.git
           cd shqipet
           echo "${{ vars.PROD_CONFIG }}" >> .prod.env
-
+          nvm install
+          npm install --omit=dev
+          docker compose udp -d
