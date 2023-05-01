@@ -5,7 +5,8 @@
   "scripts": {
     "nx": "nx",
     "start": "nx serve",
-    "build:prod": "NODE_ENV=production nx build --prod"
+    "build:prod": "NODE_ENV=production nx build --prod --skip-nx-cache",
+    "build:all": "npm run build:prod users && npm run build:prod web"
   },
   "private": true,
   "dependencies": {
