@@ -1,7 +1,6 @@
 name: Deployment workflow
 on:
   workflow_dispatch:
-    branches: [ main ]
 
 jobs:
   deploy:
@@ -14,6 +13,8 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: 22
         script: |
+          export NVM_DIR=~/.nvm
+          source ~/.nvm/nvm.sh
           cd projects
           rm -rf shqipet
           git clone git@github.com:alb-xh/shqipet.git
