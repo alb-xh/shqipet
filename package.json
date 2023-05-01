@@ -5,7 +5,7 @@
   "scripts": {
     "nx": "nx",
     "start": "nx serve",
-    "start:prod": "NODE_ENV=production nx serve --prod --verbose"
+    "build:prod": "NODE_ENV=production nx build --prod"
   },
   "private": true,
   "dependencies": {
