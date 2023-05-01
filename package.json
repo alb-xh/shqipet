@@ -10,6 +10,7 @@
   },
   "private": true,
   "dependencies": {
+    "@maxmind/geoip2-node": "^3.5.0",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.1",
     "@nestjs/common": "^9.0.0",

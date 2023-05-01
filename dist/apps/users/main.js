@@ -35,13 +35,17 @@ exports.AppModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(6);
-const me_1 = __webpack_require__(7);
+const geo_1 = __webpack_require__(7);
+const me_1 = __webpack_require__(13);
 const envFilePath = process.env['NODE' + '_ENV'] === 'production' ? '.prod.env' : '.dev.env';
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule.forRoot({ envFilePath })],
+        imports: [
+            config_1.ConfigModule.forRoot({ envFilePath, isGlobal: true }),
+            geo_1.GeoModule,
+        ],
         controllers: [me_1.MeController],
         providers: [me_1.GoogleTokenManagerService],
     })
@@ -61,11 +65,8 @@ module.exports = require("@nestjs/config");
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MeController = exports.GoogleTokenManagerService = void 0;
-var google_token_manager_service_1 = __webpack_require__(8);
-Object.defineProperty(exports, "GoogleTokenManagerService", ({ enumerable: true, get: function () { return google_token_manager_service_1.GoogleTokenManagerService; } }));
-var controller_1 = __webpack_require__(11);
-Object.defineProperty(exports, "MeController", ({ enumerable: true, get: function () { return controller_1.MeController; } }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(8), exports);
 
 
 /***/ }),
@@ -73,14 +74,106 @@ Object.defineProperty(exports, "MeController", ({ enumerable: true, get: functio
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GeoModule = void 0;
+const tslib_1 = __webpack_require__(1);
+const common_1 = __webpack_require__(3);
+const geo_service_1 = __webpack_require__(9);
+let GeoModule = class GeoModule {
+};
+GeoModule = tslib_1.__decorate([
+    (0, common_1.Module)({
+        providers: [geo_service_1.GeoService],
+        exports: [geo_service_1.GeoService],
+    })
+], GeoModule);
+exports.GeoModule = GeoModule;
+
+
+/***/ }),
+/* 9 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GeoService = void 0;
+const tslib_1 = __webpack_require__(1);
+const path_1 = __webpack_require__(10);
+const fs_1 = __webpack_require__(11);
+const common_1 = __webpack_require__(3);
+const config_1 = __webpack_require__(6);
+const geoip2_node_1 = __webpack_require__(12);
+let GeoService = class GeoService {
+    constructor(configService) {
+        const path = configService.getOrThrow('GEO_DB_PATH');
+        const fullPath = (0, path_1.join)(process.cwd(), path);
+        const file = (0, fs_1.readFileSync)(fullPath);
+        this.reader = geoip2_node_1.Reader.openBuffer(file);
+    }
+    getInfo(ip) {
+        var _a, _b;
+        const { country, city, location, } = this.reader.city(ip);
+        return {
+            name: (_a = country === null || country === void 0 ? void 0 : country.names) === null || _a === void 0 ? void 0 : _a.en,
+            code: country === null || country === void 0 ? void 0 : country.isoCode,
+            city: (_b = city === null || city === void 0 ? void 0 : city.names) === null || _b === void 0 ? void 0 : _b.en,
+            lat: location === null || location === void 0 ? void 0 : location.latitude,
+            lng: location === null || location === void 0 ? void 0 : location.longitude,
+        };
+    }
+};
+GeoService = tslib_1.__decorate([
+    (0, common_1.Injectable)(),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _a : Object])
+], GeoService);
+exports.GeoService = GeoService;
+
+
+/***/ }),
+/* 10 */
+/***/ ((module) => {
+
+module.exports = require("path");
+
+/***/ }),
+/* 11 */
+/***/ ((module) => {
+
+module.exports = require("fs");
+
+/***/ }),
+/* 12 */
+/***/ ((module) => {
+
+module.exports = require("@maxmind/geoip2-node");
+
+/***/ }),
+/* 13 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MeController = exports.GoogleTokenManagerService = void 0;
+var google_token_manager_service_1 = __webpack_require__(14);
+Object.defineProperty(exports, "GoogleTokenManagerService", ({ enumerable: true, get: function () { return google_token_manager_service_1.GoogleTokenManagerService; } }));
+var controller_1 = __webpack_require__(17);
+Object.defineProperty(exports, "MeController", ({ enumerable: true, get: function () { return controller_1.MeController; } }));
+
+
+/***/ }),
+/* 14 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GoogleTokenManagerService = void 0;
 const tslib_1 = __webpack_require__(1);
-const axios_1 = tslib_1.__importDefault(__webpack_require__(9));
+const axios_1 = tslib_1.__importDefault(__webpack_require__(15));
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(6);
-const google_auth_library_1 = __webpack_require__(10);
+const google_auth_library_1 = __webpack_require__(16);
 let GoogleTokenManagerService = class GoogleTokenManagerService {
     constructor(configService) {
         const clientId = configService.getOrThrow('GOOGLE_CLIENT_ID');
@@ -119,19 +212,19 @@ exports.GoogleTokenManagerService = GoogleTokenManagerService;
 
 
 /***/ }),
-/* 9 */
+/* 15 */
 /***/ ((module) => {
 
 module.exports = require("axios");
 
 /***/ }),
-/* 10 */
+/* 16 */
 /***/ ((module) => {
 
 module.exports = require("google-auth-library");
 
 /***/ }),
-/* 11 */
+/* 17 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -140,10 +233,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MeController = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
-const express_1 = __webpack_require__(12);
+const express_1 = __webpack_require__(18);
 const config_1 = __webpack_require__(6);
-const dto_1 = __webpack_require__(13);
-const google_token_manager_service_1 = __webpack_require__(8);
+const dto_1 = __webpack_require__(19);
+const google_token_manager_service_1 = __webpack_require__(14);
 let MeController = class MeController {
     constructor(googleTokenManagerService, configService) {
         this.googleTokenManagerService = googleTokenManagerService;
@@ -208,20 +301,20 @@ exports.MeController = MeController;
 
 
 /***/ }),
-/* 12 */
+/* 18 */
 /***/ ((module) => {
 
 module.exports = require("express");
 
 /***/ }),
-/* 13 */
+/* 19 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreateMeDto = void 0;
 const tslib_1 = __webpack_require__(1);
-const class_validator_1 = __webpack_require__(14);
+const class_validator_1 = __webpack_require__(20);
 class CreateMeDto {
 }
 tslib_1.__decorate([
@@ -233,7 +326,7 @@ exports.CreateMeDto = CreateMeDto;
 
 
 /***/ }),
-/* 14 */
+/* 20 */
 /***/ ((module) => {
 
 module.exports = require("class-validator");
