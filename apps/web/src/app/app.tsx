@@ -12,31 +12,30 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   if (!user) {
-  //     setLoading(true);
+  useEffect(() => {
+    if (!user) {
+      setLoading(true);
 
-  //     usersClient.getMe()
-  //       .then((user: any) => {
-  //         setUser(user);
-  //         setLoading(false);
-  //       })
-  //       .catch(() => {
-  //         setLoading(false);
-  //       });
-  //   }
-  // }, [user]);
+      usersClient.getMe()
+        .then((user: any) => {
+          setUser(user);
+          setLoading(false);
+        })
+        .catch(() => {
+          setLoading(false);
+        });
+    }
+  }, [user]);
 
   const value = useMemo(() => ({ user, setUser, loading, setLoading }),[ user, loading ]);
 
   return (
     <UserContext.Provider value={value as any}>
       <Logo />
-      {/* { !loading && user ? <Logout /> : null }
+      { !loading && user ? <Logout /> : null }
       { loading ? <Loading /> : null }
       { !loading && !user ? <LoginPage /> : null }
-      { !loading && user ? <MainPage /> : null } */}
-      <MainPage />
+      { !loading && user ? <MainPage /> : null }
     </UserContext.Provider>
   );
 }
