@@ -37,7 +37,6 @@ const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(6);
 const me_1 = __webpack_require__(7);
 const envFilePath = process.env['NODE' + '_ENV'] === 'production' ? '.prod.env' : '.dev.env';
-console.log(envFilePath);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([

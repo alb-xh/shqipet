@@ -6,9 +6,11 @@ services:
       dockerfile_inline: |
         FROM node:18.16.0-alpine
         WORKDIR /usr/src/app
-        COPY ./dist/apps/users .
+        COPY ./node_modules ./node_modules
+        COPY ./dist/apps/users package.json .prod.env .
+        ENV NODE_ENV production
         EXPOSE 3000
-        CMD [ "NODE_ENV=production", "node", "main.js" ]
+        CMD [ "node", "main.js" ]
     ports:
       - "3000:3000"
     restart: always
@@ -18,7 +20,7 @@ services:
       dockerfile_inline: |
         FROM node:18.16.0-alpine
         WORKDIR /usr/src/app
-        COPY ../dist/apps/web .
+        COPY ./dist/apps/web .
         RUN npm install --global serve
         EXPOSE 4200
         CMD [ "serve", ".", "-p", "4200" ]
