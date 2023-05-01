@@ -67,6 +67,7 @@ module.exports = require("@nestjs/config");
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
 tslib_1.__exportStar(__webpack_require__(8), exports);
+tslib_1.__exportStar(__webpack_require__(9), exports);
 
 
 /***/ }),
@@ -228,18 +229,29 @@ module.exports = require("google-auth-library");
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f, _g;
+var _a, _b, _c, _d, _e, _f, _g, _h;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MeController = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
 const express_1 = __webpack_require__(18);
 const config_1 = __webpack_require__(6);
-const dto_1 = __webpack_require__(19);
+const geo_1 = __webpack_require__(7);
 const google_token_manager_service_1 = __webpack_require__(14);
 let MeController = class MeController {
-    constructor(googleTokenManagerService, configService) {
+    getMeInfo(req) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const userInfo = yield this.googleTokenManagerService.getUserInfo(req.body.token);
+            const ip = this.domain !== 'localhost'
+                ? req.headers['X-Real-IP'] || req.socket.remoteAddress
+                : '91.82.156.27';
+            const geoInfo = this.geoService.getInfo(ip);
+            return Object.assign(Object.assign({}, userInfo), { geo: geoInfo });
+        });
+    }
+    constructor(googleTokenManagerService, geoService, configService) {
         this.googleTokenManagerService = googleTokenManagerService;
+        this.geoService = geoService;
         this.cookieName = 'me';
         this.cookieOptions = {
             path: '/users',
@@ -247,6 +259,7 @@ let MeController = class MeController {
             sameSite: true,
         };
         const domain = configService.getOrThrow('DOMAIN');
+        this.domain = domain;
         this.cookieOptions.domain = domain;
         this.cookieOptions.secure = domain !== 'localhost';
     }
@@ -255,14 +268,14 @@ let MeController = class MeController {
         if (!cookie) {
             throw new common_1.ForbiddenException();
         }
-        return this.googleTokenManagerService.getUserInfo(cookie);
+        return this.getMeInfo(cookie);
     }
-    createMe(body, res) {
+    createMe(req, res) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const userInfo = yield this.googleTokenManagerService.getUserInfo(body.token);
+            const meInfo = yield this.getMeInfo(req);
             res
-                .cookie(this.cookieName, body.token, this.cookieOptions)
-                .send(userInfo);
+                .cookie(this.cookieName, req.body.token, this.cookieOptions)
+                .send(meInfo);
         });
     }
     removeMe(res) {
@@ -275,27 +288,27 @@ tslib_1.__decorate([
     (0, common_1.Get)(),
     tslib_1.__param(0, (0, common_1.Req)()),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_c = typeof express_1.Request !== "undefined" && express_1.Request) === "function" ? _c : Object]),
+    tslib_1.__metadata("design:paramtypes", [typeof (_d = typeof express_1.Request !== "undefined" && express_1.Request) === "function" ? _d : Object]),
     tslib_1.__metadata("design:returntype", void 0)
 ], MeController.prototype, "getMe", null);
 tslib_1.__decorate([
     (0, common_1.Post)(),
-    tslib_1.__param(0, (0, common_1.Body)()),
+    tslib_1.__param(0, (0, common_1.Req)()),
     tslib_1.__param(1, (0, common_1.Res)()),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_d = typeof dto_1.CreateMeDto !== "undefined" && dto_1.CreateMeDto) === "function" ? _d : Object, typeof (_e = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _e : Object]),
-    tslib_1.__metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
+    tslib_1.__metadata("design:paramtypes", [typeof (_e = typeof express_1.Request !== "undefined" && express_1.Request) === "function" ? _e : Object, typeof (_f = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _f : Object]),
+    tslib_1.__metadata("design:returntype", typeof (_g = typeof Promise !== "undefined" && Promise) === "function" ? _g : Object)
 ], MeController.prototype, "createMe", null);
 tslib_1.__decorate([
     (0, common_1.Delete)(),
     tslib_1.__param(0, (0, common_1.Res)()),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_g = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _g : Object]),
+    tslib_1.__metadata("design:paramtypes", [typeof (_h = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _h : Object]),
     tslib_1.__metadata("design:returntype", void 0)
 ], MeController.prototype, "removeMe", null);
 MeController = tslib_1.__decorate([
     (0, common_1.Controller)('/me'),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof google_token_manager_service_1.GoogleTokenManagerService !== "undefined" && google_token_manager_service_1.GoogleTokenManagerService) === "function" ? _a : Object, typeof (_b = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _b : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof google_token_manager_service_1.GoogleTokenManagerService !== "undefined" && google_token_manager_service_1.GoogleTokenManagerService) === "function" ? _a : Object, typeof (_b = typeof geo_1.GeoService !== "undefined" && geo_1.GeoService) === "function" ? _b : Object, typeof (_c = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _c : Object])
 ], MeController);
 exports.MeController = MeController;
 
@@ -305,31 +318,6 @@ exports.MeController = MeController;
 /***/ ((module) => {
 
 module.exports = require("express");
-
-/***/ }),
-/* 19 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CreateMeDto = void 0;
-const tslib_1 = __webpack_require__(1);
-const class_validator_1 = __webpack_require__(20);
-class CreateMeDto {
-}
-tslib_1.__decorate([
-    (0, class_validator_1.IsJWT)(),
-    tslib_1.__metadata("design:type", String)
-], CreateMeDto.prototype, "token", void 0);
-exports.CreateMeDto = CreateMeDto;
-;
-
-
-/***/ }),
-/* 20 */
-/***/ ((module) => {
-
-module.exports = require("class-validator");
 
 /***/ })
 /******/ 	]);
