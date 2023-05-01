@@ -16,12 +16,16 @@ export class MeController {
   }
 
   private async getMeInfo (req: Request): Promise<UserInfo & { geo: GeoInfo }> {
-    const userInfo = await this.googleTokenManagerService.getUserInfo(req.body.token);
-
+    const token = req?.body?.token;
     const ip = this.domain !== 'localhost'
       ? req.headers['X-Real-IP'] as string || req.socket.remoteAddress
       : '91.82.156.27';
 
+    if (!token || !ip) {
+      throw new ForbiddenException();
+    }
+
+    const userInfo = await this.googleTokenManagerService.getUserInfo(token);
     const geoInfo = this.geoService.getInfo(ip);
 
     return {

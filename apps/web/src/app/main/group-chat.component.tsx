@@ -14,7 +14,7 @@ import {
   textFieldElementsStyle,
   messagesButtonStyle,
 } from './styles';
-import UserContext from '../common/user.context';
+import AppContext from '../common/app.context';
 
 export interface Message {
   sender: string;
@@ -25,7 +25,7 @@ export interface Message {
 const messagesPanelId = 'message-panel';
 
 const GroupChat = () => {
-  const { user } = useContext(UserContext);
+  const { user } = useContext(AppContext);
   const [isVisible, setIsVisible] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
@@ -38,11 +38,15 @@ const GroupChat = () => {
   }, [ messages ]);
 
   const handleSend = () => {
-    if (newMessage && user) {
-      const message = { sender: 'You', avatar: user.avatar, text: newMessage };
+    if (newMessage) {
+      if (!user) {
+        alert('Please login first');
+      } else {
+        const message = { sender: 'You', avatar: user.avatar, text: newMessage };
 
-      setMessages([ ...messages, message ]);
-      setNewMessage('');
+        setMessages([ ...messages, message ]);
+        setNewMessage('');
+      }
     }
   };
 

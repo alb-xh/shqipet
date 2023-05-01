@@ -2,7 +2,6 @@ import { Button } from "@mui/material";
 import { CSSProperties, useContext } from "react";
 
 import AppContext from "./app.context";
-import usersClient from "./usersClient";
 
 const style: CSSProperties = {
   position: 'absolute',
@@ -10,17 +9,13 @@ const style: CSSProperties = {
   right: '8px',
 };
 
-export default function Logout () {
-  const { setUser, setLoading } = useContext(AppContext);
+export default function Login () {
+  const { setLogin } = useContext(AppContext);
   const onClick = async () => {
-    setLoading(true);
-
-    await usersClient.logOut();
-
-    setUser(null);
+    setLogin(true);
   }
 
   return <Button variant="contained" style={style} onClick={onClick}>
-    Logout
+    Login
   </Button>;
 }

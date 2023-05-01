@@ -2,15 +2,17 @@ import { useState, useMemo, useEffect } from "react";
 
 import MainPage from "./main";
 import LoginPage from "./login";
-import UserContext from "./common/user.context";
+import AppContext from "./common/app.context";
 import Logo from './common/logo.component';
 import Logout from "./common/logout.component";
 import Loading from "./common/loading.component";
 import usersClient from "./common/usersClient";
+import Login from "./common/login.component";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [login, setLogin] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -27,16 +29,26 @@ function App() {
     }
   }, [user]);
 
-  const value = useMemo(() => ({ user, setUser, loading, setLoading }),[ user, loading ]);
+  const value = useMemo(() => ({
+    user,
+    setUser,
+    loading,
+    setLoading,
+    login,
+    setLogin,
+  }),[ user, loading, login ]);
 
   return (
-    <UserContext.Provider value={value as any}>
+    <AppContext.Provider value={value as any}>
       <Logo />
-      { !loading && user ? <Logout /> : null }
       { loading ? <Loading /> : null }
-      { !loading && !user ? <LoginPage /> : null }
-      { !loading && user ? <MainPage /> : null }
-    </UserContext.Provider>
+
+      { !loading && !user && !login ? <Login /> : null }
+      { !loading && !user && login ? <LoginPage /> : null }
+
+      { !loading && !login ? <MainPage /> : null }
+      { !loading && !login && user ? <Logout /> : null }
+    </AppContext.Provider>
   );
 }
 

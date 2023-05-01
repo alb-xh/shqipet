@@ -1,7 +1,7 @@
 import { useRef, useEffect, useContext } from 'react';
 
 import { googleSignInPanel } from './styles';
-import UserContext from '../common/user.context';
+import AppContext from '../common/app.context';
 import usersClient from '../common/usersClient';
 import { GOOGLE_CLIENT_ID } from '../config';
 
@@ -13,7 +13,7 @@ const googleButtonOptions = {
 };
 
 export default function GoogleSignIn () {
-  const { setUser, setLoading } = useContext(UserContext);
+  const { setUser, setLoading, setLogin } = useContext(AppContext);
   const ref = useRef(null);
 
   const callback = async (res: any, error: any) => {
@@ -24,8 +24,9 @@ export default function GoogleSignIn () {
 
       const user = await usersClient.signIn(res.credential);
 
-      setLoading(false);
       setUser(user);
+      setLogin(false);
+      setLoading(false);
     }
   };
 
