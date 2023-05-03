@@ -269,11 +269,9 @@ const geo_1 = __webpack_require__(9);
 const google_token_manager_service_1 = __webpack_require__(16);
 let MeController = class MeController {
     getMeInfo(req) {
-        var _a, _b;
+        var _a;
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            console.log(req.headers);
-            console.log((_a = req === null || req === void 0 ? void 0 : req.socket) === null || _a === void 0 ? void 0 : _a.remoteAddress);
-            const token = (_b = req === null || req === void 0 ? void 0 : req.body) === null || _b === void 0 ? void 0 : _b.token;
+            const token = (_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.token;
             const ip = this.domain !== 'localhost'
                 ? req.headers['x-real-ip'] || req.socket.remoteAddress
                 : '91.82.156.27';

@@ -29,14 +29,13 @@ exports.AppModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(2);
 const config_1 = __webpack_require__(5);
-const app_controller_1 = __webpack_require__(6);
-const app_service_1 = __webpack_require__(7);
-const envFilePath = process.env['NODE' + '_ENV'] === 'production' ? '.prod.env' : '.dev.env';
+const app_controller_1 = __webpack_require__(8);
+const app_service_1 = __webpack_require__(9);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule.forRoot({ envFilePath, isGlobal: true }),],
+        imports: [config_1.ConfigModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
@@ -46,12 +45,45 @@ exports.AppModule = AppModule;
 
 /***/ }),
 /* 5 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(6), exports);
+
+
+/***/ }),
+/* 6 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ConfigModule = void 0;
+const tslib_1 = __webpack_require__(1);
+const common_1 = __webpack_require__(2);
+const config_1 = __webpack_require__(7);
+const envFilePath = process.env['NODE' + '_ENV'] === 'production' ? '.prod.env' : '.dev.env';
+let ConfigModule = class ConfigModule {
+};
+ConfigModule = tslib_1.__decorate([
+    (0, common_1.Module)({
+        imports: [config_1.ConfigModule.forRoot({ isGlobal: true, envFilePath })],
+        providers: [config_1.ConfigService],
+        exports: [config_1.ConfigService],
+    })
+], ConfigModule);
+exports.ConfigModule = ConfigModule;
+
+
+/***/ }),
+/* 7 */
 /***/ ((module) => {
 
 module.exports = require("@nestjs/config");
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -60,7 +92,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppController = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(2);
-const app_service_1 = __webpack_require__(7);
+const app_service_1 = __webpack_require__(9);
 let AppController = class AppController {
     constructor(appService) {
         this.appService = appService;
@@ -83,7 +115,7 @@ exports.AppController = AppController;
 
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -144,7 +176,7 @@ const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(2);
 const core_1 = __webpack_require__(3);
 const app_module_1 = __webpack_require__(4);
-const config_1 = __webpack_require__(5);
+const config_1 = __webpack_require__(7);
 function bootstrap() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const app = yield core_1.NestFactory.create(app_module_1.AppModule);
