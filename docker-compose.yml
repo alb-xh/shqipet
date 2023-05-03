@@ -13,6 +13,8 @@ services:
         CMD [ "node", "main.js" ]
     ports:
       - "3000:3000"
+    volumes:
+      - ../../storage/geo/geo.mmdb:./geo.mmdb
     restart: always
   web:
     build:
