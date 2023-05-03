@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule } from '@shqipet/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-const envFilePath = process.env['NODE' + '_ENV'] === 'production' ? '.prod.env' : '.dev.env';
-
 @Module({
-  imports: [ConfigModule.forRoot({ envFilePath, isGlobal: true }),],
+  imports: [ConfigModule],
   controllers: [AppController],
   providers: [AppService],
 })

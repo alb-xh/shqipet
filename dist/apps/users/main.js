@@ -35,17 +35,13 @@ exports.AppModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(6);
-const geo_1 = __webpack_require__(7);
-const me_1 = __webpack_require__(13);
-const envFilePath = process.env['NODE' + '_ENV'] === 'production' ? '.prod.env' : '.dev.env';
+const geo_1 = __webpack_require__(9);
+const me_1 = __webpack_require__(15);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
     (0, common_1.Module)({
-        imports: [
-            config_1.ConfigModule.forRoot({ envFilePath, isGlobal: true }),
-            geo_1.GeoModule,
-        ],
+        imports: [config_1.ConfigModule, geo_1.GeoModule],
         controllers: [me_1.MeController],
         providers: [me_1.GoogleTokenManagerService],
     })
@@ -55,9 +51,13 @@ exports.AppModule = AppModule;
 
 /***/ }),
 /* 6 */
-/***/ ((module) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-module.exports = require("@nestjs/config");
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(7), exports);
+
 
 /***/ }),
 /* 7 */
@@ -65,13 +65,42 @@ module.exports = require("@nestjs/config");
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ConfigModule = void 0;
 const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(8), exports);
-tslib_1.__exportStar(__webpack_require__(9), exports);
+const common_1 = __webpack_require__(3);
+const config_1 = __webpack_require__(8);
+const envFilePath = process.env['NODE' + '_ENV'] === 'production' ? '.prod.env' : '.dev.env';
+let ConfigModule = class ConfigModule {
+};
+ConfigModule = tslib_1.__decorate([
+    (0, common_1.Module)({
+        imports: [config_1.ConfigModule.forRoot({ isGlobal: true, envFilePath })],
+        providers: [config_1.ConfigService],
+        exports: [config_1.ConfigService],
+    })
+], ConfigModule);
+exports.ConfigModule = ConfigModule;
 
 
 /***/ }),
 /* 8 */
+/***/ ((module) => {
+
+module.exports = require("@nestjs/config");
+
+/***/ }),
+/* 9 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(10), exports);
+tslib_1.__exportStar(__webpack_require__(11), exports);
+
+
+/***/ }),
+/* 10 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -79,7 +108,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GeoModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
-const geo_service_1 = __webpack_require__(9);
+const geo_service_1 = __webpack_require__(11);
 let GeoModule = class GeoModule {
 };
 GeoModule = tslib_1.__decorate([
@@ -92,7 +121,7 @@ exports.GeoModule = GeoModule;
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -100,11 +129,11 @@ var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GeoService = void 0;
 const tslib_1 = __webpack_require__(1);
-const path_1 = __webpack_require__(10);
-const fs_1 = __webpack_require__(11);
+const path_1 = __webpack_require__(12);
+const fs_1 = __webpack_require__(13);
 const common_1 = __webpack_require__(3);
-const config_1 = __webpack_require__(6);
-const geoip2_node_1 = __webpack_require__(12);
+const config_1 = __webpack_require__(8);
+const geoip2_node_1 = __webpack_require__(14);
 let GeoService = class GeoService {
     constructor(configService) {
         const path = configService.getOrThrow('GEO_DB_PATH');
@@ -132,38 +161,38 @@ exports.GeoService = GeoService;
 
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ ((module) => {
 
 module.exports = require("path");
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ ((module) => {
 
 module.exports = require("fs");
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ ((module) => {
 
 module.exports = require("@maxmind/geoip2-node");
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MeController = exports.GoogleTokenManagerService = void 0;
-var google_token_manager_service_1 = __webpack_require__(14);
+var google_token_manager_service_1 = __webpack_require__(16);
 Object.defineProperty(exports, "GoogleTokenManagerService", ({ enumerable: true, get: function () { return google_token_manager_service_1.GoogleTokenManagerService; } }));
-var controller_1 = __webpack_require__(17);
+var controller_1 = __webpack_require__(19);
 Object.defineProperty(exports, "MeController", ({ enumerable: true, get: function () { return controller_1.MeController; } }));
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -171,10 +200,10 @@ var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GoogleTokenManagerService = void 0;
 const tslib_1 = __webpack_require__(1);
-const axios_1 = tslib_1.__importDefault(__webpack_require__(15));
+const axios_1 = tslib_1.__importDefault(__webpack_require__(17));
 const common_1 = __webpack_require__(3);
-const config_1 = __webpack_require__(6);
-const google_auth_library_1 = __webpack_require__(16);
+const config_1 = __webpack_require__(8);
+const google_auth_library_1 = __webpack_require__(18);
 let GoogleTokenManagerService = class GoogleTokenManagerService {
     constructor(configService) {
         const clientId = configService.getOrThrow('GOOGLE_CLIENT_ID');
@@ -213,19 +242,19 @@ exports.GoogleTokenManagerService = GoogleTokenManagerService;
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ ((module) => {
 
 module.exports = require("axios");
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ ((module) => {
 
 module.exports = require("google-auth-library");
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -234,10 +263,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MeController = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
-const express_1 = __webpack_require__(18);
-const config_1 = __webpack_require__(6);
-const geo_1 = __webpack_require__(7);
-const google_token_manager_service_1 = __webpack_require__(14);
+const express_1 = __webpack_require__(20);
+const config_1 = __webpack_require__(8);
+const geo_1 = __webpack_require__(9);
+const google_token_manager_service_1 = __webpack_require__(16);
 let MeController = class MeController {
     getMeInfo(req) {
         var _a, _b;
@@ -321,7 +350,7 @@ exports.MeController = MeController;
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ ((module) => {
 
 module.exports = require("express");
@@ -369,7 +398,7 @@ const cookie_parser_1 = tslib_1.__importDefault(__webpack_require__(2));
 const common_1 = __webpack_require__(3);
 const core_1 = __webpack_require__(4);
 const app_module_1 = __webpack_require__(5);
-const config_1 = __webpack_require__(6);
+const config_1 = __webpack_require__(8);
 function bootstrap() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const app = yield core_1.NestFactory.create(app_module_1.AppModule);

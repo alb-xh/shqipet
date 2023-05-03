@@ -16,9 +16,6 @@ export class MeController {
   }
 
   private async getMeInfo (req: Request): Promise<UserInfo & { geo: GeoInfo }> {
-    console.log(req.headers);
-    console.log(req?.socket?.remoteAddress);
-
     const token = req?.body?.token;
     const ip = this.domain !== 'localhost'
       ? req.headers['x-real-ip'] as string || req.socket.remoteAddress
