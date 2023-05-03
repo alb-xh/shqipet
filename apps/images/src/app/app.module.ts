@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@shqipet/config';
 
-import { AppController } from './app.controller';
+import { AppController } from './iam.controller';
 import { AppService } from './app.service';
 
 @Module({

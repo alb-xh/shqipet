@@ -42,3 +42,4 @@ Thumbs.db
 
 # folders
 *.mmdb
+/images
