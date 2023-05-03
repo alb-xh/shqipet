@@ -19,6 +19,7 @@ jobs:
           rm -rf shqipet
           git clone git@github.com:alb-xh/shqipet.git
           cd shqipet
+          cp ~/storage/geo/geo.mmdb ./geo.mmdb
           echo "${{ vars.CONFIG }}" >> .prod.env
           nvm install
           npm install --omit=dev

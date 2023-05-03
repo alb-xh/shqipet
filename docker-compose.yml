@@ -7,14 +7,12 @@ services:
         FROM node:18.16.0-alpine
         WORKDIR /usr/src/app
         COPY ./node_modules ./node_modules
-        COPY ./dist/apps/users package.json .prod.env ../../storage/geo/geo.mmdb .
+        COPY ./dist/apps/users package.json .prod.env geo.mmdb .
         ENV NODE_ENV production
         EXPOSE 3000
         CMD [ "node", "main.js" ]
     ports:
       - "3000:3000"
-    volumes:
-      - ../../storage/geo/geo.mmdb:./geo.mmdb
     restart: always
   web:
     build:
