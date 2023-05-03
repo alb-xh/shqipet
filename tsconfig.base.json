@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@shqipet/config": ["libs/config/src/index.ts"],
       "@shqipet/geo": ["libs/geo/src/index.ts"]
     }
   },
