@@ -76,7 +76,7 @@ const GroupChat = () => {
           (messages).map((message, i) => (
             <div key={i} style={messageStyle}>
               <Avatar sx={avatarStyle}
-                src={`data:image/jpeg;base64,${message.avatar}`}
+                src={message.avatar}
                 alt={`${message.sender} avatar`}
               />
               <div>

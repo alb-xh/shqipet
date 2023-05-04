@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 export class ImagesStorageService {
   private readonly imagesDir: string;
   private readonly domain: string;
+  private readonly extension = 'png';
 
   constructor (configService: ConfigService) {
     this.domain = configService.getOrThrow('DOMAIN');
@@ -31,23 +32,10 @@ export class ImagesStorageService {
     return join(this.imagesDir, name);
   }
 
-  private getNameFromPath (path: string): string {
-    return path.replace(/\//g, '__');
-  }
+  private getExternalUrlName (url: string): string {
+    const identifier = new URL(url).pathname.replace(/\//g, '__');
 
-  private getNameFromUrl (url: string): string {
-    return this.getNameFromPath(new URL(url).pathname);
-  }
-
-  private getImageUrl (name: string): string {
-    return this.domain !== 'localhost'
-      ? `https://${this.domain}/${name}`
-      : `http://localhost:4000/${name}`;
-  }
-
-  async fetchUrl (url: string): Promise<fs.ReadStream> {
-    const { data } = await axios.get(url, { responseType: 'stream' });
-    return data;
+    return `${identifier}.${this.extension}`;
   }
 
   async readByName (name: string): Promise<fs.ReadStream> {
@@ -58,29 +46,35 @@ export class ImagesStorageService {
       throw new NotFoundException();
     }
 
-    return fs.createReadStream(path, { encoding: 'binary' });
+    return fs.createReadStream(path);
   }
 
-  async readByPath (path: string): Promise<fs.ReadStream> {
-    return await this.readByName(this.getNameFromPath(path));
+  private getImageUrl (name: string): string {
+    return this.domain !== 'localhost'
+      ? `https://${this.domain}/images/${name}`
+      : `http://localhost:4000/images/${name}`;
   }
 
-  async readByUrl (url: string): Promise<fs.ReadStream> {
-    return await this.readByName(this.getNameFromUrl(url));
+  async fetchUrl (url: string): Promise<fs.ReadStream> {
+    const { data } = await axios.get(url, { responseType: 'stream' });
+    return data;
   }
 
   async saveBySteam (stream: fs.ReadStream, name: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      const writeStream = fs.createWriteStream(this.getPath(name), { encoding: 'binary' });
+      const path = this.getPath(name);
+      const url = this.getImageUrl(name);
+
+      const writeStream = fs.createWriteStream(path);
 
       stream.pipe(writeStream)
         .on('error', reject)
-        .on('finish', () => resolve(this.getImageUrl(name)));
+        .on('finish', () => resolve(url));
     });
   }
 
   async saveByUrl (url: string, name?: string): Promise<string> {
-    const filename = name || this.getNameFromUrl(url);
+    const filename = name || this.getExternalUrlName(url);
 
     const stream = await this.fetchUrl(url) ;
     const imageUrl = await this.saveBySteam(stream, filename);

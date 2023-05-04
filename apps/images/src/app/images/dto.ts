@@ -7,5 +7,5 @@ export class CreateImageDto {
 
 export class GetImageParamsDto {
   @IsString()
-  path: string;
+  name: string;
 }

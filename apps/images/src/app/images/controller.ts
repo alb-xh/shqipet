@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { Body, Controller, Post, Res, Get, Param } from '@nestjs/common';
+import { Body, Controller, Post, Res, Get, Param, Header } from '@nestjs/common';
 import { ImagesStorageService } from '@shqipet/storage';
 
 import { CreateImageDto, GetImageParamsDto } from './dto';
@@ -17,11 +17,12 @@ export class ImagesController {
     return { name };
   }
 
-  @Get(':path')
+  @Get(':name')
+  @Header('Content-Type', 'image/png')
   async getImage (@Param() params: GetImageParamsDto, @Res() res: Response) {
-    const { path } = params;
+    const { name } = params;
 
-    const stream = await this.imageStorageService.readByPath(path);
+    const stream = await this.imageStorageService.readByName(name);
 
     stream.pipe(res);
   }

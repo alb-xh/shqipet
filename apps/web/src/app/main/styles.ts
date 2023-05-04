@@ -7,6 +7,7 @@ export const showButtonStyle: CSSProperties = {
 };
 
 export const groupChatStyle: CSSProperties = {
+  zIndex: 1000,
   position: 'fixed',
   bottom: 16,
   right: 16,

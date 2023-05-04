@@ -29,14 +29,15 @@ exports.AppModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(2);
 const config_1 = __webpack_require__(5);
-const images_1 = __webpack_require__(8);
+const storage_1 = __webpack_require__(8);
+const images_1 = __webpack_require__(15);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule],
+        imports: [config_1.ConfigModule, storage_1.StorageModule],
         controllers: [images_1.ImagesController],
-        providers: [images_1.ImagesService],
+        providers: [],
     })
 ], AppModule);
 exports.AppModule = AppModule;
@@ -87,11 +88,9 @@ module.exports = require("@nestjs/config");
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ImagesService = exports.ImagesController = void 0;
-var controller_1 = __webpack_require__(9);
-Object.defineProperty(exports, "ImagesController", ({ enumerable: true, get: function () { return controller_1.ImagesController; } }));
-var service_1 = __webpack_require__(11);
-Object.defineProperty(exports, "ImagesService", ({ enumerable: true, get: function () { return service_1.ImagesService; } }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(9), exports);
+tslib_1.__exportStar(__webpack_require__(10), exports);
 
 
 /***/ }),
@@ -99,80 +98,44 @@ Object.defineProperty(exports, "ImagesService", ({ enumerable: true, get: functi
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ImagesController = void 0;
+exports.StorageModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(2);
-const express_1 = __webpack_require__(10);
-const service_1 = __webpack_require__(11);
-const dto_1 = __webpack_require__(16);
-let ImagesController = class ImagesController {
-    constructor(imageService) {
-        this.imageService = imageService;
-    }
-    createImage(body) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const { url } = body;
-            const name = yield this.imageService.saveByUrl(url);
-            return { name };
-        });
-    }
-    getImage(params, res) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const { path } = params;
-            const stream = yield this.imageService.readByPath(path);
-            stream.pipe(res);
-        });
-    }
+const images_storage_service_1 = __webpack_require__(10);
+let StorageModule = class StorageModule {
 };
-tslib_1.__decorate([
-    (0, common_1.Post)(),
-    tslib_1.__param(0, (0, common_1.Body)()),
-    tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_b = typeof dto_1.CreateImageDto !== "undefined" && dto_1.CreateImageDto) === "function" ? _b : Object]),
-    tslib_1.__metadata("design:returntype", Promise)
-], ImagesController.prototype, "createImage", null);
-tslib_1.__decorate([
-    (0, common_1.Get)(':path'),
-    tslib_1.__param(0, (0, common_1.Param)()),
-    tslib_1.__param(1, (0, common_1.Res)()),
-    tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_c = typeof dto_1.GetImageParamsDto !== "undefined" && dto_1.GetImageParamsDto) === "function" ? _c : Object, typeof (_d = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _d : Object]),
-    tslib_1.__metadata("design:returntype", Promise)
-], ImagesController.prototype, "getImage", null);
-ImagesController = tslib_1.__decorate([
-    (0, common_1.Controller)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof service_1.ImagesService !== "undefined" && service_1.ImagesService) === "function" ? _a : Object])
-], ImagesController);
-exports.ImagesController = ImagesController;
+StorageModule = tslib_1.__decorate([
+    (0, common_1.Module)({
+        controllers: [],
+        providers: [images_storage_service_1.ImagesStorageService],
+        exports: [images_storage_service_1.ImagesStorageService],
+    })
+], StorageModule);
+exports.StorageModule = StorageModule;
 
 
 /***/ }),
 /* 10 */
-/***/ ((module) => {
-
-module.exports = require("express");
-
-/***/ }),
-/* 11 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ImagesService = void 0;
+exports.ImagesStorageService = void 0;
 const tslib_1 = __webpack_require__(1);
-const fs_1 = tslib_1.__importDefault(__webpack_require__(12));
-const promises_1 = __webpack_require__(13);
-const axios_1 = tslib_1.__importDefault(__webpack_require__(14));
-const path_1 = __webpack_require__(15);
+const fs = tslib_1.__importStar(__webpack_require__(11));
+const promises_1 = __webpack_require__(12);
+const axios_1 = tslib_1.__importDefault(__webpack_require__(13));
+const path_1 = __webpack_require__(14);
 const common_1 = __webpack_require__(2);
 const config_1 = __webpack_require__(7);
-let ImagesService = class ImagesService {
+let ImagesStorageService = class ImagesStorageService {
     constructor(configService) {
-        this.imagesDir = configService.getOrThrow('IMAGES_DIR');
+        this.extension = 'png';
         this.domain = configService.getOrThrow('DOMAIN');
+        const dir = configService.getOrThrow('IMAGES_DIR');
+        this.imagesDir = (0, path_1.join)(process.cwd(), dir);
     }
     exists(path) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -188,22 +151,9 @@ let ImagesService = class ImagesService {
     getPath(name) {
         return (0, path_1.join)(this.imagesDir, name);
     }
-    getNameFromPath(path) {
-        return path.replace(/\//g, '__');
-    }
-    getNameFromUrl(url) {
-        return this.getNameFromPath(new URL(url).pathname);
-    }
-    getImageUrl(name) {
-        return this.domain !== 'localhost'
-            ? `https://${this.domain}/${name}`
-            : `http://localhost:4000/${name}`;
-    }
-    fetchUrl(url) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const { data } = yield axios_1.default.get(url, { responseType: 'stream' });
-            return data;
-        });
+    getExternalUrlName(url) {
+        const identifier = new URL(url).pathname.replace(/\//g, '__');
+        return `${identifier}.${this.extension}`;
     }
     readByName(name) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -212,78 +162,153 @@ let ImagesService = class ImagesService {
             if (!exists) {
                 throw new common_1.NotFoundException();
             }
-            return fs_1.default.createReadStream(path, { encoding: 'binary' });
+            return fs.createReadStream(path);
         });
     }
-    readByPath(path) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return yield this.readByName(this.getNameFromPath(path));
-        });
+    getImageUrl(name) {
+        return this.domain !== 'localhost'
+            ? `https://${this.domain}/images/${name}`
+            : `http://localhost:4000/images/${name}`;
     }
-    readByUrl(url) {
+    fetchUrl(url) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return yield this.readByName(this.getNameFromUrl(url));
+            const { data } = yield axios_1.default.get(url, { responseType: 'stream' });
+            return data;
         });
     }
     saveBySteam(stream, name) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
-                const writeStream = fs_1.default.createWriteStream(this.getPath(name), { encoding: 'binary' });
+                const path = this.getPath(name);
+                const url = this.getImageUrl(name);
+                const writeStream = fs.createWriteStream(path);
                 stream.pipe(writeStream)
                     .on('error', reject)
-                    .on('finish', () => resolve(this.getImageUrl(name)));
+                    .on('finish', () => resolve(url));
             });
         });
     }
     saveByUrl(url, name) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const filename = name || this.getNameFromUrl(url);
+            const filename = name || this.getExternalUrlName(url);
             const stream = yield this.fetchUrl(url);
             const imageUrl = yield this.saveBySteam(stream, filename);
             return imageUrl;
         });
     }
 };
-ImagesService = tslib_1.__decorate([
+ImagesStorageService = tslib_1.__decorate([
     (0, common_1.Injectable)(),
     tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _a : Object])
-], ImagesService);
-exports.ImagesService = ImagesService;
+], ImagesStorageService);
+exports.ImagesStorageService = ImagesStorageService;
 
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ ((module) => {
 
 module.exports = require("fs");
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ ((module) => {
 
 module.exports = require("fs/promises");
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ ((module) => {
 
 module.exports = require("axios");
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ ((module) => {
 
 module.exports = require("path");
+
+/***/ }),
+/* 15 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ImagesController = void 0;
+var controller_1 = __webpack_require__(16);
+Object.defineProperty(exports, "ImagesController", ({ enumerable: true, get: function () { return controller_1.ImagesController; } }));
+
 
 /***/ }),
 /* 16 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
+var _a, _b, _c, _d;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ImagesController = void 0;
+const tslib_1 = __webpack_require__(1);
+const express_1 = __webpack_require__(17);
+const common_1 = __webpack_require__(2);
+const storage_1 = __webpack_require__(8);
+const dto_1 = __webpack_require__(18);
+let ImagesController = class ImagesController {
+    constructor(imageStorageService) {
+        this.imageStorageService = imageStorageService;
+    }
+    createImage(body) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { url } = body;
+            const name = yield this.imageStorageService.saveByUrl(url);
+            return { name };
+        });
+    }
+    getImage(params, res) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { name } = params;
+            const stream = yield this.imageStorageService.readByName(name);
+            stream.pipe(res);
+        });
+    }
+};
+tslib_1.__decorate([
+    (0, common_1.Post)(),
+    tslib_1.__param(0, (0, common_1.Body)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [typeof (_b = typeof dto_1.CreateImageDto !== "undefined" && dto_1.CreateImageDto) === "function" ? _b : Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], ImagesController.prototype, "createImage", null);
+tslib_1.__decorate([
+    (0, common_1.Get)(':name'),
+    (0, common_1.Header)('Content-Type', 'image/png'),
+    tslib_1.__param(0, (0, common_1.Param)()),
+    tslib_1.__param(1, (0, common_1.Res)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [typeof (_c = typeof dto_1.GetImageParamsDto !== "undefined" && dto_1.GetImageParamsDto) === "function" ? _c : Object, typeof (_d = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _d : Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], ImagesController.prototype, "getImage", null);
+ImagesController = tslib_1.__decorate([
+    (0, common_1.Controller)(),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof storage_1.ImagesStorageService !== "undefined" && storage_1.ImagesStorageService) === "function" ? _a : Object])
+], ImagesController);
+exports.ImagesController = ImagesController;
+
+
+/***/ }),
+/* 17 */
+/***/ ((module) => {
+
+module.exports = require("express");
+
+/***/ }),
+/* 18 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GetImageParamsDto = exports.CreateImageDto = void 0;
 const tslib_1 = __webpack_require__(1);
-const class_validator_1 = __webpack_require__(17);
+const class_validator_1 = __webpack_require__(19);
 class CreateImageDto {
 }
 tslib_1.__decorate([
@@ -296,12 +321,12 @@ class GetImageParamsDto {
 tslib_1.__decorate([
     (0, class_validator_1.IsString)(),
     tslib_1.__metadata("design:type", String)
-], GetImageParamsDto.prototype, "path", void 0);
+], GetImageParamsDto.prototype, "name", void 0);
 exports.GetImageParamsDto = GetImageParamsDto;
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ ((module) => {
 
 module.exports = require("class-validator");

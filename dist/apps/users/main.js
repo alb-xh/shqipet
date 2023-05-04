@@ -37,6 +37,7 @@ const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(6);
 const geo_1 = __webpack_require__(9);
 const me_1 = __webpack_require__(15);
+const storage_1 = __webpack_require__(21);
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(me_1.IpMiddleware)
@@ -45,7 +46,7 @@ let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule, geo_1.GeoModule],
+        imports: [config_1.ConfigModule, geo_1.GeoModule, storage_1.StorageModule],
         controllers: [me_1.MeController],
         providers: [me_1.IpMiddleware, me_1.GoogleTokenManagerService, me_1.UsersService],
     })
@@ -195,7 +196,7 @@ var controller_1 = __webpack_require__(18);
 Object.defineProperty(exports, "MeController", ({ enumerable: true, get: function () { return controller_1.MeController; } }));
 var service_1 = __webpack_require__(20);
 Object.defineProperty(exports, "UsersService", ({ enumerable: true, get: function () { return service_1.UsersService; } }));
-var ip_middleware_1 = __webpack_require__(21);
+var ip_middleware_1 = __webpack_require__(26);
 Object.defineProperty(exports, "IpMiddleware", ({ enumerable: true, get: function () { return ip_middleware_1.IpMiddleware; } }));
 
 
@@ -343,29 +344,38 @@ module.exports = require("express");
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b;
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UsersService = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
 const geo_1 = __webpack_require__(9);
+const storage_1 = __webpack_require__(21);
 const google_token_manager_service_1 = __webpack_require__(16);
 let UsersService = class UsersService {
-    constructor(googleTokenManagerService, geoService) {
+    constructor(googleTokenManagerService, imagesStorageService, geoService) {
         this.googleTokenManagerService = googleTokenManagerService;
+        this.imagesStorageService = imagesStorageService;
         this.geoService = geoService;
     }
     getUser(data) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const userInfo = yield this.googleTokenManagerService.getUserInfo(data.token);
             const geoInfo = this.geoService.getInfo(data.ip);
-            return Object.assign(Object.assign({}, userInfo), { geo: geoInfo });
+            const { name, avatar } = yield this.googleTokenManagerService.getUserInfo(data.token);
+            const ourAvatar = avatar
+                ? yield this.imagesStorageService.saveByUrl(avatar)
+                : null;
+            return {
+                geo: geoInfo,
+                avatar: ourAvatar,
+                name,
+            };
         });
     }
 };
 UsersService = tslib_1.__decorate([
     (0, common_1.Injectable)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof google_token_manager_service_1.GoogleTokenManagerService !== "undefined" && google_token_manager_service_1.GoogleTokenManagerService) === "function" ? _a : Object, typeof (_b = typeof geo_1.GeoService !== "undefined" && geo_1.GeoService) === "function" ? _b : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof google_token_manager_service_1.GoogleTokenManagerService !== "undefined" && google_token_manager_service_1.GoogleTokenManagerService) === "function" ? _a : Object, typeof (_b = typeof storage_1.ImagesStorageService !== "undefined" && storage_1.ImagesStorageService) === "function" ? _b : Object, typeof (_c = typeof geo_1.GeoService !== "undefined" && geo_1.GeoService) === "function" ? _c : Object])
 ], UsersService);
 exports.UsersService = UsersService;
 ;
@@ -373,6 +383,140 @@ exports.UsersService = UsersService;
 
 /***/ }),
 /* 21 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(22), exports);
+tslib_1.__exportStar(__webpack_require__(23), exports);
+
+
+/***/ }),
+/* 22 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StorageModule = void 0;
+const tslib_1 = __webpack_require__(1);
+const common_1 = __webpack_require__(3);
+const images_storage_service_1 = __webpack_require__(23);
+let StorageModule = class StorageModule {
+};
+StorageModule = tslib_1.__decorate([
+    (0, common_1.Module)({
+        controllers: [],
+        providers: [images_storage_service_1.ImagesStorageService],
+        exports: [images_storage_service_1.ImagesStorageService],
+    })
+], StorageModule);
+exports.StorageModule = StorageModule;
+
+
+/***/ }),
+/* 23 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ImagesStorageService = void 0;
+const tslib_1 = __webpack_require__(1);
+const fs = tslib_1.__importStar(__webpack_require__(13));
+const promises_1 = __webpack_require__(24);
+const axios_1 = tslib_1.__importDefault(__webpack_require__(25));
+const path_1 = __webpack_require__(12);
+const common_1 = __webpack_require__(3);
+const config_1 = __webpack_require__(8);
+let ImagesStorageService = class ImagesStorageService {
+    constructor(configService) {
+        this.extension = 'png';
+        this.domain = configService.getOrThrow('DOMAIN');
+        const dir = configService.getOrThrow('IMAGES_DIR');
+        this.imagesDir = (0, path_1.join)(process.cwd(), dir);
+    }
+    exists(path) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            try {
+                yield (0, promises_1.access)(path);
+                return true;
+            }
+            catch (_a) {
+                return false;
+            }
+        });
+    }
+    getPath(name) {
+        return (0, path_1.join)(this.imagesDir, name);
+    }
+    getExternalUrlName(url) {
+        const identifier = new URL(url).pathname.replace(/\//g, '__');
+        return `${identifier}.${this.extension}`;
+    }
+    readByName(name) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const path = this.getPath(name);
+            const exists = yield this.exists(path);
+            if (!exists) {
+                throw new common_1.NotFoundException();
+            }
+            return fs.createReadStream(path);
+        });
+    }
+    getImageUrl(name) {
+        return this.domain !== 'localhost'
+            ? `https://${this.domain}/images/${name}`
+            : `http://localhost:4000/images/${name}`;
+    }
+    fetchUrl(url) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { data } = yield axios_1.default.get(url, { responseType: 'stream' });
+            return data;
+        });
+    }
+    saveBySteam(stream, name) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                const path = this.getPath(name);
+                const url = this.getImageUrl(name);
+                const writeStream = fs.createWriteStream(path);
+                stream.pipe(writeStream)
+                    .on('error', reject)
+                    .on('finish', () => resolve(url));
+            });
+        });
+    }
+    saveByUrl(url, name) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const filename = name || this.getExternalUrlName(url);
+            const stream = yield this.fetchUrl(url);
+            const imageUrl = yield this.saveBySteam(stream, filename);
+            return imageUrl;
+        });
+    }
+};
+ImagesStorageService = tslib_1.__decorate([
+    (0, common_1.Injectable)(),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _a : Object])
+], ImagesStorageService);
+exports.ImagesStorageService = ImagesStorageService;
+
+
+/***/ }),
+/* 24 */
+/***/ ((module) => {
+
+module.exports = require("fs/promises");
+
+/***/ }),
+/* 25 */
+/***/ ((module) => {
+
+module.exports = require("axios");
+
+/***/ }),
+/* 26 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
