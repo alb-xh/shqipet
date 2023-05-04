@@ -1,11 +1,9 @@
 import { Module } from '@nestjs/common';
-
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { GeoMapService } from './geo-map.service';
+import { ChatGateway } from './chat.gateway';
 
 @Module({
   imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [ GeoMapService, ChatGateway ],
 })
 export class AppModule {}
