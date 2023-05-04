@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@shqipet/config": ["libs/config/src/index.ts"],
-      "@shqipet/geo": ["libs/geo/src/index.ts"]
+      "@shqipet/geo": ["libs/geo/src/index.ts"],
+      "@shqipet/storage": ["libs/storage/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
