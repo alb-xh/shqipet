@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@shqipet/config';
 
-import { AppController } from './iam.controller';
-import { AppService } from './app.service';
+import { ImagesController, ImagesService } from './images';
 
 @Module({
   imports: [ConfigModule],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [ImagesController],
+  providers: [ImagesService],
 })
 export class AppModule {}

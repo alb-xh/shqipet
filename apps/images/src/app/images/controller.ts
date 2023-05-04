@@ -9,16 +9,20 @@ export class ImagesController {
   constructor(private readonly imageService: ImagesService) {}
 
   @Post()
-  async createImage (@Body() body: CreateImageDto, @Res() res: Response) {
+  async createImage (@Body() body: CreateImageDto) {
     const { url } = body;
 
-    const name = await this.imageService.saveFromUrl(url);
+    const name = await this.imageService.saveByUrl(url);
+
+    return { name };
   }
 
   @Get(':path')
-  async getImage (@Param() params: GetImageParamsDto, res: Response) {
+  async getImage (@Param() params: GetImageParamsDto, @Res() res: Response) {
     const { path } = params;
 
-    const stream = readFrom()
+    const stream = await this.imageService.readByPath(path);
+
+    stream.pipe(res);
   }
 }

@@ -24,15 +24,19 @@ export class ImagesService {
     }
   }
 
-  private getFilePath (name: string): string {
+  private getPath (name: string): string {
     return join(this.imagesDir, name);
   }
 
-  private getNameFromUrl (url: string): string {
-    return new URL(url).pathname.replace(/\//g, '__');
+  private getNameFromPath (path: string): string {
+    return path.replace(/\//g, '__');
   }
 
-  private getResourceUrl (name: string): string {
+  private getNameFromUrl (url: string): string {
+    return this.getNameFromPath(new URL(url).pathname);
+  }
+
+  private getImageUrl (name: string): string {
     return this.domain !== 'localhost'
       ? `https://${this.domain}/${name}`
       : `http://localhost:4000/${name}`;
@@ -43,8 +47,8 @@ export class ImagesService {
     return data;
   }
 
-  async readFromStream (name: string): Promise<ReadStream> {
-    const path = this.getFilePath(name);
+  async readByName (name: string): Promise<ReadStream> {
+    const path = this.getPath(name);
 
     const exists = await this.exists(path);
     if (!exists) {
@@ -54,26 +58,30 @@ export class ImagesService {
     return fs.createReadStream(path, { encoding: 'binary' });
   }
 
-  async readFromUrl (url: string): Promise<ReadStream> {
-    return await this.readFromStream(this.getNameFromUrl(url));
+  async readByPath (path: string): Promise<ReadStream> {
+    return await this.readByName(this.getNameFromPath(path));
   }
 
-  async saveFromSteam (stream: ReadStream, name: string): Promise<string> {
+  async readByUrl (url: string): Promise<ReadStream> {
+    return await this.readByName(this.getNameFromUrl(url));
+  }
+
+  async saveBySteam (stream: ReadStream, name: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      const writeStream = fs.createWriteStream(this.getFilePath(name), { encoding: 'binary' });
+      const writeStream = fs.createWriteStream(this.getPath(name), { encoding: 'binary' });
 
       stream.pipe(writeStream)
         .on('error', reject)
-        .on('finish', () => resolve(this.getResourceUrl(name)));
+        .on('finish', () => resolve(this.getImageUrl(name)));
     });
   }
 
-  async saveFromUrl (url: string, name?: string): Promise<string> {
+  async saveByUrl (url: string, name?: string): Promise<string> {
     const filename = name || this.getNameFromUrl(url);
 
     const stream = await this.fetchUrl(url) ;
-    await this.saveFromSteam(stream, filename);
+    const imageUrl = await this.saveBySteam(stream, filename);
 
-    return filename;
+    return imageUrl;
   }
 }
