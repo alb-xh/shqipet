@@ -4,6 +4,8 @@ import { Geo } from './usersClient';
 import { CHAT_ENDPOINT_URL } from '../config';
 
 export enum Event {
+  AddUser = 'add_user',
+  RemoveUser = 'remove_user',
   UpdateUsers = 'update_users',
   NewMessage = 'new_message',
 };
@@ -15,18 +17,25 @@ class ChatSocket {
   private readonly socket: Socket;
 
   constructor (url: string) {
-    this.socket = io(url, { autoConnect: false });
+    const { origin, pathname } = new URL(url);
+    this.socket = io(origin, { autoConnect: false, path: pathname });
   };
 
   async onUpdateUsers (cb: (usersMap: UsersMap) => void) {
     this.socket.on(Event.UpdateUsers, cb);
   }
 
-  connect () {
+  isConnected (): boolean {
+    return this.socket.connected;
+  }
+
+  connect (user: UserData) {
     this.socket.connect();
+    this.socket.emit(Event.AddUser, user);
   }
 
   disconnect () {
+    this.socket.emit(Event.RemoveUser);
     this.socket.disconnect();
   }
 }

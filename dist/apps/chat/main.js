@@ -87,7 +87,7 @@ exports.UsersMap = UsersMap;
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b;
+var _a, _b, _c, _d, _e;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChatGateway = void 0;
 const tslib_1 = __webpack_require__(1);
@@ -99,13 +99,14 @@ let ChatGateway = class ChatGateway {
     constructor(users) {
         this.users = users;
     }
-    handleConnection(client, data) {
+    addUser(client, data) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            console.log(data);
             this.server.emit(events_1.Event.UpdateUsers, this.users.add(client.id, data)
                 .getAll());
         });
     }
-    handleDisconnect(client) {
+    removeUser(client) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             this.server.emit(events_1.Event.UpdateUsers, this.users.remove(client.id)
                 .getAll());
@@ -116,6 +117,18 @@ tslib_1.__decorate([
     (0, websockets_1.WebSocketServer)(),
     tslib_1.__metadata("design:type", typeof (_b = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _b : Object)
 ], ChatGateway.prototype, "server", void 0);
+tslib_1.__decorate([
+    (0, websockets_1.SubscribeMessage)(events_1.Event.AddUser),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [typeof (_c = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _c : Object, typeof (_d = typeof users_map_1.UserData !== "undefined" && users_map_1.UserData) === "function" ? _d : Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], ChatGateway.prototype, "addUser", null);
+tslib_1.__decorate([
+    (0, websockets_1.SubscribeMessage)(events_1.Event.RemoveUser),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [typeof (_e = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _e : Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], ChatGateway.prototype, "removeUser", null);
 ChatGateway = tslib_1.__decorate([
     (0, websockets_1.WebSocketGateway)({ path: '/chat', cors: { origin: '*' } }),
     tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof users_map_1.UsersMap !== "undefined" && users_map_1.UsersMap) === "function" ? _a : Object])
@@ -144,6 +157,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Event = void 0;
 var Event;
 (function (Event) {
+    Event["AddUser"] = "add_user";
+    Event["RemoveUser"] = "remove_user";
     Event["UpdateUsers"] = "update_users";
     Event["NewMessage"] = "new_message";
 })(Event = exports.Event || (exports.Event = {}));

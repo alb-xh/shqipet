@@ -16,6 +16,7 @@ export default function Earth () {
   const [markers, setMarkers] = useState([]);
 
   chatSocket.onUpdateUsers((usersMap) => {
+    console.log(usersMap);
     const newMarkers = [];
 
     for (const { geo } of Object.values(usersMap)) {

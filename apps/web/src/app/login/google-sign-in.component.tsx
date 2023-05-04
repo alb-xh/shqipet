@@ -3,7 +3,6 @@ import { useRef, useEffect, useContext } from 'react';
 import { googleSignInPanel } from './styles';
 import AppContext from '../common/app.context';
 import usersClient from '../common/usersClient';
-import chatSocket from '../common/chat.socket';
 
 import { GOOGLE_CLIENT_ID } from '../config';
 
@@ -25,7 +24,6 @@ export default function GoogleSignIn () {
       setLoading(true);
 
       const user = await usersClient.signIn(res.credential);
-      chatSocket.connect();
 
       setUser(user);
       setLogin(false);
