@@ -1,9 +1,8 @@
+import { Response, Request, CookieOptions} from 'express';
 import { Controller, Delete, ForbiddenException, Get, Post, Req, Res } from '@nestjs/common';
-import { Response, Request, CookieOptions} from 'express'
 import { ConfigService } from '@nestjs/config';
-import { GeoInfo, GeoService } from '@shqipet/geo';
 
-import { UserInfo, GoogleTokenManagerService } from './google-token-manager.service';
+import { UsersService } from './service';
 
 @Controller('/me')
 export class MeController {
@@ -15,28 +14,8 @@ export class MeController {
     sameSite: true,
   }
 
-  private async getMeInfo (req: Request): Promise<UserInfo & { geo: GeoInfo }> {
-    const token = req?.body?.token;
-    const ip = this.domain !== 'localhost'
-      ? req.headers['x-real-ip'] as string || req.socket.remoteAddress
-      : '91.82.156.27';
-
-    if (!token || !ip) {
-      throw new ForbiddenException();
-    }
-
-    const userInfo = await this.googleTokenManagerService.getUserInfo(token);
-    const geoInfo = this.geoService.getInfo(ip);
-
-    return {
-      ...userInfo,
-      geo: geoInfo,
-    };
-  }
-
   constructor(
-    private readonly googleTokenManagerService: GoogleTokenManagerService,
-    private readonly geoService: GeoService,
+    private readonly usersService: UsersService,
     configService: ConfigService,
   ) {
     const domain = configService.getOrThrow('DOMAIN')
@@ -48,22 +27,30 @@ export class MeController {
 
   @Get()
   getMe (@Req() req: Request) {
+    const ip = req['clientIp'];
     const cookie = req.cookies[this.cookieName];
 
-    if (!cookie) {
+    if (!ip || !cookie) {
       throw new ForbiddenException();
     }
 
-    return this.getMeInfo(cookie);
+    return this.usersService.getUser({ token: cookie, ip });
   }
 
   @Post()
   async createMe (@Req() req: Request, @Res() res: Response): Promise<void> {
-    const meInfo = await this.getMeInfo(req);
+    const ip = req['clientIp'];
+    const token = req.body?.token;
+
+    if (!ip || !token) {
+      throw new ForbiddenException();
+    }
+
+    const meData = await this.usersService.getUser({ token, ip });
 
     res
       .cookie(this.cookieName, req.body.token, this.cookieOptions)
-      .send(meInfo);
+      .send(meData);
   }
 
   @Delete()

@@ -38,12 +38,16 @@ const config_1 = __webpack_require__(6);
 const geo_1 = __webpack_require__(9);
 const me_1 = __webpack_require__(15);
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer.apply(me_1.IpMiddleware)
+            .forRoutes(me_1.MeController);
+    }
 };
 AppModule = tslib_1.__decorate([
     (0, common_1.Module)({
         imports: [config_1.ConfigModule, geo_1.GeoModule],
         controllers: [me_1.MeController],
-        providers: [me_1.GoogleTokenManagerService],
+        providers: [me_1.IpMiddleware, me_1.GoogleTokenManagerService, me_1.UsersService],
     })
 ], AppModule);
 exports.AppModule = AppModule;
@@ -184,11 +188,15 @@ module.exports = require("@maxmind/geoip2-node");
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MeController = exports.GoogleTokenManagerService = void 0;
+exports.IpMiddleware = exports.UsersService = exports.MeController = exports.GoogleTokenManagerService = void 0;
 var google_token_manager_service_1 = __webpack_require__(16);
 Object.defineProperty(exports, "GoogleTokenManagerService", ({ enumerable: true, get: function () { return google_token_manager_service_1.GoogleTokenManagerService; } }));
-var controller_1 = __webpack_require__(19);
+var controller_1 = __webpack_require__(18);
 Object.defineProperty(exports, "MeController", ({ enumerable: true, get: function () { return controller_1.MeController; } }));
+var service_1 = __webpack_require__(20);
+Object.defineProperty(exports, "UsersService", ({ enumerable: true, get: function () { return service_1.UsersService; } }));
+var ip_middleware_1 = __webpack_require__(21);
+Object.defineProperty(exports, "IpMiddleware", ({ enumerable: true, get: function () { return ip_middleware_1.IpMiddleware; } }));
 
 
 /***/ }),
@@ -200,10 +208,9 @@ var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GoogleTokenManagerService = void 0;
 const tslib_1 = __webpack_require__(1);
-const axios_1 = tslib_1.__importDefault(__webpack_require__(17));
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(8);
-const google_auth_library_1 = __webpack_require__(18);
+const google_auth_library_1 = __webpack_require__(17);
 let GoogleTokenManagerService = class GoogleTokenManagerService {
     constructor(configService) {
         const clientId = configService.getOrThrow('GOOGLE_CLIENT_ID');
@@ -221,15 +228,9 @@ let GoogleTokenManagerService = class GoogleTokenManagerService {
             if (!userName) {
                 throw new common_1.ForbiddenException('User must have a name!');
             }
-            let avatar;
-            if (picture) {
-                const { data } = yield axios_1.default.get(picture, { responseType: 'arraybuffer' });
-                avatar = Buffer.from(data, 'binary')
-                    .toString('base64');
-            }
             return {
                 name: userName,
-                avatar,
+                avatar: picture,
             };
         });
     }
@@ -245,47 +246,24 @@ exports.GoogleTokenManagerService = GoogleTokenManagerService;
 /* 17 */
 /***/ ((module) => {
 
-module.exports = require("axios");
-
-/***/ }),
-/* 18 */
-/***/ ((module) => {
-
 module.exports = require("google-auth-library");
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f, _g, _h;
+var _a, _b, _c, _d, _e, _f, _g;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MeController = void 0;
 const tslib_1 = __webpack_require__(1);
+const express_1 = __webpack_require__(19);
 const common_1 = __webpack_require__(3);
-const express_1 = __webpack_require__(20);
 const config_1 = __webpack_require__(8);
-const geo_1 = __webpack_require__(9);
-const google_token_manager_service_1 = __webpack_require__(16);
+const service_1 = __webpack_require__(20);
 let MeController = class MeController {
-    getMeInfo(req) {
-        var _a;
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const token = (_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.token;
-            const ip = this.domain !== 'localhost'
-                ? req.headers['x-real-ip'] || req.socket.remoteAddress
-                : '91.82.156.27';
-            if (!token || !ip) {
-                throw new common_1.ForbiddenException();
-            }
-            const userInfo = yield this.googleTokenManagerService.getUserInfo(token);
-            const geoInfo = this.geoService.getInfo(ip);
-            return Object.assign(Object.assign({}, userInfo), { geo: geoInfo });
-        });
-    }
-    constructor(googleTokenManagerService, geoService, configService) {
-        this.googleTokenManagerService = googleTokenManagerService;
-        this.geoService = geoService;
+    constructor(usersService, configService) {
+        this.usersService = usersService;
         this.cookieName = 'me';
         this.cookieOptions = {
             path: '/users',
@@ -298,18 +276,25 @@ let MeController = class MeController {
         this.cookieOptions.secure = domain !== 'localhost';
     }
     getMe(req) {
+        const ip = req['clientIp'];
         const cookie = req.cookies[this.cookieName];
-        if (!cookie) {
+        if (!ip || !cookie) {
             throw new common_1.ForbiddenException();
         }
-        return this.getMeInfo(cookie);
+        return this.usersService.getUser({ token: cookie, ip });
     }
     createMe(req, res) {
+        var _a;
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const meInfo = yield this.getMeInfo(req);
+            const ip = req['clientIp'];
+            const token = (_a = req.body) === null || _a === void 0 ? void 0 : _a.token;
+            if (!ip || !token) {
+                throw new common_1.ForbiddenException();
+            }
+            const meData = yield this.usersService.getUser({ token, ip });
             res
                 .cookie(this.cookieName, req.body.token, this.cookieOptions)
-                .send(meInfo);
+                .send(meData);
         });
     }
     removeMe(res) {
@@ -322,7 +307,7 @@ tslib_1.__decorate([
     (0, common_1.Get)(),
     tslib_1.__param(0, (0, common_1.Req)()),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_d = typeof express_1.Request !== "undefined" && express_1.Request) === "function" ? _d : Object]),
+    tslib_1.__metadata("design:paramtypes", [typeof (_c = typeof express_1.Request !== "undefined" && express_1.Request) === "function" ? _c : Object]),
     tslib_1.__metadata("design:returntype", void 0)
 ], MeController.prototype, "getMe", null);
 tslib_1.__decorate([
@@ -330,28 +315,92 @@ tslib_1.__decorate([
     tslib_1.__param(0, (0, common_1.Req)()),
     tslib_1.__param(1, (0, common_1.Res)()),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_e = typeof express_1.Request !== "undefined" && express_1.Request) === "function" ? _e : Object, typeof (_f = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _f : Object]),
-    tslib_1.__metadata("design:returntype", typeof (_g = typeof Promise !== "undefined" && Promise) === "function" ? _g : Object)
+    tslib_1.__metadata("design:paramtypes", [typeof (_d = typeof express_1.Request !== "undefined" && express_1.Request) === "function" ? _d : Object, typeof (_e = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _e : Object]),
+    tslib_1.__metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
 ], MeController.prototype, "createMe", null);
 tslib_1.__decorate([
     (0, common_1.Delete)(),
     tslib_1.__param(0, (0, common_1.Res)()),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_h = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _h : Object]),
+    tslib_1.__metadata("design:paramtypes", [typeof (_g = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _g : Object]),
     tslib_1.__metadata("design:returntype", void 0)
 ], MeController.prototype, "removeMe", null);
 MeController = tslib_1.__decorate([
     (0, common_1.Controller)('/me'),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof google_token_manager_service_1.GoogleTokenManagerService !== "undefined" && google_token_manager_service_1.GoogleTokenManagerService) === "function" ? _a : Object, typeof (_b = typeof geo_1.GeoService !== "undefined" && geo_1.GeoService) === "function" ? _b : Object, typeof (_c = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _c : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof service_1.UsersService !== "undefined" && service_1.UsersService) === "function" ? _a : Object, typeof (_b = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _b : Object])
 ], MeController);
 exports.MeController = MeController;
 
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ ((module) => {
 
 module.exports = require("express");
+
+/***/ }),
+/* 20 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UsersService = void 0;
+const tslib_1 = __webpack_require__(1);
+const common_1 = __webpack_require__(3);
+const geo_1 = __webpack_require__(9);
+const google_token_manager_service_1 = __webpack_require__(16);
+let UsersService = class UsersService {
+    constructor(googleTokenManagerService, geoService) {
+        this.googleTokenManagerService = googleTokenManagerService;
+        this.geoService = geoService;
+    }
+    getUser(data) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const userInfo = yield this.googleTokenManagerService.getUserInfo(data.token);
+            const geoInfo = this.geoService.getInfo(data.ip);
+            return Object.assign(Object.assign({}, userInfo), { geo: geoInfo });
+        });
+    }
+};
+UsersService = tslib_1.__decorate([
+    (0, common_1.Injectable)(),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof google_token_manager_service_1.GoogleTokenManagerService !== "undefined" && google_token_manager_service_1.GoogleTokenManagerService) === "function" ? _a : Object, typeof (_b = typeof geo_1.GeoService !== "undefined" && geo_1.GeoService) === "function" ? _b : Object])
+], UsersService);
+exports.UsersService = UsersService;
+;
+
+
+/***/ }),
+/* 21 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.IpMiddleware = void 0;
+const tslib_1 = __webpack_require__(1);
+const common_1 = __webpack_require__(3);
+const config_1 = __webpack_require__(8);
+let IpMiddleware = class IpMiddleware {
+    constructor(configService) {
+        this.devIp = '91.82.156.27';
+        this.domain = configService.getOrThrow('DOMAIN');
+    }
+    use(req, res, next) {
+        const ip = this.domain !== 'localhost'
+            ? req.headers['x-real-ip'] || req.socket.remoteAddress
+            : this.devIp;
+        req['clientIp'] = ip;
+        next();
+    }
+};
+IpMiddleware = tslib_1.__decorate([
+    (0, common_1.Injectable)(),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _a : Object])
+], IpMiddleware);
+exports.IpMiddleware = IpMiddleware;
+
 
 /***/ })
 /******/ 	]);

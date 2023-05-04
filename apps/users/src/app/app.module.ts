@@ -1,12 +1,17 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@shqipet/config';
 import { GeoModule } from '@shqipet/geo';
 
-import { MeController, GoogleTokenManagerService } from './me';
+import { MeController, GoogleTokenManagerService, UsersService, IpMiddleware } from './me';
 
 @Module({
   imports: [ ConfigModule, GeoModule ],
   controllers: [ MeController ],
-  providers: [ GoogleTokenManagerService],
+  providers: [ IpMiddleware, GoogleTokenManagerService, UsersService ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(IpMiddleware)
+      .forRoutes(MeController)
+  }
+}

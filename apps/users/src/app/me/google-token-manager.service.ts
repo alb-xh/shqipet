@@ -1,5 +1,4 @@
 
-import axios from "axios";
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { OAuth2Client } from 'google-auth-library';
@@ -33,16 +32,9 @@ export class GoogleTokenManagerService {
       throw new ForbiddenException('User must have a name!');
     }
 
-    let avatar: string;
-    if (picture) {
-      const { data } = await axios.get(picture, { responseType: 'arraybuffer' });
-      avatar = Buffer.from(data, 'binary')
-        .toString('base64');
-    }
-
     return {
       name: userName,
-      avatar,
+      avatar: picture,
     };
   }
 }
