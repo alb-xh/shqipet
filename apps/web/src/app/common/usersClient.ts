@@ -2,16 +2,18 @@ import axios from 'axios';
 
 import { USERS_ENDPOINT_URL } from '../config';
 
+export interface Geo {
+  name?: string,
+  code?: string,
+  city?: string,
+  lat?: number,
+  lng?: number,
+}
+
 export interface User {
   avatar: string,
   name: string,
-  geo: {
-    name?: string,
-    code?: string,
-    city?: string,
-    lat?: number,
-    lng?: number,
-  }
+  geo: Geo,
 }
 
 class UsersClient {

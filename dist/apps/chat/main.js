@@ -22,14 +22,13 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
-const geo_map_service_1 = __webpack_require__(5);
+const users_map_1 = __webpack_require__(5);
 const chat_gateway_1 = __webpack_require__(6);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
     (0, common_1.Module)({
-        imports: [],
-        providers: [geo_map_service_1.GeoMapService, chat_gateway_1.ChatGateway],
+        providers: [users_map_1.UsersMap, chat_gateway_1.ChatGateway],
     })
 ], AppModule);
 exports.AppModule = AppModule;
@@ -47,40 +46,40 @@ module.exports = require("@nestjs/common");
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GeoMapService = void 0;
+exports.UsersMap = void 0;
 const common_1 = __webpack_require__(4);
 (0, common_1.Injectable)();
-class GeoMapService {
+class UsersMap {
     constructor() {
-        this.idMap = new Map();
-        this.geoMap = new Map();
-        this.defaultGeo = {
-            active: 0,
-        };
+        this.usersMap = {};
     }
-    add(id, geo) {
-        if (this.idMap.get(id)) {
+    exists(id) {
+        return !!this.usersMap[id];
+    }
+    get(id) {
+        if (!this.exists(id)) {
             throw new common_1.ForbiddenException();
         }
-        this.idMap.set(id, geo);
-        const geoEntry = this.geoMap.get(geo) || Object.assign({}, this.defaultGeo);
-        geoEntry.active++;
-        return Object.assign({}, this.geoMap);
+        return Object.assign({}, this.usersMap[id]);
+    }
+    getAll() {
+        return Object.assign({}, this.usersMap);
+    }
+    add(id, data) {
+        if (this.exists(id)) {
+            throw new common_1.ForbiddenException();
+        }
+        this.usersMap[id] = data;
+        return this;
     }
     remove(id) {
-        const geo = this.idMap.get(id);
-        if (geo) {
+        if (!this.exists(id)) {
             throw new common_1.ForbiddenException();
         }
-        const geoEntry = this.geoMap.get(geo);
-        if (!geoEntry || geoEntry.active <= 0) {
-            throw new common_1.ForbiddenException();
-        }
-        geoEntry.active--;
-        return Object.assign({}, this.geoMap);
+        return this;
     }
 }
-exports.GeoMapService = GeoMapService;
+exports.UsersMap = UsersMap;
 
 
 /***/ }),
@@ -95,20 +94,21 @@ const tslib_1 = __webpack_require__(1);
 const websockets_1 = __webpack_require__(7);
 const socket_io_1 = __webpack_require__(8);
 const events_1 = __webpack_require__(9);
-const geo_map_service_1 = __webpack_require__(5);
-console.log(process.env['DOMAIN']);
+const users_map_1 = __webpack_require__(5);
 let ChatGateway = class ChatGateway {
-    constructor(geoMapService) {
-        this.geoMapService = geoMapService;
+    constructor(users) {
+        this.users = users;
     }
-    handleConnection(client, geo) {
+    handleConnection(client, data) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            this.server.emit(events_1.Event.GeoMap, this.geoMapService.add(client.id, geo));
+            this.server.emit(events_1.Event.UpdateUsers, this.users.add(client.id, data)
+                .getAll());
         });
     }
     handleDisconnect(client) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            this.server.emit(events_1.Event.GeoMap, this.geoMapService.remove(client.id));
+            this.server.emit(events_1.Event.UpdateUsers, this.users.remove(client.id)
+                .getAll());
         });
     }
 };
@@ -117,8 +117,8 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:type", typeof (_b = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _b : Object)
 ], ChatGateway.prototype, "server", void 0);
 ChatGateway = tslib_1.__decorate([
-    (0, websockets_1.WebSocketGateway)({ path: '/chat', cors: { origin: process.env['NODE' + '_ENV']['DOMAIN'] } }),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof geo_map_service_1.GeoMapService !== "undefined" && geo_map_service_1.GeoMapService) === "function" ? _a : Object])
+    (0, websockets_1.WebSocketGateway)({ path: '/chat', cors: { origin: '*' } }),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof users_map_1.UsersMap !== "undefined" && users_map_1.UsersMap) === "function" ? _a : Object])
 ], ChatGateway);
 exports.ChatGateway = ChatGateway;
 
@@ -144,8 +144,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Event = void 0;
 var Event;
 (function (Event) {
-    Event["GeoMap"] = "geo_map";
-    Event["Message"] = "message";
+    Event["UpdateUsers"] = "update_users";
+    Event["NewMessage"] = "new_message";
 })(Event = exports.Event || (exports.Event = {}));
 ;
 

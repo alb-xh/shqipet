@@ -1,4 +1,4 @@
 export enum Event {
-  GeoMap = 'geo_map',
-  Message = 'message',
+  UpdateUsers = 'update_users',
+  NewMessage = 'new_message',
 };
