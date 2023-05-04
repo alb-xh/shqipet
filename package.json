@@ -17,6 +17,8 @@
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
+    "@nestjs/platform-socket.io": "^9.4.0",
+    "@nestjs/websockets": "^9.4.0",
     "@nrwl/js": "^16.0.1",
     "@nrwl/react": "^16.0.1",
     "@nrwl/webpack": "^16.0.1",
