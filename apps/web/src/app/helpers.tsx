@@ -1,15 +1,27 @@
+import { GeoMap } from "@shqipet/common";
 
-export function dataURItoURL(dataURI: string): string {
-  // Extract base64-encoded data from data URI
-  const base64Data = dataURI.replace(/^data:image\/\w+;base64,/, "");
+import { Marker } from "./types";
 
-  // Decode base64-encoded data into binary data
-  const binaryData = atob(base64Data);
+export const getMarkersFromGeoMap = (geoMap: GeoMap): Marker[] => {
+  const markers = [];
 
-  // Generate blob URL from binary data
-  const blob = new Blob([binaryData], { type: dataURI.split(";")[0].split(":")[1] });
-  const url = URL.createObjectURL(blob);
+  for (const { lat, lng, city } of Object.values(geoMap)) {
+    if (!lat || !lng || !city) {
+      continue;
+    }
 
-  // Return the generated blob URL
-  return url;
-}
+    const marker = markers.find((m) => (
+      m.lat === lat &&
+      m.lng === lng &&
+      m.city === city
+    ));
+
+    if (!marker) {
+      markers.push({ lat, lng, city, active: 1 });
+    } else {
+      marker.active++;
+    }
+  }
+
+  return markers;
+};

@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { UserInfo } from '@shqipet/common';
+import { GeoMap, UserInfo } from '@shqipet/common';
 
 export interface AppContextInterface {
   loading: boolean,
@@ -8,6 +8,8 @@ export interface AppContextInterface {
   setUser: (user: UserInfo | null) => void,
   login: boolean,
   setLogin: (flag: boolean) => void,
+  geoMap: GeoMap,
+  setGeoMap: (geoMap: GeoMap) => void,
 };
 
 const AppContext = createContext<AppContextInterface>({
@@ -17,6 +19,8 @@ const AppContext = createContext<AppContextInterface>({
   setUser: () => undefined,
   login: false,
   setLogin: () => undefined,
+  geoMap: {},
+  setGeoMap: () => undefined
 });
 
 export default AppContext;
