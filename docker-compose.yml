@@ -13,7 +13,6 @@ services:
         EXPOSE 3000
         CMD [ "node", "main.js" ]
     volumes:
-      - ~/storage/geo:/usr/src/app/geo
       - ~/storage/images:/usr/src/app/images
     ports:
       - "3000:3000"
@@ -34,6 +33,23 @@ services:
       - ~/storage/images:/usr/src/app/images
     ports:
       - "4000:4000"
+    restart: always
+  chat:
+    container_name: chat
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM node:18.16.0-alpine
+        WORKDIR /usr/src/app
+        COPY ./node_modules ./node_modules
+        COPY ./dist/apps/chat package.json .prod.env .
+        ENV NODE_ENV production
+        EXPOSE 5000
+        CMD [ "node", "main.js" ]
+    volumes:
+      - ~/storage/geo:/usr/src/app/geo
+    ports:
+      - "5000:5000"
     restart: always
   web:
     container_name: web
