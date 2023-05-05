@@ -1,6 +1,4 @@
 export enum Event {
-  AddUser = 'add_user',
-  RemoveUser = 'remove_user',
-  UpdateUsers = 'update_users',
+  UpdateGeoMap = 'update_geo_map',
   NewMessage = 'new_message',
 };

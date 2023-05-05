@@ -3,35 +3,53 @@ import {
   WebSocketServer,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  SubscribeMessage,
 } from '@nestjs/websockets';
-import { GeoInfo } from '@shqipet/geo';
+import { GeoService } from '@shqipet/geo';
 import { Server, Socket } from 'socket.io';
 
 import { Event } from './events';
-import { UserData, UsersMap } from './users.map';
+import { GeoMap } from './geo.map';
+import { ConfigService } from '@nestjs/config';
 
 @WebSocketGateway({ path: '/chat', cors: { origin: '*' } })
-export class ChatGateway {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
+  private readonly domain: string;
+  private readonly devIp = '91.82.156.27';
 
-  constructor (private readonly users: UsersMap) {}
+  constructor (
+    private readonly geoMap: GeoMap,
+    private readonly geoService: GeoService,
+    configService: ConfigService,
+  ) {
+    this.domain = configService.getOrThrow('DOMAIN');
+  }
 
-  @SubscribeMessage(Event.AddUser)
-  async addUser (client: Socket, data: UserData) {
-    console.log(data);
+  private getIp (client: Socket): string {
+    return this.domain !== 'localhost'
+      ? client.handshake.headers['x-real-ip'] as string || client.handshake.address
+      : this.devIp;
+  }
+
+  async handleConnection (client: Socket) {
+    const ip = this.getIp(client);
+    if (!ip) {
+      return;
+    }
+
+    const geoInfo = this.geoService.getInfo(ip);
+
     this.server.emit(
-      Event.UpdateUsers,
-      this.users.add(client.id, data)
+      Event.UpdateGeoMap,
+      this.geoMap.add(client.id, geoInfo)
         .getAll()
     );
   }
 
-  @SubscribeMessage(Event.RemoveUser)
-  async removeUser(client: Socket) {
+  async handleDisconnect(client: Socket) {
     this.server.emit(
-      Event.UpdateUsers,
-      this.users.remove(client.id)
+      Event.UpdateGeoMap,
+      this.geoMap.remove(client.id)
         .getAll()
     );
   }

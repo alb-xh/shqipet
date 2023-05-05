@@ -102,6 +102,7 @@ let ChatGateway = class ChatGateway {
     addUser(client, data) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             console.log(data);
+            console.log(client);
             this.server.emit(events_1.Event.UpdateUsers, this.users.add(client.id, data)
                 .getAll());
         });

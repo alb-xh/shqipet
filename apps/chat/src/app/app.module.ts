@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { UsersMap } from './users.map';
+import { GeoMap } from './geo.map';
 import { ChatGateway } from './chat.gateway';
 
 @Module({
-  providers: [ UsersMap, ChatGateway ],
+  providers: [ GeoMap, ChatGateway ],
 })
 export class AppModule {}
