@@ -5,9 +5,9 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { GeoService } from '@shqipet/geo';
+import { ChatEvent } from '@shqipet/common';
 import { Server, Socket } from 'socket.io';
 
-import { Event } from './events';
 import { GeoMap } from './geo.map';
 import { ConfigService } from '@nestjs/config';
 
@@ -40,7 +40,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const geoInfo = this.geoService.getInfo(ip);
 
     this.server.emit(
-      Event.UpdateGeoMap,
+      ChatEvent.UpdateGeoMap,
       this.geoMap.add(client.id, geoInfo)
         .getAll()
     );
@@ -48,7 +48,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleDisconnect(client: Socket) {
     this.server.emit(
-      Event.UpdateGeoMap,
+      ChatEvent.UpdateGeoMap,
       this.geoMap.remove(client.id)
         .getAll()
     );

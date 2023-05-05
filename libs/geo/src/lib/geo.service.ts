@@ -1,18 +1,9 @@
 import { join } from 'path';
 import { readFileSync } from 'fs';
-
+import { GeoInfo } from '@shqipet/common';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
 import { Reader as ReaderNode, ReaderModel } from '@maxmind/geoip2-node';
-
-export interface GeoInfo {
-  name?: string,
-  code?: string,
-  city?: string,
-  lat?: number,
-  lng?: number,
-}
 
 @Injectable()
 export class GeoService {

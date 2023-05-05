@@ -1,7 +1,5 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
-import { GeoInfo } from "@shqipet/geo";
-
-export type IGeoMap = Record<string, GeoInfo>;
+import { GeoInfo, GeoMap as IGeoMap } from "@shqipet/common";
 
 Injectable()
 export class GeoMap {

@@ -22,10 +22,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
-const config_1 = __webpack_require__(17);
-const geo_1 = __webpack_require__(6);
-const geo_map_1 = __webpack_require__(12);
-const chat_gateway_1 = __webpack_require__(13);
+const config_1 = __webpack_require__(5);
+const geo_1 = __webpack_require__(8);
+const geo_map_1 = __webpack_require__(14);
+const chat_gateway_1 = __webpack_require__(15);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
@@ -45,9 +45,13 @@ module.exports = require("@nestjs/common");
 
 /***/ }),
 /* 5 */
-/***/ ((module) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-module.exports = require("@nestjs/config");
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(6), exports);
+
 
 /***/ }),
 /* 6 */
@@ -55,13 +59,42 @@ module.exports = require("@nestjs/config");
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ConfigModule = void 0;
 const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(7), exports);
-tslib_1.__exportStar(__webpack_require__(8), exports);
+const common_1 = __webpack_require__(4);
+const config_1 = __webpack_require__(7);
+const envFilePath = process.env['NODE' + '_ENV'] === 'production' ? '.prod.env' : '.dev.env';
+let ConfigModule = class ConfigModule {
+};
+ConfigModule = tslib_1.__decorate([
+    (0, common_1.Module)({
+        imports: [config_1.ConfigModule.forRoot({ isGlobal: true, envFilePath })],
+        providers: [config_1.ConfigService],
+        exports: [config_1.ConfigService],
+    })
+], ConfigModule);
+exports.ConfigModule = ConfigModule;
 
 
 /***/ }),
 /* 7 */
+/***/ ((module) => {
+
+module.exports = require("@nestjs/config");
+
+/***/ }),
+/* 8 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(9), exports);
+tslib_1.__exportStar(__webpack_require__(10), exports);
+
+
+/***/ }),
+/* 9 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -69,7 +102,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GeoModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
-const geo_service_1 = __webpack_require__(8);
+const geo_service_1 = __webpack_require__(10);
 let GeoModule = class GeoModule {
 };
 GeoModule = tslib_1.__decorate([
@@ -82,7 +115,7 @@ exports.GeoModule = GeoModule;
 
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -90,11 +123,11 @@ var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GeoService = void 0;
 const tslib_1 = __webpack_require__(1);
-const path_1 = __webpack_require__(9);
-const fs_1 = __webpack_require__(10);
+const path_1 = __webpack_require__(11);
+const fs_1 = __webpack_require__(12);
 const common_1 = __webpack_require__(4);
-const config_1 = __webpack_require__(5);
-const geoip2_node_1 = __webpack_require__(11);
+const config_1 = __webpack_require__(7);
+const geoip2_node_1 = __webpack_require__(13);
 let GeoService = class GeoService {
     constructor(configService) {
         const path = configService.getOrThrow('GEO_DB_PATH');
@@ -122,25 +155,25 @@ exports.GeoService = GeoService;
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ ((module) => {
 
 module.exports = require("path");
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ ((module) => {
 
 module.exports = require("fs");
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ ((module) => {
 
 module.exports = require("@maxmind/geoip2-node");
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -179,7 +212,7 @@ exports.GeoMap = GeoMap;
 
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -187,12 +220,12 @@ var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChatGateway = void 0;
 const tslib_1 = __webpack_require__(1);
-const websockets_1 = __webpack_require__(14);
-const geo_1 = __webpack_require__(6);
-const socket_io_1 = __webpack_require__(15);
-const events_1 = __webpack_require__(16);
-const geo_map_1 = __webpack_require__(12);
-const config_1 = __webpack_require__(5);
+const websockets_1 = __webpack_require__(16);
+const geo_1 = __webpack_require__(8);
+const common_1 = __webpack_require__(17);
+const socket_io_1 = __webpack_require__(19);
+const geo_map_1 = __webpack_require__(14);
+const config_1 = __webpack_require__(7);
 let ChatGateway = class ChatGateway {
     constructor(geoMap, geoService, configService) {
         this.geoMap = geoMap;
@@ -212,13 +245,13 @@ let ChatGateway = class ChatGateway {
                 return;
             }
             const geoInfo = this.geoService.getInfo(ip);
-            this.server.emit(events_1.Event.UpdateGeoMap, this.geoMap.add(client.id, geoInfo)
+            this.server.emit(common_1.ChatEvent.UpdateGeoMap, this.geoMap.add(client.id, geoInfo)
                 .getAll());
         });
     }
     handleDisconnect(client) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            this.server.emit(events_1.Event.UpdateGeoMap, this.geoMap.remove(client.id)
+            this.server.emit(common_1.ChatEvent.UpdateGeoMap, this.geoMap.remove(client.id)
                 .getAll());
         });
     }
@@ -235,31 +268,10 @@ exports.ChatGateway = ChatGateway;
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ ((module) => {
 
 module.exports = require("@nestjs/websockets");
-
-/***/ }),
-/* 15 */
-/***/ ((module) => {
-
-module.exports = require("socket.io");
-
-/***/ }),
-/* 16 */
-/***/ ((__unused_webpack_module, exports) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Event = void 0;
-var Event;
-(function (Event) {
-    Event["UpdateGeoMap"] = "update_geo_map";
-    Event["NewMessage"] = "new_message";
-})(Event = exports.Event || (exports.Event = {}));
-;
-
 
 /***/ }),
 /* 17 */
@@ -273,26 +285,25 @@ tslib_1.__exportStar(__webpack_require__(18), exports);
 
 /***/ }),
 /* 18 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ConfigModule = void 0;
-const tslib_1 = __webpack_require__(1);
-const common_1 = __webpack_require__(4);
-const config_1 = __webpack_require__(5);
-const envFilePath = process.env['NODE' + '_ENV'] === 'production' ? '.prod.env' : '.dev.env';
-let ConfigModule = class ConfigModule {
-};
-ConfigModule = tslib_1.__decorate([
-    (0, common_1.Module)({
-        imports: [config_1.ConfigModule.forRoot({ isGlobal: true, envFilePath })],
-        providers: [config_1.ConfigService],
-        exports: [config_1.ConfigService],
-    })
-], ConfigModule);
-exports.ConfigModule = ConfigModule;
+exports.ChatEvent = void 0;
+var ChatEvent;
+(function (ChatEvent) {
+    ChatEvent["UpdateGeoMap"] = "update_geo_map";
+    ChatEvent["NewMessage"] = "new_message";
+})(ChatEvent = exports.ChatEvent || (exports.ChatEvent = {}));
+;
+;
 
+
+/***/ }),
+/* 19 */
+/***/ ((module) => {
+
+module.exports = require("socket.io");
 
 /***/ })
 /******/ 	]);
