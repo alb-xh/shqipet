@@ -1,6 +1,7 @@
 import Avatar from '@mui/material/Avatar';
 import { Button, Paper, TextField } from '@mui/material';
 import { KeyboardEventHandler, useContext, useEffect, useState } from 'react';
+import isEqual from 'lodash/isEqual';
 
 import {
   showButtonStyle,
@@ -16,18 +17,11 @@ import {
 } from './styles';
 import AppContext from '../common/app.context';
 
-export interface Message {
-  sender: string;
-  text: string;
-  avatar: string;
-}
-
 const messagesPanelId = 'message-panel';
 
 const GroupChat = () => {
-  const { user } = useContext(AppContext);
+  const { user, messages, sendMessage } = useContext(AppContext);
   const [isVisible, setIsVisible] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
 
   useEffect(() => {
@@ -42,9 +36,9 @@ const GroupChat = () => {
       if (!user) {
         alert('Please login first');
       } else {
-        const message = { sender: 'You', avatar: user.avatar, text: newMessage };
+        const message = { user, text: newMessage };
 
-        setMessages([ ...messages, message ]);
+        sendMessage(message);
         setNewMessage('');
       }
     }
@@ -73,14 +67,14 @@ const GroupChat = () => {
     <Paper sx={groupChatStyle}>
       <div id={messagesPanelId} style={messagesPanelStyle}>
         {
-          (messages).map((message, i) => (
+          messages.map((message, i) => (
             <div key={i} style={messageStyle}>
               <Avatar sx={avatarStyle}
-                src={message.avatar}
-                alt={`${message.sender} avatar`}
+                src={message.user.avatar}
+                alt={`${message.user.name} avatar`}
               />
               <div>
-                <div>{message.sender}</div>
+                <div>{message.user.name}</div>
                 <div>{message.text}</div>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { ChatEvent, UserInfo } from "@shqipet/common";
+import { ChatEvent, Message, UserInfo } from "@shqipet/common";
 
 import MainPage from "./main";
 import LoginPage from "./login";
@@ -16,11 +16,12 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [login, setLogin] = useState(false);
   const [geoMap, setGeoMap ] = useState({});
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     chatSocket.on(ChatEvent.UpdateGeoMap, setGeoMap);
-    chatSocket.connect();
 
+    chatSocket.connect();
     return () => {
       chatSocket.disconnect();
     };
@@ -30,6 +31,9 @@ function App() {
     if (!user) {
       setLoading(true);
 
+      chatSocket.off(ChatEvent.BroadcastMessage);
+      setMessages([]);
+
       usersClient.getMe()
         .then((user: UserInfo) => {
           setUser(user);
@@ -38,8 +42,16 @@ function App() {
         .catch(() => {
           setLoading(false);
         });
+    } else {
+      chatSocket.on(ChatEvent.BroadcastMessage, (message: Message) => {
+        setMessages((messages: Message[]) => [ ...messages, message ].slice(0, 100));
+      });
     }
   }, [user]);
+
+  const sendMessage = (message: Message) => {
+    chatSocket.emit(ChatEvent.CreateMessage, message);
+  };
 
   const value = useMemo(() => ({
     user,
@@ -50,7 +62,10 @@ function App() {
     setLogin,
     geoMap,
     setGeoMap,
-  }),[ user, loading, login, geoMap ]);
+    messages,
+    setMessages,
+    sendMessage,
+  }),[ user, loading, login, geoMap, messages ]);
 
   return (
     <AppContext.Provider value={value}>

@@ -1,6 +1,7 @@
 export enum ChatEvent {
   UpdateGeoMap = 'update_geo_map',
-  NewMessage = 'new_message',
+  CreateMessage = 'create_message',
+  BroadcastMessage = 'broadcast_message',
 };
 
 export interface GeoInfo {
@@ -17,3 +18,8 @@ export interface UserInfo {
   avatar?: string,
   name: string,
 }
+
+export interface Message {
+  user: UserInfo,
+  text: string,
+};
