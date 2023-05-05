@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { ImagesStorageService } from "@shqipet/storage";
+import { UserInfo } from "@shqipet/common";
 
-import { GoogleTokenManagerService, UserInfo } from "./google-token-manager.service";
+import { GoogleTokenManagerService } from "./google-token-manager.service";
 
 @Injectable()
 export class UsersService {

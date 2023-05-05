@@ -12,3 +12,8 @@ export interface GeoInfo {
 };
 
 export type GeoMap = Record<string, GeoInfo>;
+
+export interface UserInfo {
+  avatar?: string,
+  name: string,
+}

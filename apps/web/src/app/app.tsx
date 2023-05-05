@@ -8,7 +8,6 @@ import Logout from "./common/logout.component";
 import Loading from "./common/loading.component";
 import usersClient from "./common/usersClient";
 import Login from "./common/login.component";
-import chatSocket from "./common/chat.socket";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -17,10 +16,6 @@ function App() {
 
   useEffect(() => {
     if (!user) {
-      if (chatSocket.isConnected()) {
-        chatSocket.disconnect();
-      }
-
       setLoading(true);
 
       usersClient.getMe()
@@ -31,8 +26,6 @@ function App() {
         .catch(() => {
           setLoading(false);
         });
-    } else {
-      chatSocket.connect(user);
     }
   }, [user]);
 

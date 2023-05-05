@@ -1,12 +1,8 @@
 
 import { ForbiddenException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { UserInfo } from "@shqipet/common";
 import { OAuth2Client } from 'google-auth-library';
-
-export interface UserInfo {
-  avatar?: string,
-  name: string,
-}
 
 @Injectable()
 export class GoogleTokenManagerService {

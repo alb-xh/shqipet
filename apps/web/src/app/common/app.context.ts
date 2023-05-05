@@ -1,12 +1,11 @@
 import { createContext } from "react";
-
-import { User } from "./usersClient";
+import { UserInfo } from '@shqipet/common';
 
 export interface AppContextInterface {
   loading: boolean,
   setLoading: (flag: boolean) => void,
-  user: User | null,
-  setUser: (user: User | null) => void,
+  user: UserInfo | null,
+  setUser: (user: UserInfo | null) => void,
   login: boolean,
   setLogin: (flag: boolean) => void,
 };

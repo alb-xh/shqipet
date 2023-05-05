@@ -1,11 +1,11 @@
 
 import Globe from 'react-globe.gl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import earth from '../../assets/earth-texture.jpg';
 import space from '../../assets/space.png';
 import chatSocket from '../common/chat.socket';
-
+import { ChatEvent, GeoMap } from '@shqipet/common';
 
 const markerSvg = `<svg viewBox="-4 0 36 36">
     <path fill="currentColor" d="M14,0 C21.732,0 28,5.641 28,12.6 C28,23.963 14,36 14,36 C14,36 0,24.064 0,12.6 C0,5.641 6.268,0 14,0 Z"></path>
@@ -15,34 +15,42 @@ const markerSvg = `<svg viewBox="-4 0 36 36">
 export default function Earth () {
   const [markers, setMarkers] = useState([]);
 
-  chatSocket.onUpdateUsers((usersMap) => {
-    console.log(usersMap);
+  chatSocket.on(ChatEvent.UpdateGeoMap, (geoMap: GeoMap) => {
     const newMarkers = [];
 
-    for (const { geo } of Object.values(usersMap)) {
-      const { lat, lng, city } = geo;
-
+    for (const { lat, lng, city } of Object.values(geoMap)) {
       if (!lat || !lng || !city) {
         continue;
       }
 
-      const marker = newMarkers.find((m) => m.lat === lat && m.lng === lng && m.city === city);
+      const marker = newMarkers.find((m) => (
+        m.lat === lat &&
+        m.lng === lng &&
+        m.city === city
+      ));
 
-      if (marker) {
-        marker.active++;
-      } else {
+      if (!marker) {
         newMarkers.push({ lat, lng, city, active: 1 });
+      } else {
+        marker.active++;
       }
     }
 
     setMarkers(newMarkers);
   });
 
+  const onGlobeReady = () => {
+    if (!chatSocket.connected) {
+      chatSocket.connect();
+    }
+  };
+
   return (
     <Globe
         width={window.innerWidth * 0.995}
         height={window.innerHeight * 0.8}
         globeImageUrl={earth}
+        onGlobeReady={onGlobeReady}
         backgroundImageUrl={space}
         htmlElementsData={markers}
         htmlLat={(d: any) => d.lat}
@@ -58,7 +66,7 @@ export default function Earth () {
 
           const tooltip = document.createElement('span');
           tooltip.className = "tooltiptext";
-          tooltip.innerText = `${d.city}  ${d.active} on`;
+          tooltip.innerHTML = `${d.city}&nbsp;&nbsp;<span style="color:lightgreen;">${d.active}</span>`;
 
           el.appendChild(tooltip);
 

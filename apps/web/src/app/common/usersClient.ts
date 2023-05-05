@@ -1,20 +1,7 @@
 import axios from 'axios';
+import { UserInfo } from '@shqipet/common';
 
 import { USERS_ENDPOINT_URL } from '../config';
-
-export interface Geo {
-  name?: string,
-  code?: string,
-  city?: string,
-  lat?: number,
-  lng?: number,
-}
-
-export interface User {
-  avatar: string,
-  name: string,
-  geo: Geo,
-}
 
 class UsersClient {
   private readonly meEndpoint: string;
@@ -22,12 +9,12 @@ class UsersClient {
     this.meEndpoint = `${usersEndpoint}/me`;
   };
 
-  async signIn (token: string): Promise<User> {
+  async signIn (token: string): Promise<UserInfo> {
     const { data } = await axios.post(this.meEndpoint, { token }, { withCredentials: true });
     return data;
   }
 
-  async getMe (): Promise<User> {
+  async getMe (): Promise<UserInfo> {
     const { data } = await axios.get(this.meEndpoint, { withCredentials: true })
     return data;
   }
