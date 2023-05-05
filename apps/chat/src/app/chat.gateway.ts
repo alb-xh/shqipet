@@ -3,9 +3,11 @@ import {
   WebSocketServer,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  SubscribeMessage,
+  MessageBody,
 } from '@nestjs/websockets';
 import { GeoService } from '@shqipet/geo';
-import { ChatEvent } from '@shqipet/common';
+import { ChatEvent, Message } from '@shqipet/common';
 import { Server, Socket } from 'socket.io';
 
 import { GeoMap } from './geo.map';
@@ -52,5 +54,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.geoMap.remove(client.id)
         .getAll()
     );
+  }
+
+  @SubscribeMessage(ChatEvent.CreateMessage)
+  async handleCreateMessage(@MessageBody() message: Message) {
+    this.server.emit(ChatEvent.BroadcastMessage, message);
   }
 }

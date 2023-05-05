@@ -216,7 +216,7 @@ exports.GeoMap = GeoMap;
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d;
+var _a, _b, _c, _d, _e;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChatGateway = void 0;
 const tslib_1 = __webpack_require__(1);
@@ -255,11 +255,23 @@ let ChatGateway = class ChatGateway {
                 .getAll());
         });
     }
+    handleCreateMessage(message) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            this.server.emit(common_1.ChatEvent.BroadcastMessage, message);
+        });
+    }
 };
 tslib_1.__decorate([
     (0, websockets_1.WebSocketServer)(),
     tslib_1.__metadata("design:type", typeof (_d = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _d : Object)
 ], ChatGateway.prototype, "server", void 0);
+tslib_1.__decorate([
+    (0, websockets_1.SubscribeMessage)(common_1.ChatEvent.CreateMessage),
+    tslib_1.__param(0, (0, websockets_1.MessageBody)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [typeof (_e = typeof common_1.Message !== "undefined" && common_1.Message) === "function" ? _e : Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], ChatGateway.prototype, "handleCreateMessage", null);
 ChatGateway = tslib_1.__decorate([
     (0, websockets_1.WebSocketGateway)({ path: '/chat', cors: { origin: '*' } }),
     tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof geo_map_1.GeoMap !== "undefined" && geo_map_1.GeoMap) === "function" ? _a : Object, typeof (_b = typeof geo_1.GeoService !== "undefined" && geo_1.GeoService) === "function" ? _b : Object, typeof (_c = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _c : Object])
@@ -293,8 +305,10 @@ exports.ChatEvent = void 0;
 var ChatEvent;
 (function (ChatEvent) {
     ChatEvent["UpdateGeoMap"] = "update_geo_map";
-    ChatEvent["NewMessage"] = "new_message";
+    ChatEvent["CreateMessage"] = "create_message";
+    ChatEvent["BroadcastMessage"] = "broadcast_message";
 })(ChatEvent = exports.ChatEvent || (exports.ChatEvent = {}));
+;
 ;
 ;
 
