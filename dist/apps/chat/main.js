@@ -22,13 +22,16 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
-const users_map_1 = __webpack_require__(5);
-const chat_gateway_1 = __webpack_require__(6);
+const config_1 = __webpack_require__(17);
+const geo_1 = __webpack_require__(6);
+const geo_map_1 = __webpack_require__(12);
+const chat_gateway_1 = __webpack_require__(13);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
     (0, common_1.Module)({
-        providers: [users_map_1.UsersMap, chat_gateway_1.ChatGateway],
+        imports: [config_1.ConfigModule, geo_1.GeoModule],
+        providers: [geo_map_1.GeoMap, chat_gateway_1.ChatGateway],
     })
 ], AppModule);
 exports.AppModule = AppModule;
@@ -42,115 +45,209 @@ module.exports = require("@nestjs/common");
 
 /***/ }),
 /* 5 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((module) => {
 
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UsersMap = void 0;
-const common_1 = __webpack_require__(4);
-(0, common_1.Injectable)();
-class UsersMap {
-    constructor() {
-        this.usersMap = {};
-    }
-    exists(id) {
-        return !!this.usersMap[id];
-    }
-    get(id) {
-        if (!this.exists(id)) {
-            throw new common_1.ForbiddenException();
-        }
-        return Object.assign({}, this.usersMap[id]);
-    }
-    getAll() {
-        return Object.assign({}, this.usersMap);
-    }
-    add(id, data) {
-        if (this.exists(id)) {
-            throw new common_1.ForbiddenException();
-        }
-        this.usersMap[id] = data;
-        return this;
-    }
-    remove(id) {
-        if (!this.exists(id)) {
-            throw new common_1.ForbiddenException();
-        }
-        return this;
-    }
-}
-exports.UsersMap = UsersMap;
-
+module.exports = require("@nestjs/config");
 
 /***/ }),
 /* 6 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(7), exports);
+tslib_1.__exportStar(__webpack_require__(8), exports);
+
+
+/***/ }),
+/* 7 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GeoModule = void 0;
+const tslib_1 = __webpack_require__(1);
+const common_1 = __webpack_require__(4);
+const geo_service_1 = __webpack_require__(8);
+let GeoModule = class GeoModule {
+};
+GeoModule = tslib_1.__decorate([
+    (0, common_1.Module)({
+        providers: [geo_service_1.GeoService],
+        exports: [geo_service_1.GeoService],
+    })
+], GeoModule);
+exports.GeoModule = GeoModule;
+
+
+/***/ }),
+/* 8 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GeoService = void 0;
+const tslib_1 = __webpack_require__(1);
+const path_1 = __webpack_require__(9);
+const fs_1 = __webpack_require__(10);
+const common_1 = __webpack_require__(4);
+const config_1 = __webpack_require__(5);
+const geoip2_node_1 = __webpack_require__(11);
+let GeoService = class GeoService {
+    constructor(configService) {
+        const path = configService.getOrThrow('GEO_DB_PATH');
+        const fullPath = (0, path_1.join)(process.cwd(), path);
+        const file = (0, fs_1.readFileSync)(fullPath);
+        this.reader = geoip2_node_1.Reader.openBuffer(file);
+    }
+    getInfo(ip) {
+        var _a, _b;
+        const { country, city, location, } = this.reader.city(ip);
+        return {
+            name: (_a = country === null || country === void 0 ? void 0 : country.names) === null || _a === void 0 ? void 0 : _a.en,
+            code: country === null || country === void 0 ? void 0 : country.isoCode,
+            city: (_b = city === null || city === void 0 ? void 0 : city.names) === null || _b === void 0 ? void 0 : _b.en,
+            lat: location === null || location === void 0 ? void 0 : location.latitude,
+            lng: location === null || location === void 0 ? void 0 : location.longitude,
+        };
+    }
+};
+GeoService = tslib_1.__decorate([
+    (0, common_1.Injectable)(),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _a : Object])
+], GeoService);
+exports.GeoService = GeoService;
+
+
+/***/ }),
+/* 9 */
+/***/ ((module) => {
+
+module.exports = require("path");
+
+/***/ }),
+/* 10 */
+/***/ ((module) => {
+
+module.exports = require("fs");
+
+/***/ }),
+/* 11 */
+/***/ ((module) => {
+
+module.exports = require("@maxmind/geoip2-node");
+
+/***/ }),
+/* 12 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GeoMap = void 0;
+const common_1 = __webpack_require__(4);
+(0, common_1.Injectable)();
+class GeoMap {
+    constructor() {
+        this.geoMap = {};
+    }
+    exists(id) {
+        return !!this.geoMap[id];
+    }
+    get(id) {
+        if (!this.exists(id)) {
+            throw new common_1.ForbiddenException();
+        }
+        return Object.assign({}, this.geoMap[id]);
+    }
+    getAll() {
+        return Object.assign({}, this.geoMap);
+    }
+    add(id, data) {
+        this.geoMap[id] = data;
+        return this;
+    }
+    remove(id) {
+        if (this.exists(id)) {
+            delete this.geoMap[id];
+        }
+        return this;
+    }
+}
+exports.GeoMap = GeoMap;
+
+
+/***/ }),
+/* 13 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChatGateway = void 0;
 const tslib_1 = __webpack_require__(1);
-const websockets_1 = __webpack_require__(7);
-const socket_io_1 = __webpack_require__(8);
-const events_1 = __webpack_require__(9);
-const users_map_1 = __webpack_require__(5);
+const websockets_1 = __webpack_require__(14);
+const geo_1 = __webpack_require__(6);
+const socket_io_1 = __webpack_require__(15);
+const events_1 = __webpack_require__(16);
+const geo_map_1 = __webpack_require__(12);
+const config_1 = __webpack_require__(5);
 let ChatGateway = class ChatGateway {
-    constructor(users) {
-        this.users = users;
+    constructor(geoMap, geoService, configService) {
+        this.geoMap = geoMap;
+        this.geoService = geoService;
+        this.devIp = '91.82.156.27';
+        this.domain = configService.getOrThrow('DOMAIN');
     }
-    addUser(client, data) {
+    getIp(client) {
+        return this.domain !== 'localhost'
+            ? client.handshake.headers['x-real-ip'] || client.handshake.address
+            : this.devIp;
+    }
+    handleConnection(client) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            console.log(data);
-            console.log(client);
-            this.server.emit(events_1.Event.UpdateUsers, this.users.add(client.id, data)
+            const ip = this.getIp(client);
+            if (!ip) {
+                return;
+            }
+            const geoInfo = this.geoService.getInfo(ip);
+            this.server.emit(events_1.Event.UpdateGeoMap, this.geoMap.add(client.id, geoInfo)
                 .getAll());
         });
     }
-    removeUser(client) {
+    handleDisconnect(client) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            this.server.emit(events_1.Event.UpdateUsers, this.users.remove(client.id)
+            this.server.emit(events_1.Event.UpdateGeoMap, this.geoMap.remove(client.id)
                 .getAll());
         });
     }
 };
 tslib_1.__decorate([
     (0, websockets_1.WebSocketServer)(),
-    tslib_1.__metadata("design:type", typeof (_b = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _b : Object)
+    tslib_1.__metadata("design:type", typeof (_d = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _d : Object)
 ], ChatGateway.prototype, "server", void 0);
-tslib_1.__decorate([
-    (0, websockets_1.SubscribeMessage)(events_1.Event.AddUser),
-    tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_c = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _c : Object, typeof (_d = typeof users_map_1.UserData !== "undefined" && users_map_1.UserData) === "function" ? _d : Object]),
-    tslib_1.__metadata("design:returntype", Promise)
-], ChatGateway.prototype, "addUser", null);
-tslib_1.__decorate([
-    (0, websockets_1.SubscribeMessage)(events_1.Event.RemoveUser),
-    tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_e = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _e : Object]),
-    tslib_1.__metadata("design:returntype", Promise)
-], ChatGateway.prototype, "removeUser", null);
 ChatGateway = tslib_1.__decorate([
     (0, websockets_1.WebSocketGateway)({ path: '/chat', cors: { origin: '*' } }),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof users_map_1.UsersMap !== "undefined" && users_map_1.UsersMap) === "function" ? _a : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof geo_map_1.GeoMap !== "undefined" && geo_map_1.GeoMap) === "function" ? _a : Object, typeof (_b = typeof geo_1.GeoService !== "undefined" && geo_1.GeoService) === "function" ? _b : Object, typeof (_c = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _c : Object])
 ], ChatGateway);
 exports.ChatGateway = ChatGateway;
 
 
 /***/ }),
-/* 7 */
+/* 14 */
 /***/ ((module) => {
 
 module.exports = require("@nestjs/websockets");
 
 /***/ }),
-/* 8 */
+/* 15 */
 /***/ ((module) => {
 
 module.exports = require("socket.io");
 
 /***/ }),
-/* 9 */
+/* 16 */
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -158,12 +255,43 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Event = void 0;
 var Event;
 (function (Event) {
-    Event["AddUser"] = "add_user";
-    Event["RemoveUser"] = "remove_user";
-    Event["UpdateUsers"] = "update_users";
+    Event["UpdateGeoMap"] = "update_geo_map";
     Event["NewMessage"] = "new_message";
 })(Event = exports.Event || (exports.Event = {}));
 ;
+
+
+/***/ }),
+/* 17 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(18), exports);
+
+
+/***/ }),
+/* 18 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ConfigModule = void 0;
+const tslib_1 = __webpack_require__(1);
+const common_1 = __webpack_require__(4);
+const config_1 = __webpack_require__(5);
+const envFilePath = process.env['NODE' + '_ENV'] === 'production' ? '.prod.env' : '.dev.env';
+let ConfigModule = class ConfigModule {
+};
+ConfigModule = tslib_1.__decorate([
+    (0, common_1.Module)({
+        imports: [config_1.ConfigModule.forRoot({ isGlobal: true, envFilePath })],
+        providers: [config_1.ConfigService],
+        exports: [config_1.ConfigService],
+    })
+], ConfigModule);
+exports.ConfigModule = ConfigModule;
 
 
 /***/ })

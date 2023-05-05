@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule } from '@shqipet/config';
 import { GeoModule } from '@shqipet/geo';
 
 import { GeoMap } from './geo.map';
