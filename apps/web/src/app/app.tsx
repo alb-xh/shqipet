@@ -10,6 +10,7 @@ import Loading from "./common/loading.component";
 import usersClient from "./common/usersClient";
 import Login from "./common/login.component";
 import chatSocket from "./common/chat.socket";
+import { Authorship } from "./common/authorship";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -73,6 +74,7 @@ function App() {
 
       { !loading && !login ? <MainPage /> : null }
       { !loading && !login && user ? <Logout /> : null }
+      <Authorship />
     </AppContext.Provider>
   );
 }
