@@ -8,10 +8,11 @@ import {
 } from '@nestjs/websockets';
 import { GeoService } from '@shqipet/geo';
 import { ChatEvent, Message } from '@shqipet/common';
-import { Server, Socket } from 'socket.io';
-
-import { GeoMap } from './geo.map';
 import { ConfigService } from '@nestjs/config';
+
+import { Server, Socket } from 'socket.io';
+import { GeoMap } from './geo.map';
+import { MessageFormatter } from './message-formatter';
 
 @WebSocketGateway({ path: '/chat', cors: { origin: '*' } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -22,6 +23,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor (
     private readonly geoMap: GeoMap,
     private readonly geoService: GeoService,
+    private readonly messageFormatter: MessageFormatter,
     configService: ConfigService,
   ) {
     this.domain = configService.getOrThrow('DOMAIN');
@@ -58,6 +60,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage(ChatEvent.CreateMessage)
   async handleCreateMessage(@MessageBody() message: Message) {
-    this.server.emit(ChatEvent.BroadcastMessage, message);
+    const { user, text } = message;
+    const formattedText = this.messageFormatter.format(text);
+
+    if (formattedText) {
+      this.server.emit(ChatEvent.BroadcastMessage, { user, text: formattedText });
+    }
   }
 }

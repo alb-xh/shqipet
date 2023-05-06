@@ -35,9 +35,7 @@ const GroupChat = () => {
       if (!user) {
         alert('Please login first');
       } else {
-        const message = { user, text: newMessage };
-
-        sendMessage(message);
+        sendMessage({ user, text: newMessage });
         setNewMessage('');
       }
     }
@@ -74,7 +72,7 @@ const GroupChat = () => {
               />
               <div>
                 <div>{message.user.name}</div>
-                <div>{message.text}</div>
+                <div dangerouslySetInnerHTML={{__html: message.text }} />
               </div>
             </div>
           ))
