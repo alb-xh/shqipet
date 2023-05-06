@@ -22,7 +22,7 @@ export default function Alert () {
     return null;
   }
 
-  const { text, severity = 'info' } = alert;
+  const { text, severity } = alert;
 
   return (
     <Box className='alert'>

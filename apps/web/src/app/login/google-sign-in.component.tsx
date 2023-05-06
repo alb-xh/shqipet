@@ -14,12 +14,12 @@ const googleButtonOptions = {
 };
 
 export default function GoogleSignIn () {
-  const { setUser, setLoading, setLogin } = useContext(AppContext);
+  const { setUser, setLoading, setLogin, setAlert } = useContext(AppContext);
   const ref = useRef(null);
 
   const callback = async (res: any, error: any) => {
     if (error) {
-      alert('Something went wrong sorry!');
+      setAlert({ severity: 'error',  text: 'Something went wrong!' });
     } else {
       setLoading(true);
 
