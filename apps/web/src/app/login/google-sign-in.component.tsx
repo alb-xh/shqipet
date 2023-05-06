@@ -1,17 +1,10 @@
 import { useRef, useEffect, useContext } from 'react';
 
-import { googleSignInPanel } from './styles';
 import AppContext from '../common/app.context';
 import usersClient from '../common/usersClient';
 
 import { GOOGLE_CLIENT_ID } from '../config';
-
-const googleButtonOptions = {
-  shape: 'circle',
-  theme: 'filled_blue',
-  size: 'large',
-  type: 'standard',
-};
+import { Box } from '@mui/material';
 
 export default function GoogleSignIn () {
   const { setUser, setLoading, setLogin, setAlert } = useContext(AppContext);
@@ -35,10 +28,16 @@ export default function GoogleSignIn () {
       if (ref.current) {
         const win = (window as any);
         win.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback });
-        win.google.accounts.id.renderButton(ref.current, googleButtonOptions);
+        win.google.accounts.id.renderButton(ref.current, {
+          shape: 'circle',
+          theme: 'filled_blue',
+          size: 'large',
+          type: 'standard',
+        });
       }
   }, [ ref.current ]);
 
-
-  return <div style={googleSignInPanel} ref={ref} />;
+  return (
+    <Box className='google-sign-in-panel' ref={ref} />
+  )
 }
