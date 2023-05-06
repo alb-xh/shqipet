@@ -20,6 +20,9 @@ function App() {
 
   useEffect(() => {
     chatSocket.on(ChatEvent.UpdateGeoMap, setGeoMap);
+    chatSocket.on(ChatEvent.BroadcastMessage, (message: Message) => {
+      setMessages((messages: Message[]) => [ ...messages, message ].slice(-100));
+    });
 
     chatSocket.connect();
     return () => {
@@ -31,9 +34,6 @@ function App() {
     if (!user) {
       setLoading(true);
 
-      chatSocket.off(ChatEvent.BroadcastMessage);
-      setMessages([]);
-
       usersClient.getMe()
         .then((user: UserInfo) => {
           setUser(user);
@@ -42,10 +42,6 @@ function App() {
         .catch(() => {
           setLoading(false);
         });
-    } else {
-      chatSocket.on(ChatEvent.BroadcastMessage, (message: Message) => {
-        setMessages((messages: Message[]) => [ ...messages, message ].slice(0, 100));
-      });
     }
   }, [user]);
 
