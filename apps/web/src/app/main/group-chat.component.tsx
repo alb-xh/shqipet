@@ -19,7 +19,7 @@ import AppContext from '../common/app.context';
 const messagesPanelId = 'message-panel';
 
 const GroupChat = () => {
-  const { user, messages, sendMessage } = useContext(AppContext);
+  const { user, messages, sendMessage, setAlert } = useContext(AppContext);
   const [isVisible, setIsVisible] = useState(false);
   const [newMessage, setNewMessage] = useState<string>('');
 
@@ -33,7 +33,7 @@ const GroupChat = () => {
   const handleSend = () => {
     if (newMessage) {
       if (!user) {
-        alert('Please login first');
+        setAlert({ text: 'You must login first', severity: 'warning' });
       } else {
         sendMessage({ user, text: newMessage });
         setNewMessage('');

@@ -1,5 +1,6 @@
 import { createContext } from "react";
 import { GeoMap, UserInfo, Message } from '@shqipet/common';
+import { AlertSettings } from "../types";
 
 export interface AppContextInterface {
   loading: boolean,
@@ -13,6 +14,8 @@ export interface AppContextInterface {
   messages: Message[],
   setMessages: (messages: Message[]) => void,
   sendMessage: (message: Message) => void,
+  alert: AlertSettings | null,
+  setAlert: (settings: AlertSettings | null) => void,
 };
 
 const AppContext = createContext<AppContextInterface>({
@@ -27,6 +30,8 @@ const AppContext = createContext<AppContextInterface>({
   messages: [],
   setMessages: () => undefined,
   sendMessage: () => undefined,
+  alert: null,
+  setAlert: () => undefined,
 });
 
 export default AppContext;

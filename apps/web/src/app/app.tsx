@@ -10,7 +10,8 @@ import Loading from "./common/loading.component";
 import usersClient from "./common/usersClient";
 import Login from "./common/login.component";
 import chatSocket from "./common/chat.socket";
-import { Authorship } from "./common/authorship";
+import Authorship from "./common/authorship.component";
+import Alert from "./common/alert.component";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -18,6 +19,7 @@ function App() {
   const [login, setLogin] = useState(false);
   const [geoMap, setGeoMap ] = useState({});
   const [messages, setMessages] = useState([]);
+  const [alert, setAlert] = useState(null);
 
   useEffect(() => {
     chatSocket.on(ChatEvent.UpdateGeoMap, setGeoMap);
@@ -62,11 +64,14 @@ function App() {
     messages,
     setMessages,
     sendMessage,
-  }),[ user, loading, login, geoMap, messages ]);
+    alert,
+    setAlert,
+  }),[ user, loading, login, geoMap, messages, alert ]);
 
   return (
     <AppContext.Provider value={value}>
       <Logo />
+      <Alert />
       { loading ? <Loading /> : null }
 
       { !loading && !user && !login ? <Login /> : null }
