@@ -25,14 +25,7 @@ export default function Alert () {
   const { text, severity = 'info' } = alert;
 
   return (
-    <Box
-      sx={{
-        position: 'absolute',
-        top: '5%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-      }}
-    >
+    <Box className='alert'>
       <MuiAlert severity={severity}>{text}</MuiAlert>
     </Box>
   );

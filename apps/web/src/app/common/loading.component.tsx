@@ -1,18 +1,9 @@
-import { CircularProgress } from "@mui/material";
-import { CSSProperties } from "react";
-
-const divStyle: CSSProperties = {
-  display: "flex",
-  height: '70vh',
-  width: '100%',
-  justifyContent: 'center',
-  alignItems: 'center',
-};
+import { Box, CircularProgress } from "@mui/material";
 
 export default function Loading () {
   return (
-    <div style={divStyle}>
+    <Box className='loading'>
       <CircularProgress />
-    </div>
+    </Box>
   );
 }

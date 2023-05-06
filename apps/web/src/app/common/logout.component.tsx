@@ -1,14 +1,8 @@
 import { Button } from "@mui/material";
-import { CSSProperties, useContext } from "react";
+import { useContext } from "react";
 
 import AppContext from "./app.context";
 import usersClient from "./usersClient";
-
-const style: CSSProperties = {
-  position: 'absolute',
-  top: '15px',
-  right: '8px',
-};
 
 export default function Logout () {
   const { setUser, setLoading } = useContext(AppContext);
@@ -20,7 +14,9 @@ export default function Logout () {
     setUser(null);
   }
 
-  return <Button variant="contained" style={style} onClick={onClick}>
-    Logout
-  </Button>;
+  return (
+    <Button className="logout" variant="contained" onClick={onClick}>
+      Logout
+    </Button>
+  )
 }
