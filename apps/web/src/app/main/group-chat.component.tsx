@@ -1,5 +1,5 @@
 import Avatar from '@mui/material/Avatar';
-import { Button, Paper, TextField } from '@mui/material';
+import { Box, Button, Paper, TextField } from '@mui/material';
 import { KeyboardEventHandler, useContext, useEffect, useState } from 'react';
 
 import {
@@ -24,9 +24,9 @@ const GroupChat = () => {
   const [newMessage, setNewMessage] = useState<string>('');
 
   useEffect(() => {
-    const div = document.getElementById(messagesPanelId);
-    if (div) {
-      div.scrollTop = div.scrollHeight;
+    const panel = document.getElementById(messagesPanelId);
+    if (panel) {
+      panel.scrollTop = panel.scrollHeight;
     }
   }, [ messages ]);
 
@@ -62,23 +62,23 @@ const GroupChat = () => {
 
   return (
     <Paper sx={groupChatStyle}>
-      <div id={messagesPanelId} style={messagesPanelStyle}>
+      <Box id={messagesPanelId} style={messagesPanelStyle}>
         {
           messages.map((message, i) => (
-            <div key={i} style={messageStyle}>
+            <Box key={i} style={messageStyle}>
               <Avatar sx={avatarStyle}
                 src={message.user.avatar}
                 alt={`${message.user.name} avatar`}
               />
-              <div>
-                <div>{message.user.name}</div>
-                <div dangerouslySetInnerHTML={{__html: message.text }} />
-              </div>
-            </div>
+              <Box>
+                <Box>{message.user.name}</Box>
+                <Box dangerouslySetInnerHTML={{__html: message.text }} />
+              </Box>
+            </Box>
           ))
         }
-      </div>
-      <div style={messagesButtonPanelStyle}>
+      </Box>
+      <Box style={messagesButtonPanelStyle}>
         <TextField
           label="Message"
           variant="outlined"
@@ -98,7 +98,7 @@ const GroupChat = () => {
         <Button variant="contained" style={messagesButtonStyle} onClick={toggleVisibility}>
           Hide
         </Button>
-      </div>
+      </Box>
     </Paper>
   );
 };

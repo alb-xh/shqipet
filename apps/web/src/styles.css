@@ -76,7 +76,7 @@ body {
 }
 
 .logout {
-  position: absolute;
+  position: absolute !important;
   top: 15px;
   right: 8px;
 }
