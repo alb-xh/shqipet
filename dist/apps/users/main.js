@@ -242,10 +242,15 @@ let MeController = class MeController {
             if (!token) {
                 throw new common_1.ForbiddenException();
             }
-            const meData = yield this.googleAuthService.getUser(token);
-            res
-                .cookie(this.cookieName, token, this.cookieOptions)
-                .send(meData);
+            try {
+                const meData = yield this.googleAuthService.getUser(token);
+                res
+                    .cookie(this.cookieName, token, this.cookieOptions)
+                    .send(meData);
+            }
+            catch (_a) {
+                throw new common_1.ForbiddenException();
+            }
         });
     }
     removeMe(res) {
