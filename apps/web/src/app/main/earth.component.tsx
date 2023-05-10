@@ -5,9 +5,10 @@ import { useContext, useMemo } from 'react';
 import earth from '../../assets/earth-texture.jpg';
 import space from '../../assets/space.png';
 import AppContext from '../common/app.context';
+import markerIcon from './marker.icon';
+
 import { getMarkersFromGeoMap } from '../helpers';
 import { Marker } from '../types';
-import markerIcon from './marker.icon';
 
 export default function Earth () {
   const { geoMap } = useContext(AppContext);
@@ -15,31 +16,31 @@ export default function Earth () {
 
   return (
     <Globe
-        width={window.innerWidth * 0.995}
-        height={window.innerHeight * 0.8}
-        globeImageUrl={earth}
-        backgroundImageUrl={space}
-        htmlElementsData={markers}
-        htmlLat={(m: Marker) => m.lat}
-        htmlLng={(m: Marker) => m.lng}
-        htmlElement={(m: Marker) => {
-          const el = document.createElement('div');
-          el.className="tooltip";
-          el.innerHTML= markerIcon;
+      width={window.innerWidth * 0.995}
+      height={window.innerHeight * 0.8}
+      globeImageUrl={earth}
+      backgroundImageUrl={space}
+      htmlElementsData={markers}
+      htmlLat={(m: Marker) => m.lat}
+      htmlLng={(m: Marker) => m.lng}
+      htmlElement={(m: Marker) => {
+        const el = document.createElement('div');
+        el.className="tooltip";
+        el.innerHTML= markerIcon;
 
-          el.style.color = 'red';
-          el.style.width = `30px`;
-          el.style['pointer-events'] = 'auto';
-          el.style.cursor = 'pointer';
+        el.style.color = 'red';
+        el.style.width = `30px`;
+        el.style['pointer-events'] = 'auto';
+        el.style.cursor = 'pointer';
 
-          const tooltip = document.createElement('span');
-          tooltip.className = "tooltiptext";
-          tooltip.innerHTML = `${m.city}&nbsp;&nbsp;<span style="color:lightgreen;">${m.active}</span>`;
+        const tooltip = document.createElement('span');
+        tooltip.className = "tooltiptext";
+        tooltip.innerHTML = `${m.city}&nbsp;&nbsp;<span class="online">${m.active}</span>`;
 
-          el.appendChild(tooltip);
+        el.appendChild(tooltip);
 
-          return el;
-        }}
-      />
+        return el;
+      }}
+    />
   )
 }

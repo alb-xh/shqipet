@@ -2,18 +2,6 @@ import Avatar from '@mui/material/Avatar';
 import { Box, Button, Paper, TextField } from '@mui/material';
 import { KeyboardEventHandler, useContext, useEffect, useState } from 'react';
 
-import {
-  showButtonStyle,
-  groupChatStyle,
-  messagesPanelStyle,
-  messageStyle,
-  avatarStyle,
-  messagesButtonPanelStyle,
-  textFieldStyle,
-  textFieldInputStyle,
-  textFieldElementsStyle,
-  messagesButtonStyle,
-} from './styles';
 import AppContext from '../common/app.context';
 
 const messagesPanelId = 'message-panel';
@@ -54,19 +42,20 @@ const GroupChat = () => {
 
   if (!isVisible) {
     return (
-      <Button variant="contained" sx={showButtonStyle} onClick={toggleVisibility}>
+      <Button className="show-button" variant="contained" onClick={toggleVisibility}>
         Show
       </Button>
     );
   }
 
   return (
-    <Paper sx={groupChatStyle}>
-      <Box id={messagesPanelId} style={messagesPanelStyle}>
+    <Paper className='group-chat'>
+      <Box id={messagesPanelId} className="messages-panel">
         {
           messages.map((message, i) => (
-            <Box key={i} style={messageStyle}>
-              <Avatar sx={avatarStyle}
+            <Box key={i} className="message">
+              <Avatar
+                className='avatar'
                 src={message.user.avatar}
                 alt={`${message.user.name} avatar`}
               />
@@ -78,24 +67,34 @@ const GroupChat = () => {
           ))
         }
       </Box>
-      <Box style={messagesButtonPanelStyle}>
+      <Box className="messages-button-panel" >
         <TextField
+          className='text-field'
           label="Message"
           variant="outlined"
           autoComplete="off"
           size="small"
-          style={textFieldStyle}
-          sx={textFieldElementsStyle}
-          InputLabelProps={{ style: textFieldInputStyle }}
-          InputProps={{ style: textFieldInputStyle }}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "& > fieldset": { borderColor: "#ff000042" },
+              '&:hover fieldset': {
+                borderColor: '#ff0000ba',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#ff0000ba',
+              },
+            },
+          }}
+          InputLabelProps={{ style: { color: "white" } }}
+          InputProps={{ style: { color: "white" } }}
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={handleSubmit}
         />
-        <Button variant="contained" style={messagesButtonStyle} onClick={handleSend} >
+        <Button variant="contained" className='messages-button' onClick={handleSend} >
           Send
         </Button>
-        <Button variant="contained" style={messagesButtonStyle} onClick={toggleVisibility}>
+        <Button variant="contained" className='messages-button' onClick={toggleVisibility}>
           Hide
         </Button>
       </Box>

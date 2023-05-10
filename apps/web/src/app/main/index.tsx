@@ -3,11 +3,9 @@ import { Box } from '@mui/material';
 import Earth from './earth.component';
 import GroupChat from './group-chat.component';
 
-import { pageStyle } from './styles';
-
 function MainPage() {
   return (
-    <Box style={pageStyle}>
+    <Box className="main">
       <Earth />
       <GroupChat />
     </Box>
