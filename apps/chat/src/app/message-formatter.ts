@@ -11,6 +11,7 @@ export class MessageFormatter {
       headerIds: false,
       mangle: false,
       highlight: null,
+      langPrefix: null,
     });
   }
 }

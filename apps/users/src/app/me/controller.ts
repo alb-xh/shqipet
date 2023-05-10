@@ -5,10 +5,8 @@ import { GoogleAuthService } from '@shqipet/auth';
 
 @Controller('/me')
 export class MeController {
-  private readonly domain: string;
-  private readonly cookieName = 'me';
+  private readonly cookieName;
   private readonly cookieOptions: CookieOptions = {
-    path: '/users',
     httpOnly: true,
     sameSite: true,
   }
@@ -17,9 +15,10 @@ export class MeController {
     private readonly googleAuthService: GoogleAuthService,
     configService: ConfigService,
   ) {
-    const domain = configService.getOrThrow('DOMAIN')
+    const cookieName = configService.getOrThrow('COOKIE');
+    const domain = configService.getOrThrow('DOMAIN');
 
-    this.domain = domain;
+    this.cookieName = cookieName;
     this.cookieOptions.domain = domain;
     this.cookieOptions.secure = domain !== 'localhost';
   }
@@ -46,11 +45,15 @@ export class MeController {
       throw new ForbiddenException();
     }
 
-    const meData = await this.googleAuthService.getUser(token);
+    try {
+      const meData = await this.googleAuthService.getUser(token);
 
-    res
+      res
       .cookie(this.cookieName, token, this.cookieOptions)
       .send(meData);
+    } catch {
+      throw new ForbiddenException();
+    }
   }
 
   @Delete()

@@ -27,9 +27,11 @@ export class GeoMap {
   }
 
   remove (id: string): this {
-    if (this.exists(id)) {
-      delete this.geoMap[id];
+    if (!this.exists(id)) {
+      throw new ForbiddenException();
     }
+
+    delete this.geoMap[id];
 
     return this;
   }

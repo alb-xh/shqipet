@@ -26,12 +26,13 @@ const config_1 = __webpack_require__(5);
 const geo_1 = __webpack_require__(8);
 const geo_map_1 = __webpack_require__(14);
 const chat_gateway_1 = __webpack_require__(15);
-const message_formatter_1 = __webpack_require__(20);
+const message_formatter_1 = __webpack_require__(21);
+const auth_1 = __webpack_require__(25);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule, geo_1.GeoModule],
+        imports: [config_1.ConfigModule, auth_1.AuthModule, geo_1.GeoModule],
         providers: [geo_map_1.GeoMap, message_formatter_1.MessageFormatter, chat_gateway_1.ChatGateway],
     })
 ], AppModule);
@@ -203,9 +204,10 @@ class GeoMap {
         return this;
     }
     remove(id) {
-        if (this.exists(id)) {
-            delete this.geoMap[id];
+        if (!this.exists(id)) {
+            throw new common_1.ForbiddenException();
         }
+        delete this.geoMap[id];
         return this;
     }
 }
@@ -217,24 +219,39 @@ exports.GeoMap = GeoMap;
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f;
+var _a, _b, _c, _d, _e, _f, _g, _h;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChatGateway = void 0;
 const tslib_1 = __webpack_require__(1);
+const cookie_1 = tslib_1.__importDefault(__webpack_require__(20));
 const websockets_1 = __webpack_require__(16);
 const geo_1 = __webpack_require__(8);
 const common_1 = __webpack_require__(17);
 const config_1 = __webpack_require__(7);
 const socket_io_1 = __webpack_require__(19);
 const geo_map_1 = __webpack_require__(14);
-const message_formatter_1 = __webpack_require__(20);
+const message_formatter_1 = __webpack_require__(21);
+const auth_1 = __webpack_require__(25);
+const cors = {
+    credentials: true,
+    origin: '*',
+};
 let ChatGateway = class ChatGateway {
-    constructor(geoMap, geoService, messageFormatter, configService) {
+    constructor(googleAuthService, geoMap, geoService, messageFormatter, configService) {
+        this.googleAuthService = googleAuthService;
         this.geoMap = geoMap;
         this.geoService = geoService;
         this.messageFormatter = messageFormatter;
         this.devIp = '91.82.156.27';
-        this.domain = configService.getOrThrow('DOMAIN');
+        this.isLoggedIn = (0, common_1.memoizeAsync)((client) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const token = cookie_1.default.parse(client.handshake.headers.cookie)[this.cookieName];
+            return token && (yield this.googleAuthService.isValid(token));
+        }), (client) => client.id);
+        const cookieName = configService.getOrThrow('COOKIE');
+        const domain = configService.getOrThrow('DOMAIN');
+        this.cookieName = cookieName;
+        this.domain = domain;
+        cors.origin = new RegExp(domain);
     }
     getIp(client) {
         return this.domain !== 'localhost'
@@ -244,44 +261,48 @@ let ChatGateway = class ChatGateway {
     handleConnection(client) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const ip = this.getIp(client);
-            if (!ip) {
-                return;
+            if (ip) {
+                const geoInfo = this.geoService.getInfo(ip);
+                this.server.emit(common_1.ChatEvent.UpdateGeoMap, this.geoMap.add(client.id, geoInfo)
+                    .getAll());
             }
-            const geoInfo = this.geoService.getInfo(ip);
-            this.server.emit(common_1.ChatEvent.UpdateGeoMap, this.geoMap.add(client.id, geoInfo)
-                .getAll());
         });
     }
     handleDisconnect(client) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            this.server.emit(common_1.ChatEvent.UpdateGeoMap, this.geoMap.remove(client.id)
-                .getAll());
+            if (this.geoMap.exists(client.id)) {
+                this.server.emit(common_1.ChatEvent.UpdateGeoMap, this.geoMap.remove(client.id)
+                    .getAll());
+            }
         });
     }
-    handleCreateMessage(message) {
+    handleCreateMessage(message, client) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const { user, text } = message;
-            const formattedText = this.messageFormatter.format(text);
-            if (formattedText) {
-                this.server.emit(common_1.ChatEvent.BroadcastMessage, { user, text: formattedText });
+            if (yield this.isLoggedIn(client)) {
+                const { user, text } = message;
+                const formattedText = this.messageFormatter.format(text);
+                if (formattedText) {
+                    this.server.emit(common_1.ChatEvent.BroadcastMessage, { user, text: formattedText });
+                }
             }
         });
     }
 };
 tslib_1.__decorate([
     (0, websockets_1.WebSocketServer)(),
-    tslib_1.__metadata("design:type", typeof (_e = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _e : Object)
+    tslib_1.__metadata("design:type", typeof (_f = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _f : Object)
 ], ChatGateway.prototype, "server", void 0);
 tslib_1.__decorate([
     (0, websockets_1.SubscribeMessage)(common_1.ChatEvent.CreateMessage),
     tslib_1.__param(0, (0, websockets_1.MessageBody)()),
+    tslib_1.__param(1, (0, websockets_1.ConnectedSocket)()),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_f = typeof common_1.Message !== "undefined" && common_1.Message) === "function" ? _f : Object]),
+    tslib_1.__metadata("design:paramtypes", [typeof (_g = typeof common_1.Message !== "undefined" && common_1.Message) === "function" ? _g : Object, typeof (_h = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _h : Object]),
     tslib_1.__metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "handleCreateMessage", null);
 ChatGateway = tslib_1.__decorate([
-    (0, websockets_1.WebSocketGateway)({ path: '/chat', cors: { origin: '*' } }),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof geo_map_1.GeoMap !== "undefined" && geo_map_1.GeoMap) === "function" ? _a : Object, typeof (_b = typeof geo_1.GeoService !== "undefined" && geo_1.GeoService) === "function" ? _b : Object, typeof (_c = typeof message_formatter_1.MessageFormatter !== "undefined" && message_formatter_1.MessageFormatter) === "function" ? _c : Object, typeof (_d = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _d : Object])
+    (0, websockets_1.WebSocketGateway)({ path: '/chat', cors }),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof auth_1.GoogleAuthService !== "undefined" && auth_1.GoogleAuthService) === "function" ? _a : Object, typeof (_b = typeof geo_map_1.GeoMap !== "undefined" && geo_map_1.GeoMap) === "function" ? _b : Object, typeof (_c = typeof geo_1.GeoService !== "undefined" && geo_1.GeoService) === "function" ? _c : Object, typeof (_d = typeof message_formatter_1.MessageFormatter !== "undefined" && message_formatter_1.MessageFormatter) === "function" ? _d : Object, typeof (_e = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _e : Object])
 ], ChatGateway);
 exports.ChatGateway = ChatGateway;
 
@@ -300,6 +321,7 @@ module.exports = require("@nestjs/websockets");
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
 tslib_1.__exportStar(__webpack_require__(18), exports);
+tslib_1.__exportStar(__webpack_require__(29), exports);
 
 
 /***/ }),
@@ -328,15 +350,21 @@ module.exports = require("socket.io");
 
 /***/ }),
 /* 20 */
+/***/ ((module) => {
+
+module.exports = require("cookie");
+
+/***/ }),
+/* 21 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MessageFormatter = void 0;
 const tslib_1 = __webpack_require__(1);
-const dompurify_1 = tslib_1.__importDefault(__webpack_require__(21));
-const jsdom_1 = __webpack_require__(22);
-const marked_1 = __webpack_require__(23);
+const dompurify_1 = tslib_1.__importDefault(__webpack_require__(22));
+const jsdom_1 = __webpack_require__(23);
+const marked_1 = __webpack_require__(24);
 const window = new jsdom_1.JSDOM('').window;
 const { sanitize } = (0, dompurify_1.default)(window);
 class MessageFormatter {
@@ -345,6 +373,7 @@ class MessageFormatter {
             headerIds: false,
             mangle: false,
             highlight: null,
+            langPrefix: null,
         });
     }
 }
@@ -352,22 +381,157 @@ exports.MessageFormatter = MessageFormatter;
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ ((module) => {
 
 module.exports = require("dompurify");
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ ((module) => {
 
 module.exports = require("jsdom");
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ ((module) => {
 
 module.exports = require("marked");
+
+/***/ }),
+/* 25 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(26), exports);
+tslib_1.__exportStar(__webpack_require__(27), exports);
+
+
+/***/ }),
+/* 26 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AuthModule = void 0;
+const tslib_1 = __webpack_require__(1);
+const common_1 = __webpack_require__(4);
+const config_1 = __webpack_require__(5);
+const google_auth_service_1 = __webpack_require__(27);
+let AuthModule = class AuthModule {
+};
+AuthModule = tslib_1.__decorate([
+    (0, common_1.Module)({
+        imports: [config_1.ConfigModule],
+        providers: [google_auth_service_1.GoogleAuthService],
+        exports: [google_auth_service_1.GoogleAuthService],
+    })
+], AuthModule);
+exports.AuthModule = AuthModule;
+
+
+/***/ }),
+/* 27 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GoogleAuthService = void 0;
+const tslib_1 = __webpack_require__(1);
+const common_1 = __webpack_require__(4);
+const config_1 = __webpack_require__(7);
+const google_auth_library_1 = __webpack_require__(28);
+let GoogleAuthService = class GoogleAuthService {
+    constructor(configService) {
+        const clientId = configService.getOrThrow('GOOGLE_CLIENT_ID');
+        this.clientId = clientId;
+        this.oAuthClient = new google_auth_library_1.OAuth2Client(clientId);
+    }
+    getTicket(token) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return this.oAuthClient.verifyIdToken({
+                idToken: token,
+                audience: this.clientId
+            });
+        });
+    }
+    isValid(token) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.getTicket(token);
+                return true;
+            }
+            catch (_a) {
+                return false;
+            }
+        });
+    }
+    getUser(token) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const ticket = yield this.getTicket(token);
+            const { picture, name, given_name, family_name } = ticket.getPayload();
+            const userName = name || [given_name, family_name].join(' ');
+            if (!userName) {
+                throw new common_1.ForbiddenException('User must have a name!');
+            }
+            return {
+                name: userName,
+                avatar: picture,
+            };
+        });
+    }
+};
+GoogleAuthService = tslib_1.__decorate([
+    (0, common_1.Injectable)(),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _a : Object])
+], GoogleAuthService);
+exports.GoogleAuthService = GoogleAuthService;
+
+
+/***/ }),
+/* 28 */
+/***/ ((module) => {
+
+module.exports = require("google-auth-library");
+
+/***/ }),
+/* 29 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.memoizeAsync = exports.memoize = void 0;
+const tslib_1 = __webpack_require__(1);
+const memoize = (fn, getKey) => {
+    const cache = new Map();
+    return (...args) => {
+        const key = getKey ? getKey(...args) : args;
+        if (cache.has(key)) {
+            return cache.get(key);
+        }
+        const value = fn(...args);
+        cache.set(key, value);
+        return value;
+    };
+};
+exports.memoize = memoize;
+const memoizeAsync = (fn, getKey) => {
+    const cache = new Map();
+    return (...args) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+        const key = getKey ? getKey(...args) : args;
+        if (cache.has(key)) {
+            return cache.get(key);
+        }
+        const value = yield fn(...args);
+        cache.set(key, value);
+        return value;
+    });
+};
+exports.memoizeAsync = memoizeAsync;
+
 
 /***/ })
 /******/ 	]);

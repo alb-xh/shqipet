@@ -214,14 +214,13 @@ const auth_1 = __webpack_require__(9);
 let MeController = class MeController {
     constructor(googleAuthService, configService) {
         this.googleAuthService = googleAuthService;
-        this.cookieName = 'me';
         this.cookieOptions = {
-            path: '/users',
             httpOnly: true,
             sameSite: true,
         };
+        const cookieName = configService.getOrThrow('COOKIE');
         const domain = configService.getOrThrow('DOMAIN');
-        this.domain = domain;
+        this.cookieName = cookieName;
         this.cookieOptions.domain = domain;
         this.cookieOptions.secure = domain !== 'localhost';
     }
