@@ -33,7 +33,7 @@ export default function GoogleSignIn () {
           shape: 'circle',
           theme: 'filled_blue',
           type: 'standard',
-          size: isSmallDevice ? 'large' : 'medium',
+          size: isSmallDevice() ? 'medium' : 'large',
         });
       }
   }, [ ref.current ]);

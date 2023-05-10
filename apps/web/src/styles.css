@@ -50,8 +50,8 @@ body {
   border-color: #363636 transparent transparent transparent;
 }
 
-
 .alert {
+  z-index: 2000;
   position: absolute;
   top: 5%;
   left: 50%;
@@ -183,6 +183,10 @@ body {
     right: 6px;
   }
 
+  .alert {
+    top: 8%;
+  }
+
   .logout {
     font-size: 0.5rem !important;
     top: 10px;
@@ -217,7 +221,6 @@ body {
     font-size: 0.5rem !important;
     width: 95%;
     bottom: 5px;
-    left: 6px;
   }
 
   .messages-button {
