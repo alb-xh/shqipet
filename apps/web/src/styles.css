@@ -2,9 +2,22 @@ body {
   background-color: black;
 }
 
+.root {
+  overflow-x: clip !important;
+}
+
+.online {
+  color:lightgreen;
+}
+
 .tooltip {
   position: relative;
   display: inline-block;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
 }
 
 .tooltip .tooltiptext {
@@ -37,10 +50,6 @@ body {
   border-color: #363636 transparent transparent transparent;
 }
 
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-  opacity: 1;
-}
 
 .alert {
   position: absolute;
@@ -89,10 +98,6 @@ body {
   align-items: center;
 }
 
-.online {
-  color:lightgreen;
-}
-
 .main {
   height: 80vh;
   position: relative;
@@ -118,7 +123,7 @@ body {
   width: 600px;
   display: flex;
   flex-direction: column;
-  height: 700px;
+  height: 675px;
   background-color: hsla(0,0%,13%,1) !important;
 }
 
@@ -127,6 +132,7 @@ body {
   align-items: center;
   margin: 15px;
   color: white;
+  overflow-wrap: anywhere;
 }
 
 .messages-button-panel {
@@ -138,7 +144,8 @@ body {
 }
 
 .avatar {
-  margin-right: 2px;
+  margin-right: 5px;
+  align-self: baseline;
 }
 
 .text-field {
@@ -148,4 +155,89 @@ body {
 
 .messages-button {
   margin-left: 8px !important;
+}
+
+#message-label {
+  color: white;
+}
+
+#message-box {
+  color:white;
+}
+
+@media (max-width: 700px) {
+  .authorship {
+    font-size: 0.5rem !important;
+    bottom: 10px;
+    left: 6px;
+    color: white;
+  }
+
+  .logo {
+    height: 50px;
+  }
+
+  .login {
+    font-size: 0.5rem !important;
+    top: 10px;
+    right: 6px;
+  }
+
+  .logout {
+    font-size: 0.5rem !important;
+    top: 10px;
+    right: 6px;
+  }
+
+  .show-button {
+    font-size: 0.5rem !important;
+    bottom: 10px;
+    right: 6px;
+  }
+
+  .messages-panel {
+    overflow-y: auto;
+    max-height: 90%;
+    width: 100%;
+  }
+
+  .group-chat {
+    bottom: 10px;
+    right: 6px;
+    width: 95%;
+    height: 97.5%;
+  }
+
+  .message {
+    font-size: 0.8rem !important;
+    margin: 10px;
+  }
+
+  .messages-button-panel {
+    font-size: 0.5rem !important;
+    width: 95%;
+    bottom: 5px;
+    left: 6px;
+  }
+
+  .messages-button {
+    font-size: 0.7rem !important;
+    margin-left: 4px !important;
+  }
+
+  #message-label {
+    font-size: 0.7rem !important;
+  }
+
+  #message-box {
+    font-size: 0.7rem !important;
+  }
+
+  .hide-button {
+    font-size: 0.5rem !important;
+    position: fixed !important;
+    top: 10px;
+    right: 10px;
+  }
+
 }

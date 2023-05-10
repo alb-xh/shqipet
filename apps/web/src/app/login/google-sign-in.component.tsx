@@ -5,6 +5,7 @@ import usersClient from '../common/usersClient';
 
 import { GOOGLE_CLIENT_ID } from '../config';
 import { Box } from '@mui/material';
+import { isSmallDevice } from '../helpers';
 
 export default function GoogleSignIn () {
   const { setUser, setLoading, setLogin, setAlert } = useContext(AppContext);
@@ -31,8 +32,8 @@ export default function GoogleSignIn () {
         win.google.accounts.id.renderButton(ref.current, {
           shape: 'circle',
           theme: 'filled_blue',
-          size: 'large',
           type: 'standard',
+          size: isSmallDevice ? 'large' : 'medium',
         });
       }
   }, [ ref.current ]);

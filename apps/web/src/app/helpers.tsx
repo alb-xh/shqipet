@@ -25,3 +25,14 @@ export const getMarkersFromGeoMap = (geoMap: GeoMap): Marker[] => {
 
   return markers;
 };
+
+export const isSmallDevice = () => window.innerWidth <= 700;
+
+export const getEarthDimensions = () => ({
+  width: isSmallDevice()
+    ? window.innerWidth * 0.95
+    : window.innerWidth,
+  height: isSmallDevice()
+    ? window.innerHeight * 0.825
+    : window.innerHeight * 0.8,
+});

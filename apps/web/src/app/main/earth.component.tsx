@@ -7,7 +7,7 @@ import space from '../../assets/space.png';
 import AppContext from '../common/app.context';
 import markerIcon from './marker.icon';
 
-import { getMarkersFromGeoMap } from '../helpers';
+import { getEarthDimensions, getMarkersFromGeoMap } from '../helpers';
 import { Marker } from '../types';
 
 export default function Earth () {
@@ -16,8 +16,7 @@ export default function Earth () {
 
   return (
     <Globe
-      width={window.innerWidth * 0.995}
-      height={window.innerHeight * 0.8}
+      {...getEarthDimensions()}
       globeImageUrl={earth}
       backgroundImageUrl={space}
       htmlElementsData={markers}

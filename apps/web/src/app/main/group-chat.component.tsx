@@ -61,7 +61,10 @@ const GroupChat = () => {
               />
               <Box>
                 <Box>{message.user.name}</Box>
-                <Box dangerouslySetInnerHTML={{__html: message.text }} />
+                <Box
+                  component="span"
+                  dangerouslySetInnerHTML={{__html: message.text }}
+                />
               </Box>
             </Box>
           ))
@@ -85,16 +88,16 @@ const GroupChat = () => {
               },
             },
           }}
-          InputLabelProps={{ style: { color: "white" } }}
-          InputProps={{ style: { color: "white" } }}
+          InputLabelProps={{ id: "message-label" }}
+          InputProps={{ id: 'message-box'}}
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={handleSubmit}
         />
-        <Button variant="contained" className='messages-button' onClick={handleSend} >
+        <Button variant="contained" className='messages-button send-button' onClick={handleSend} >
           Send
         </Button>
-        <Button variant="contained" className='messages-button' onClick={toggleVisibility}>
+        <Button variant="contained" className='messages-button hide-button' onClick={toggleVisibility}>
           Hide
         </Button>
       </Box>
