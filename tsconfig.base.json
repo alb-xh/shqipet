@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@shqipet/auth": ["libs/auth/src/index.ts"],
       "@shqipet/common": ["libs/common/src/index.ts"],
       "@shqipet/config": ["libs/config/src/index.ts"],
       "@shqipet/geo": ["libs/geo/src/index.ts"],
