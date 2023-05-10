@@ -1,8 +1,7 @@
 import { Response, Request, CookieOptions} from 'express';
 import { Body, Controller, Delete, ForbiddenException, Get, Post, Req, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
-import { UsersService } from './service';
+import { GoogleAuthService } from '@shqipet/auth';
 
 @Controller('/me')
 export class MeController {
@@ -15,7 +14,7 @@ export class MeController {
   }
 
   constructor(
-    private readonly usersService: UsersService,
+    private readonly googleAuthService: GoogleAuthService,
     configService: ConfigService,
   ) {
     const domain = configService.getOrThrow('DOMAIN')
@@ -33,7 +32,7 @@ export class MeController {
       throw new ForbiddenException();
     }
 
-    return this.usersService.getUser(cookie);
+    return this.googleAuthService.getUser(cookie);
   }
 
   @Post()
@@ -42,7 +41,7 @@ export class MeController {
       throw new ForbiddenException();
     }
 
-    const meData = await this.usersService.getUser(token);
+    const meData = await this.googleAuthService.getUser(token);
 
     res
       .cookie(this.cookieName, token, this.cookieOptions)

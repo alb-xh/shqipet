@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@shqipet/config';
+import { AuthModule } from '@shqipet/auth';
 
-import { MeController, GoogleTokenManagerService, UsersService } from './me';
+import { MeController } from './me';
 import { StorageModule } from '@shqipet/storage';
 
 @Module({
-  imports: [ ConfigModule, StorageModule ],
+  imports: [ ConfigModule, AuthModule, StorageModule ],
   controllers: [ MeController ],
-  providers: [ GoogleTokenManagerService, UsersService ],
 })
 export class AppModule {}

@@ -35,15 +35,15 @@ exports.AppModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(6);
-const me_1 = __webpack_require__(9);
-const storage_1 = __webpack_require__(15);
+const auth_1 = __webpack_require__(9);
+const me_1 = __webpack_require__(13);
+const storage_1 = __webpack_require__(16);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule, storage_1.StorageModule],
+        imports: [config_1.ConfigModule, auth_1.AuthModule, storage_1.StorageModule],
         controllers: [me_1.MeController],
-        providers: [me_1.GoogleTokenManagerService, me_1.UsersService],
     })
 ], AppModule);
 exports.AppModule = AppModule;
@@ -94,13 +94,9 @@ module.exports = require("@nestjs/config");
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UsersService = exports.MeController = exports.GoogleTokenManagerService = void 0;
-var google_token_manager_service_1 = __webpack_require__(10);
-Object.defineProperty(exports, "GoogleTokenManagerService", ({ enumerable: true, get: function () { return google_token_manager_service_1.GoogleTokenManagerService; } }));
-var controller_1 = __webpack_require__(12);
-Object.defineProperty(exports, "MeController", ({ enumerable: true, get: function () { return controller_1.MeController; } }));
-var service_1 = __webpack_require__(14);
-Object.defineProperty(exports, "UsersService", ({ enumerable: true, get: function () { return service_1.UsersService; } }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(10), exports);
+tslib_1.__exportStar(__webpack_require__(11), exports);
 
 
 /***/ }),
@@ -108,25 +104,64 @@ Object.defineProperty(exports, "UsersService", ({ enumerable: true, get: functio
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AuthModule = void 0;
+const tslib_1 = __webpack_require__(1);
+const common_1 = __webpack_require__(3);
+const config_1 = __webpack_require__(6);
+const google_auth_service_1 = __webpack_require__(11);
+let AuthModule = class AuthModule {
+};
+AuthModule = tslib_1.__decorate([
+    (0, common_1.Module)({
+        imports: [config_1.ConfigModule],
+        providers: [google_auth_service_1.GoogleAuthService],
+        exports: [google_auth_service_1.GoogleAuthService],
+    })
+], AuthModule);
+exports.AuthModule = AuthModule;
+
+
+/***/ }),
+/* 11 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GoogleTokenManagerService = void 0;
+exports.GoogleAuthService = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(8);
-const google_auth_library_1 = __webpack_require__(11);
-let GoogleTokenManagerService = class GoogleTokenManagerService {
+const google_auth_library_1 = __webpack_require__(12);
+let GoogleAuthService = class GoogleAuthService {
     constructor(configService) {
         const clientId = configService.getOrThrow('GOOGLE_CLIENT_ID');
         this.clientId = clientId;
         this.oAuthClient = new google_auth_library_1.OAuth2Client(clientId);
     }
-    getUserInfo(token) {
+    getTicket(token) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const ticket = yield this.oAuthClient.verifyIdToken({
+            return this.oAuthClient.verifyIdToken({
                 idToken: token,
                 audience: this.clientId
             });
+        });
+    }
+    isValid(token) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.getTicket(token);
+                return true;
+            }
+            catch (_a) {
+                return false;
+            }
+        });
+    }
+    getUser(token) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const ticket = yield this.getTicket(token);
             const { picture, name, given_name, family_name } = ticket.getPayload();
             const userName = name || [given_name, family_name].join(' ');
             if (!userName) {
@@ -139,21 +174,32 @@ let GoogleTokenManagerService = class GoogleTokenManagerService {
         });
     }
 };
-GoogleTokenManagerService = tslib_1.__decorate([
+GoogleAuthService = tslib_1.__decorate([
     (0, common_1.Injectable)(),
     tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _a : Object])
-], GoogleTokenManagerService);
-exports.GoogleTokenManagerService = GoogleTokenManagerService;
+], GoogleAuthService);
+exports.GoogleAuthService = GoogleAuthService;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ ((module) => {
 
 module.exports = require("google-auth-library");
 
 /***/ }),
-/* 12 */
+/* 13 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MeController = void 0;
+var controller_1 = __webpack_require__(14);
+Object.defineProperty(exports, "MeController", ({ enumerable: true, get: function () { return controller_1.MeController; } }));
+
+
+/***/ }),
+/* 14 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -161,13 +207,13 @@ var _a, _b, _c, _d, _e, _f;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MeController = void 0;
 const tslib_1 = __webpack_require__(1);
-const express_1 = __webpack_require__(13);
+const express_1 = __webpack_require__(15);
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(8);
-const service_1 = __webpack_require__(14);
+const auth_1 = __webpack_require__(9);
 let MeController = class MeController {
-    constructor(usersService, configService) {
-        this.usersService = usersService;
+    constructor(googleAuthService, configService) {
+        this.googleAuthService = googleAuthService;
         this.cookieName = 'me';
         this.cookieOptions = {
             path: '/users',
@@ -184,14 +230,14 @@ let MeController = class MeController {
         if (!cookie) {
             throw new common_1.ForbiddenException();
         }
-        return this.usersService.getUser(cookie);
+        return this.googleAuthService.getUser(cookie);
     }
     createMe(token, res) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             if (!token) {
                 throw new common_1.ForbiddenException();
             }
-            const meData = yield this.usersService.getUser(token);
+            const meData = yield this.googleAuthService.getUser(token);
             res
                 .cookie(this.cookieName, token, this.cookieOptions)
                 .send(meData);
@@ -227,65 +273,16 @@ tslib_1.__decorate([
 ], MeController.prototype, "removeMe", null);
 MeController = tslib_1.__decorate([
     (0, common_1.Controller)('/me'),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof service_1.UsersService !== "undefined" && service_1.UsersService) === "function" ? _a : Object, typeof (_b = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _b : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof auth_1.GoogleAuthService !== "undefined" && auth_1.GoogleAuthService) === "function" ? _a : Object, typeof (_b = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _b : Object])
 ], MeController);
 exports.MeController = MeController;
 
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ ((module) => {
 
 module.exports = require("express");
-
-/***/ }),
-/* 14 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-var _a, _b;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UsersService = void 0;
-const tslib_1 = __webpack_require__(1);
-const common_1 = __webpack_require__(3);
-const storage_1 = __webpack_require__(15);
-const google_token_manager_service_1 = __webpack_require__(10);
-let UsersService = class UsersService {
-    constructor(googleTokenManagerService, imagesStorageService) {
-        this.googleTokenManagerService = googleTokenManagerService;
-        this.imagesStorageService = imagesStorageService;
-    }
-    getUser(token) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const { name, avatar } = yield this.googleTokenManagerService.getUserInfo(token);
-            const ourAvatar = avatar
-                ? yield this.imagesStorageService.saveByUrl(avatar)
-                : null;
-            return {
-                avatar: ourAvatar,
-                name,
-            };
-        });
-    }
-};
-UsersService = tslib_1.__decorate([
-    (0, common_1.Injectable)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof google_token_manager_service_1.GoogleTokenManagerService !== "undefined" && google_token_manager_service_1.GoogleTokenManagerService) === "function" ? _a : Object, typeof (_b = typeof storage_1.ImagesStorageService !== "undefined" && storage_1.ImagesStorageService) === "function" ? _b : Object])
-], UsersService);
-exports.UsersService = UsersService;
-;
-
-
-/***/ }),
-/* 15 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(16), exports);
-tslib_1.__exportStar(__webpack_require__(17), exports);
-
 
 /***/ }),
 /* 16 */
@@ -293,10 +290,21 @@ tslib_1.__exportStar(__webpack_require__(17), exports);
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(17), exports);
+tslib_1.__exportStar(__webpack_require__(18), exports);
+
+
+/***/ }),
+/* 17 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.StorageModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
-const images_storage_service_1 = __webpack_require__(17);
+const images_storage_service_1 = __webpack_require__(18);
 let StorageModule = class StorageModule {
 };
 StorageModule = tslib_1.__decorate([
@@ -310,7 +318,7 @@ exports.StorageModule = StorageModule;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -318,10 +326,10 @@ var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ImagesStorageService = void 0;
 const tslib_1 = __webpack_require__(1);
-const fs = tslib_1.__importStar(__webpack_require__(18));
-const promises_1 = __webpack_require__(19);
-const axios_1 = tslib_1.__importDefault(__webpack_require__(20));
-const path_1 = __webpack_require__(21);
+const fs = tslib_1.__importStar(__webpack_require__(19));
+const promises_1 = __webpack_require__(20);
+const axios_1 = tslib_1.__importDefault(__webpack_require__(21));
+const path_1 = __webpack_require__(22);
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(8);
 let ImagesStorageService = class ImagesStorageService {
@@ -399,25 +407,25 @@ exports.ImagesStorageService = ImagesStorageService;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ ((module) => {
 
 module.exports = require("fs");
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ ((module) => {
 
 module.exports = require("fs/promises");
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ ((module) => {
 
 module.exports = require("axios");
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ ((module) => {
 
 module.exports = require("path");
