@@ -230,7 +230,13 @@ let MeController = class MeController {
         if (!cookie) {
             throw new common_1.ForbiddenException();
         }
-        return this.googleAuthService.getUser(cookie);
+        try {
+            const user = this.googleAuthService.getUser(cookie);
+            return user;
+        }
+        catch (_a) {
+            throw new common_1.ForbiddenException();
+        }
     }
     createMe(token, res) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {

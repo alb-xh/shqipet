@@ -341,7 +341,11 @@ const window = new jsdom_1.JSDOM('').window;
 const { sanitize } = (0, dompurify_1.default)(window);
 class MessageFormatter {
     format(text) {
-        return marked_1.marked.parseInline(sanitize(text));
+        return marked_1.marked.parseInline(sanitize(text), {
+            headerIds: false,
+            mangle: false,
+            highlight: null,
+        });
     }
 }
 exports.MessageFormatter = MessageFormatter;

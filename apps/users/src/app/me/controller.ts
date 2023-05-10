@@ -32,7 +32,12 @@ export class MeController {
       throw new ForbiddenException();
     }
 
-    return this.googleAuthService.getUser(cookie);
+    try {
+      const user = this.googleAuthService.getUser(cookie);
+      return user;
+    } catch {
+      throw new ForbiddenException();
+    }
   }
 
   @Post()
