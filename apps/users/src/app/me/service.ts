@@ -14,12 +14,8 @@ export class UsersService {
   async getUser (token: string): Promise<UserInfo> {
     const { name, avatar } = await this.googleTokenManagerService.getUserInfo(token);
 
-    const ourAvatar = avatar
-      ? await this.imagesStorageService.saveByUrl(avatar)
-      : null;
-
     return {
-      avatar: ourAvatar,
+      avatar,
       name,
     };
   }
