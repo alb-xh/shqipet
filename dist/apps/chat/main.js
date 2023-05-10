@@ -26,8 +26,8 @@ const config_1 = __webpack_require__(5);
 const geo_1 = __webpack_require__(8);
 const geo_map_1 = __webpack_require__(14);
 const chat_gateway_1 = __webpack_require__(15);
-const message_formatter_1 = __webpack_require__(22);
-const auth_1 = __webpack_require__(26);
+const message_formatter_1 = __webpack_require__(21);
+const auth_1 = __webpack_require__(25);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
@@ -228,10 +228,10 @@ const websockets_1 = __webpack_require__(17);
 const geo_1 = __webpack_require__(8);
 const common_1 = __webpack_require__(18);
 const config_1 = __webpack_require__(7);
-const socket_io_1 = __webpack_require__(21);
+const socket_io_1 = __webpack_require__(20);
 const geo_map_1 = __webpack_require__(14);
-const message_formatter_1 = __webpack_require__(22);
-const auth_1 = __webpack_require__(26);
+const message_formatter_1 = __webpack_require__(21);
+const auth_1 = __webpack_require__(25);
 const cors = {
     credentials: true,
     origin: '*',
@@ -242,16 +242,26 @@ let ChatGateway = class ChatGateway {
         this.geoMap = geoMap;
         this.geoService = geoService;
         this.messageFormatter = messageFormatter;
+        this.verifiedClients = new Set();
         this.devIp = '91.82.156.27';
-        this.isLoggedIn = (0, common_1.memoizeAsync)((client) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const token = cookie_1.default.parse(client.handshake.headers.cookie)[this.cookieName];
-            return token && (yield this.googleAuthService.isValid(token));
-        }), (client) => client.id);
         const cookieName = configService.getOrThrow('COOKIE');
         const domain = configService.getOrThrow('DOMAIN');
         this.cookieName = cookieName;
         this.domain = domain;
         cors.origin = new RegExp(domain);
+    }
+    isLoggedIn(client) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            if (this.verifiedClients.has(client.id)) {
+                return true;
+            }
+            const token = cookie_1.default.parse(client.handshake.headers.cookie)[this.cookieName];
+            if (token && (yield this.googleAuthService.isValid(token))) {
+                this.verifiedClients.add(client.id);
+                return true;
+            }
+            return false;
+        });
     }
     getIp(client) {
         return this.domain !== 'localhost'
@@ -327,7 +337,6 @@ module.exports = require("@nestjs/websockets");
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
 tslib_1.__exportStar(__webpack_require__(19), exports);
-tslib_1.__exportStar(__webpack_require__(20), exports);
 
 
 /***/ }),
@@ -350,57 +359,21 @@ var ChatEvent;
 
 /***/ }),
 /* 20 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.memoizeAsync = exports.memoize = void 0;
-const tslib_1 = __webpack_require__(1);
-const memoize = (fn, getKey) => {
-    const cache = new Map();
-    return (...args) => {
-        const key = getKey ? getKey(...args) : args;
-        if (cache.has(key)) {
-            return cache.get(key);
-        }
-        const value = fn(...args);
-        cache.set(key, value);
-        return value;
-    };
-};
-exports.memoize = memoize;
-const memoizeAsync = (fn, getKey) => {
-    const cache = new Map();
-    return (...args) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
-        const key = getKey ? getKey(...args) : args;
-        if (cache.has(key)) {
-            return cache.get(key);
-        }
-        const value = yield fn(...args);
-        cache.set(key, value);
-        return value;
-    });
-};
-exports.memoizeAsync = memoizeAsync;
-
-
-/***/ }),
-/* 21 */
 /***/ ((module) => {
 
 module.exports = require("socket.io");
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MessageFormatter = void 0;
 const tslib_1 = __webpack_require__(1);
-const dompurify_1 = tslib_1.__importDefault(__webpack_require__(23));
-const jsdom_1 = __webpack_require__(24);
-const marked_1 = __webpack_require__(25);
+const dompurify_1 = tslib_1.__importDefault(__webpack_require__(22));
+const jsdom_1 = __webpack_require__(23);
+const marked_1 = __webpack_require__(24);
 const window = new jsdom_1.JSDOM('').window;
 const { sanitize } = (0, dompurify_1.default)(window);
 class MessageFormatter {
@@ -417,36 +390,36 @@ exports.MessageFormatter = MessageFormatter;
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ ((module) => {
 
 module.exports = require("dompurify");
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ ((module) => {
 
 module.exports = require("jsdom");
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ ((module) => {
 
 module.exports = require("marked");
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(26), exports);
 tslib_1.__exportStar(__webpack_require__(27), exports);
-tslib_1.__exportStar(__webpack_require__(28), exports);
 
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -455,7 +428,7 @@ exports.AuthModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
 const config_1 = __webpack_require__(5);
-const google_auth_service_1 = __webpack_require__(28);
+const google_auth_service_1 = __webpack_require__(27);
 let AuthModule = class AuthModule {
 };
 AuthModule = tslib_1.__decorate([
@@ -469,7 +442,7 @@ exports.AuthModule = AuthModule;
 
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -479,7 +452,7 @@ exports.GoogleAuthService = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
 const config_1 = __webpack_require__(7);
-const google_auth_library_1 = __webpack_require__(29);
+const google_auth_library_1 = __webpack_require__(28);
 let GoogleAuthService = class GoogleAuthService {
     constructor(configService) {
         const clientId = configService.getOrThrow('GOOGLE_CLIENT_ID');
@@ -528,7 +501,7 @@ exports.GoogleAuthService = GoogleAuthService;
 
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ ((module) => {
 
 module.exports = require("google-auth-library");

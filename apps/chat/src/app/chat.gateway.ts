@@ -9,7 +9,7 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { GeoService } from '@shqipet/geo';
-import { ChatEvent, Message, memoizeAsync } from '@shqipet/common';
+import { ChatEvent, Message } from '@shqipet/common';
 import { ConfigService } from '@nestjs/config';
 import { Server, Socket } from 'socket.io';
 
@@ -26,6 +26,7 @@ const cors: Record<string, unknown> = {
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
+  private readonly verifiedClients = new Set<string>();
   private readonly cookieName: string;
   private readonly domain: string;
   private readonly devIp = '91.82.156.27';
@@ -45,11 +46,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     cors.origin = new RegExp(domain);
   }
 
-  private isLoggedIn: (client: Socket) => Promise<boolean> =
-    memoizeAsync(async (client: Socket) =>{
-      const token = cookie.parse(client.handshake.headers.cookie)[this.cookieName];
-      return token && await this.googleAuthService.isValid(token);
-    }, (client: Socket) => client.id);
+  private async isLoggedIn (client: Socket): Promise<boolean> {
+    if (this.verifiedClients.has(client.id)) {
+      return true;
+    }
+
+    const token = cookie.parse(client.handshake.headers.cookie)[this.cookieName];
+    if (token && await this.googleAuthService.isValid(token)) {
+      this.verifiedClients.add(client.id);
+
+      return true;
+    }
+
+    return false;
+  }
 
   private getIp (client: Socket): string {
     return this.domain !== 'localhost'
