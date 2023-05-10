@@ -12,27 +12,8 @@ services:
         ENV NODE_ENV production
         EXPOSE 3000
         CMD [ "node", "main.js" ]
-    volumes:
-      - ~/storage/images:/usr/src/app/images
     ports:
       - "3000:3000"
-    restart: always
-  images:
-    container_name: images
-    build:
-      context: .
-      dockerfile_inline: |
-        FROM node:18.16.0-alpine
-        WORKDIR /usr/src/app
-        COPY ./node_modules ./node_modules
-        COPY ./dist/apps/images package.json .prod.env .
-        ENV NODE_ENV production
-        EXPOSE 4000
-        CMD [ "node", "main.js" ]
-    volumes:
-      - ~/storage/images:/usr/src/app/images
-    ports:
-      - "4000:4000"
     restart: always
   chat:
     container_name: chat

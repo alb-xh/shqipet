@@ -1,1 +1,0 @@
-export { ImagesController } from './controller';

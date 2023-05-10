@@ -3,10 +3,9 @@ import { ConfigModule } from '@shqipet/config';
 import { AuthModule } from '@shqipet/auth';
 
 import { MeController } from './me';
-import { StorageModule } from '@shqipet/storage';
 
 @Module({
-  imports: [ ConfigModule, AuthModule, StorageModule ],
+  imports: [ ConfigModule, AuthModule ],
   controllers: [ MeController ],
 })
 export class AppModule {}
