@@ -1,9 +1,6 @@
-export interface Marker {
-  lat: number,
-  lng: number,
-  city: string,
-  active: number,
-}
+import { GeoInfo } from "@shqipet/common"
+
+export type Marker = GeoInfo &  { active: number };
 
 export interface AlertSettings {
   text: string,

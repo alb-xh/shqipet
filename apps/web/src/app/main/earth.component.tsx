@@ -34,7 +34,7 @@ export default function Earth () {
 
         const tooltip = document.createElement('span');
         tooltip.className = "tooltiptext";
-        tooltip.innerHTML = `${m.city}&nbsp;&nbsp;<span class="online">${m.active}</span>`;
+        tooltip.innerHTML = `${m.city || m.name}&nbsp;&nbsp;<span class="online">${m.active}</span>`;
 
         el.appendChild(tooltip);
 

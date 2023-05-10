@@ -5,20 +5,17 @@ import { Marker } from "./types";
 export const getMarkersFromGeoMap = (geoMap: GeoMap): Marker[] => {
   const markers = [];
 
-  for (const { lat, lng, city } of Object.values(geoMap)) {
-    if (!lat || !lng || !city) {
+  for (const { lat, lng, name, city } of Object.values(geoMap)) {
+    if (!lat || !lng || !name) {
       continue;
     }
 
-    const marker = markers.find((m) => (
-      m.lat === lat &&
-      m.lng === lng &&
-      m.city === city
-    ));
+    const marker = markers.find((m) => m.lat === lat && m.lng === lng);
 
     if (!marker) {
-      markers.push({ lat, lng, city, active: 1 });
+      markers.push({ lat, lng, name, city, active: 1 });
     } else {
+      marker.city = marker.city || city;
       marker.active++;
     }
   }
