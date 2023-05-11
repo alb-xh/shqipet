@@ -12,6 +12,7 @@ import Login from "./common/login.component";
 import chatSocket from "./common/chat.socket";
 import Authorship from "./common/authorship.component";
 import Alert from "./common/alert.component";
+import PrivacyPolicyPage from "./privacy-policy";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -20,6 +21,7 @@ function App() {
   const [geoMap, setGeoMap ] = useState({});
   const [messages, setMessages] = useState([]);
   const [alert, setAlert] = useState(null);
+  const [showPolicy, setShowPolicy] = useState(false);
 
   useEffect(() => {
     chatSocket.on(ChatEvent.UpdateGeoMap, setGeoMap);
@@ -32,6 +34,18 @@ function App() {
       chatSocket.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    const isPolicyPage = window.location.pathname === '/privacy-policy';
+
+    if (!showPolicy && isPolicyPage) {
+      setShowPolicy(true);
+    }
+
+    if (showPolicy && !isPolicyPage) {
+      setShowPolicy(false);
+    }
+  }, [window.location.pathname])
 
   useEffect(() => {
     if (!user) {
@@ -72,13 +86,14 @@ function App() {
     <AppContext.Provider value={value}>
       <Logo />
       <Alert />
-      { loading ? <Loading /> : null }
+      { showPolicy && <PrivacyPolicyPage /> }
+      { !showPolicy && loading ? <Loading /> : null }
 
-      { !loading && !user && !login ? <Login /> : null }
-      { !loading && !user && login ? <LoginPage /> : null }
+      { !showPolicy && !loading && !user && !login ? <Login /> : null }
+      { !showPolicy && !loading && !user && login ? <LoginPage /> : null }
 
-      { !loading && !login ? <MainPage /> : null }
-      { !loading && !login && user ? <Logout /> : null }
+      { !showPolicy && !loading && !login ? <MainPage /> : null }
+      { !showPolicy && !loading && !login && user ? <Logout /> : null }
       <Authorship />
     </AppContext.Provider>
   );
