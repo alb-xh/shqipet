@@ -27,18 +27,6 @@ function App() {
   const [alert, setAlert] = useState(null);
 
   useEffect(() => {
-    chatSocket.on(ChatEvent.UpdateGeoMap, setGeoMap);
-    chatSocket.on(ChatEvent.BroadcastMessage, (message: Message) => {
-      setMessages((messages: Message[]) => [ ...messages, message ].slice(-100));
-    });
-
-    chatSocket.connect();
-    return () => {
-      chatSocket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
     if (!user) {
       setLoading(true);
 
@@ -51,6 +39,18 @@ function App() {
           setLoading(false);
         });
     }
+
+    chatSocket.on(ChatEvent.UpdateGeoMap, setGeoMap);
+    chatSocket.on(ChatEvent.BroadcastMessage, (message: Message) => {
+      setMessages((messages: Message[]) => [ ...messages, message ].slice(-100));
+    });
+
+    chatSocket.connect();
+
+    return () => {
+      chatSocket.off();
+      chatSocket.disconnect();
+    };
   }, [user]);
 
   const sendMessage = (message: Message) => {
