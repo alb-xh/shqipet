@@ -3,7 +3,7 @@ import Globe from 'react-globe.gl';
 import { useContext, useMemo } from 'react';
 
 import earth from '../../assets/earth-texture.jpg';
-import space from '../../assets/space.png';
+import space from '../../assets/space.webp';
 import AppContext from '../common/app.context';
 import markerIcon from './marker.icon';
 
