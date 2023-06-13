@@ -7,7 +7,7 @@ function MainPage() {
   return (
     <Box className="main">
       <Earth />
-      <GroupChat />
+      {/* <GroupChat /> */}
     </Box>
   );
 }

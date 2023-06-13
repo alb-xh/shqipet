@@ -2,7 +2,6 @@ import { useState, useMemo, useEffect } from "react";
 import { ChatEvent, Message, UserInfo } from "@shqipet/common";
 
 import MainPage from "./main";
-import LoginPage from "./login";
 import AppContext from "./common/app.context";
 import Logo from './common/logo.component';
 import Logout from "./common/logout.component";
@@ -10,9 +9,7 @@ import Loading from "./common/loading.component";
 import usersClient from "./common/usersClient";
 import Login from "./common/login.component";
 import chatSocket from "./common/chat.socket";
-import Authorship from "./common/authorship.component";
 import Alert from "./common/alert.component";
-import PrivacyPolicyPage from "./privacy-policy";
 import { usePage } from "./helpers";
 
 function App() {
@@ -75,17 +72,9 @@ function App() {
 
   return (
     <AppContext.Provider value={value}>
-      <Logo />
       <Alert />
-      { showPolicy && <PrivacyPolicyPage /> }
       { !showPolicy && loading ? <Loading /> : null }
-
-      { !showPolicy && !loading && !user && !login ? <Login /> : null }
-      { !showPolicy && !loading && !user && login ? <LoginPage /> : null }
-
       { !showPolicy && !loading && !login ? <MainPage /> : null }
-      { !showPolicy && !loading && !login && user ? <Logout /> : null }
-      <Authorship />
     </AppContext.Provider>
   );
 }

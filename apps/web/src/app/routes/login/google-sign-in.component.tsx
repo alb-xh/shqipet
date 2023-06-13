@@ -1,13 +1,13 @@
 import { useRef, useEffect, useContext } from 'react';
 
-import AppContext from '../common/app.context';
-import usersClient from '../common/usersClient';
+import AppContext from '../../common/app.context';
+import usersClient from '../../common/usersClient';
 
-import { GOOGLE_CLIENT_ID } from '../config';
+import { GOOGLE_CLIENT_ID } from '../../config';
 import { Box } from '@mui/material';
-import { isSmallDevice } from '../helpers';
+import { isSmallDevice } from '../../helpers';
 
-export default function GoogleSignIn () {
+export const GoogleSignIn = () => {
   const { setUser, setLoading, setLogin, setAlert } = useContext(AppContext);
   const ref = useRef(null);
 

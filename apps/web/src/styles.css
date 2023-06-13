@@ -1,5 +1,6 @@
 body {
   background-color: black;
+  margin: 0px;
 }
 
 .root {
@@ -80,7 +81,7 @@ body {
 }
 
 .logo {
-  height: 100px;
+  height: 70px;
   user-select: none;
   cursor: pointer;
 }
@@ -100,7 +101,6 @@ body {
 }
 
 .main {
-  height: 80vh;
   position: relative;
 }
 
@@ -171,7 +171,6 @@ body {
   display: flex;
   justify-content: center;
   position: relative;
-  top: -50px;
 }
 
 .policy > div {

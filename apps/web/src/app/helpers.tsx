@@ -33,7 +33,7 @@ export const getEarthDimensions = () => ({
     : window.innerWidth,
   height: isSmallDevice() && !isLandscape()
     ? window.innerHeight * 0.825
-    : window.innerHeight * 0.8,
+    : window.innerHeight * 0.85,
 });
 
 export const usePage = () => {
