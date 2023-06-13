@@ -3,7 +3,7 @@ import { UserInfo } from '@shqipet/common';
 
 import { USERS_ENDPOINT_URL } from '../config';
 
-class UsersClient {
+class UserClient {
   private readonly meEndpoint: string;
   constructor (usersEndpoint: string) {
     this.meEndpoint = `${usersEndpoint}/me`;
@@ -24,6 +24,4 @@ class UsersClient {
   }
 }
 
-const usersClient = new UsersClient(USERS_ENDPOINT_URL);
-
-export default usersClient;
+export const userClient = new UserClient(USERS_ENDPOINT_URL);

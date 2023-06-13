@@ -2,16 +2,16 @@
 import Globe from 'react-globe.gl';
 import { useContext, useMemo } from 'react';
 
-import earth from '../../assets/earth-texture.jpg';
-import space from '../../assets/space.webp';
-import AppContext from '../common/app.context';
-import markerIcon from './marker.icon';
+import earth from '../../../assets/earth-texture.jpg';
+import space from '../../../assets/space.webp';
 
-import { getEarthDimensions, getMarkersFromGeoMap } from '../helpers';
-import { Marker } from '../types';
+import { appContext } from '../../common/app.context';
+import { getEarthDimensions, getMarkersFromGeoMap } from '../../helpers';
+import { markerIcon } from '../../constants';
+import { Marker } from '../../types';
 
-export default function Earth () {
-  const { geoMap } = useContext(AppContext);
+export const Earth = () => {
+  const { geoMap } = useContext(appContext);
   const markers = useMemo(() => getMarkersFromGeoMap(geoMap), [ geoMap ]);
 
   return (

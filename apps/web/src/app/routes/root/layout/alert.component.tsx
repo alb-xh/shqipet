@@ -1,9 +1,10 @@
 import { Box, Alert as MuiAlert } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import AppContext from "./app.context";
 
-export default function Alert () {
-  const { alert, setAlert } = useContext(AppContext);
+import { appContext } from "../../../common/app.context";
+
+export const Alert = () => {
+  const { alert, setAlert } = useContext(appContext);
   const [time, setTime] = useState(null);
 
   useEffect(() => {
@@ -25,7 +26,7 @@ export default function Alert () {
   const { text, severity } = alert;
 
   return (
-    <Box className='alert'>
+    <Box>
       <MuiAlert severity={severity}>{text}</MuiAlert>
     </Box>
   );

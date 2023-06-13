@@ -1,14 +1,11 @@
 import { createContext } from "react";
 import { GeoMap, UserInfo, Message } from '@shqipet/common';
+
 import { AlertSettings } from "../types";
 
 export interface AppContextInterface {
-  loading: boolean,
-  setLoading: (flag: boolean) => void,
   user: UserInfo | null,
   setUser: (user: UserInfo | null) => void,
-  login: boolean,
-  setLogin: (flag: boolean) => void,
   geoMap: GeoMap,
   setGeoMap: (geoMap: GeoMap) => void,
   messages: Message[],
@@ -18,13 +15,9 @@ export interface AppContextInterface {
   setAlert: (settings: AlertSettings | null) => void,
 };
 
-const AppContext = createContext<AppContextInterface>({
-  loading: false,
-  setLoading: () => undefined,
+export const appContext = createContext<AppContextInterface>({
   user: null,
   setUser: () => undefined,
-  login: false,
-  setLogin: () => undefined,
   geoMap: {},
   setGeoMap: () => undefined,
   messages: [],
@@ -34,4 +27,3 @@ const AppContext = createContext<AppContextInterface>({
   setAlert: () => undefined,
 });
 
-export default AppContext;

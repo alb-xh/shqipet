@@ -1,42 +1,63 @@
 import { useState, useMemo, useEffect } from "react";
-import { ChatEvent, Message, UserInfo } from "@shqipet/common";
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
 
-import MainPage from "./main";
-import AppContext from "./common/app.context";
-import Logo from './common/logo.component';
-import Logout from "./common/logout.component";
-import Loading from "./common/loading.component";
-import usersClient from "./common/usersClient";
-import Login from "./common/login.component";
-import chatSocket from "./common/chat.socket";
-import Alert from "./common/alert.component";
-import { usePage } from "./helpers";
+import { ChatEvent, Message } from "@shqipet/common";
 
-function App() {
-  const page = usePage();
-  const showPolicy = page === 'privacy-policy';
+import { appContext, chatSocket  } from './common';
 
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [login, setLogin] = useState(false);
+import { Path } from "./constants";
+import { RootLayout, Root, PrivacyPolicy, Login, Logout } from "./routes";
+import { Error, ComingSoon } from './pages'
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <RootLayout />,
+    errorElement: <Error />,
+    children: [
+      {
+        path: Path.Root,
+        element: <Root />,
+      },
+      {
+        path: Path.Chat,
+        element: <Root />,
+      },
+      {
+        path: Path.Logout,
+        element: <Logout />,
+      },
+      {
+        path: Path.PrivacyPolicy,
+        element: <PrivacyPolicy />,
+      },
+      {
+        path: Path.Login,
+        element: <Login />,
+      },
+    ]
+  },
+  {
+    path: Path.Games,
+    element: <ComingSoon />,
+  },
+  {
+    path: Path.Posts,
+    element: <ComingSoon />,
+  },
+]);
+
+
+export const App = () => {
+  const [user, setUser] = useState(undefined);
+  const [alert, setAlert] = useState(null);
   const [geoMap, setGeoMap ] = useState({});
   const [messages, setMessages] = useState([]);
-  const [alert, setAlert] = useState(null);
 
   useEffect(() => {
-    if (!user) {
-      setLoading(true);
-
-      usersClient.getMe()
-        .then((user: UserInfo) => {
-          setUser(user);
-          setLoading(false);
-        })
-        .catch(() => {
-          setLoading(false);
-        });
-    }
-
     chatSocket.on(ChatEvent.UpdateGeoMap, setGeoMap);
     chatSocket.on(ChatEvent.BroadcastMessage, (message: Message) => {
       setMessages((messages: Message[]) => [ ...messages, message ].slice(-100));
@@ -57,10 +78,6 @@ function App() {
   const value = useMemo(() => ({
     user,
     setUser,
-    loading,
-    setLoading,
-    login,
-    setLogin,
     geoMap,
     setGeoMap,
     messages,
@@ -68,17 +85,12 @@ function App() {
     sendMessage,
     alert,
     setAlert,
-  }),[ user, loading, login, geoMap, messages, alert ]);
+  }),[ user, geoMap, messages, alert ]);
+
 
   return (
-    <AppContext.Provider value={value}>
-      <Alert />
-      { !showPolicy && loading ? <Loading /> : null }
-      { !showPolicy && !loading && !login ? <MainPage /> : null }
-    </AppContext.Provider>
+    <appContext.Provider value={value}>
+      <RouterProvider router={router} />
+    </appContext.Provider>
   );
-}
-
-export default App;
-
-
+};

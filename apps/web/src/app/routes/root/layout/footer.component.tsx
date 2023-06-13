@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useContext } from 'react';
+
 import { Box, BottomNavigation, BottomNavigationAction, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom"
 
@@ -6,10 +8,13 @@ import BookIcon from '@mui/icons-material/Book';
 import GamesIcon from '@mui/icons-material/Games';
 import ChatIcon from '@mui/icons-material/Chat';
 import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
 import PolicyIcon from '@mui/icons-material/Policy';
 import HomeIcon from '@mui/icons-material/Home';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 
-import { AUTHOR_GITHUB_URL, Path } from '../../constants';
+import { appContext } from '../../../common/app.context';
+import { AUTHOR_GITHUB_URL, Path } from '../../../constants';
 
 const NavigationItem = ({ label, icon, to }) => {
   const navigate = useNavigate();
@@ -39,7 +44,7 @@ const NavigationItem = ({ label, icon, to }) => {
 }
 
 export const Footer = () => {
-  const [value, setValue] = React.useState(0);
+  const { user } = useContext(appContext);
 
   return (
     <Box sx={{
@@ -50,21 +55,16 @@ export const Footer = () => {
       <BottomNavigation
         sx={{ backgroundColor: '#f9f9f933', color: 'white' }}
         showLabels
-        value={value}
-        onChange={(event, newValue) => {
-          setValue(newValue);
-          console.log(newValue);
-        }}
       >
-        <NavigationItem
-          label="Author"
-          icon={<BookIcon />}
-          to={AUTHOR_GITHUB_URL}
-        />
         <NavigationItem
           label="Home"
           icon={<HomeIcon />}
           to={Path.Root}
+        />
+        <NavigationItem
+          label="Author"
+          icon={<BookIcon />}
+          to={AUTHOR_GITHUB_URL}
         />
         <NavigationItem
           label="Games"
@@ -72,20 +72,37 @@ export const Footer = () => {
           to={Path.Games}
         />
         <NavigationItem
+          label="Posts"
+          icon={<ListAltIcon />}
+          to={Path.Posts}
+        />
+        <NavigationItem
           label="Chat"
           icon={<ChatIcon />}
           to={Path.Chat}
-        />
-        <NavigationItem
-          label="Login"
-          icon={<LoginIcon />}
-          to={Path.Login}
         />
         <NavigationItem
           label="Privacy Policy"
           icon={<PolicyIcon />}
           to={Path.PrivacyPolicy}
         />
+        {
+          user
+            ? (
+              <NavigationItem
+                label="Logout"
+                icon={<LogoutIcon />}
+                to={Path.Logout}
+              />
+            )
+            : (
+              <NavigationItem
+                label="Login"
+                icon={<LoginIcon />}
+                to={Path.Login}
+              />
+            )
+        }
       </BottomNavigation>
     </Box>
   );

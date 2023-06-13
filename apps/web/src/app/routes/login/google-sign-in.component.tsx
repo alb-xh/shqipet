@@ -1,27 +1,29 @@
 import { useRef, useEffect, useContext } from 'react';
 
-import AppContext from '../../common/app.context';
-import usersClient from '../../common/usersClient';
+import { appContext } from '../../common/app.context';
+import { userClient } from '../../common/user.client';
 
 import { GOOGLE_CLIENT_ID } from '../../config';
 import { Box } from '@mui/material';
 import { isSmallDevice } from '../../helpers';
 
 export const GoogleSignIn = () => {
-  const { setUser, setLoading, setLogin, setAlert } = useContext(AppContext);
   const ref = useRef(null);
+
+  const { setUser, setAlert } = useContext(appContext);
 
   const callback = async (res: any, error: any) => {
     if (error) {
       setAlert({ severity: 'error',  text: 'Something went wrong!' });
+      setUser(null);
     } else {
-      setLoading(true);
-
-      const user = await usersClient.signIn(res.credential);
-
-      setUser(user);
-      setLogin(false);
-      setLoading(false);
+      try {
+        const user = await userClient.signIn(res.credential)
+        setUser(user);
+      } catch {
+        setAlert({ severity: 'error',  text: 'Something went wrong!' });
+        setUser(null);
+      }
     }
   };
 

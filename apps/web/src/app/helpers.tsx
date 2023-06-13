@@ -1,7 +1,6 @@
 import { GeoMap } from "@shqipet/common";
 
 import { Marker } from "./types";
-import { useEffect, useState } from "react";
 
 export const getMarkersFromGeoMap = (geoMap: GeoMap): Marker[] => {
   const markers = [];
@@ -35,17 +34,3 @@ export const getEarthDimensions = () => ({
     ? window.innerHeight * 0.825
     : window.innerHeight * 0.85,
 });
-
-export const usePage = () => {
-  const [page, setPage] = useState('');
-
-  useEffect(() => {
-    const newPage = new URL(window.location.href).searchParams.get('page') || '';
-
-    if (newPage !== page) {
-      setPage(newPage);
-    }
-  }, [ window.location.href ]);
-
-  return page;
-}

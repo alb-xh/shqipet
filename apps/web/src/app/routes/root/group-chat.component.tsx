@@ -1,14 +1,17 @@
 import Avatar from '@mui/material/Avatar';
 import { Box, Button, Paper, TextField } from '@mui/material';
 import { KeyboardEventHandler, useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import AppContext from '../common/app.context';
+import { Path } from '../../constants';
+import { appContext } from '../../common/app.context';
 
 const messagesPanelId = 'message-panel';
 
-const GroupChat = () => {
-  const { user, messages, sendMessage, setAlert } = useContext(AppContext);
-  const [isVisible, setIsVisible] = useState(false);
+export const GroupChat = () => {
+  const navigate = useNavigate();
+
+  const { user, messages, sendMessage, setAlert } = useContext(appContext);
   const [newMessage, setNewMessage] = useState<string>('');
 
   useEffect(() => {
@@ -36,17 +39,9 @@ const GroupChat = () => {
     }
   };
 
-  const toggleVisibility = () => {
-    setIsVisible(!isVisible);
+  const handleHide = () => {
+    navigate(Path.Root);
   };
-
-  if (!isVisible) {
-    return (
-      <Button className="show-button" variant="contained" onClick={toggleVisibility}>
-        Show
-      </Button>
-    );
-  }
 
   return (
     <Paper className='group-chat'>
@@ -97,12 +92,10 @@ const GroupChat = () => {
         <Button variant="contained" className='messages-button send-button' onClick={handleSend} >
           Send
         </Button>
-        <Button variant="contained" className='messages-button hide-button' onClick={toggleVisibility}>
+        <Button variant="contained" className='messages-button hide-button' onClick={handleHide}>
           Hide
         </Button>
       </Box>
     </Paper>
   );
 };
-
-export default GroupChat;
