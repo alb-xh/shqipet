@@ -1,6 +1,7 @@
 import { GeoMap } from "@shqipet/common";
 
 import { Marker } from "./types";
+import { markerIcon } from "./constants";
 
 export const getMarkersFromGeoMap = (geoMap: GeoMap): Marker[] => {
   const markers = [];
@@ -23,6 +24,26 @@ export const getMarkersFromGeoMap = (geoMap: GeoMap): Marker[] => {
   return markers;
 };
 
+export const markerToHtmlElement = (marker: Marker) => {
+  const el = document.createElement('div');
+  el.className="tooltip";
+  el.innerHTML= markerIcon;
+
+  el.style.color = 'red';
+  el.style.width = `30px`;
+  el.style['pointer-events'] = 'auto';
+  el.style.cursor = 'pointer';
+
+  const tooltip = document.createElement('span');
+  tooltip.className = "tooltiptext";
+  tooltip.innerHTML = `${marker.city || marker.name}&nbsp;&nbsp;<span class="online">${marker.active}</span>`;
+
+  el.appendChild(tooltip);
+
+  return el;
+}
+
+
 export const isSmallDevice = () => window.innerWidth <= 700;
 export const isLandscape = () => window.innerWidth > window.innerHeight;
 
@@ -34,3 +55,5 @@ export const getEarthDimensions = () => ({
     ? window.innerHeight * 0.825
     : window.innerHeight * 0.85,
 });
+
+export const capOnlyFirst = (str: string) => str[0].toUpperCase() + str.slice(1).toLowerCase();

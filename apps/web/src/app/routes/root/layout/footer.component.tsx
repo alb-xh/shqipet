@@ -1,6 +1,3 @@
-import * as React from 'react';
-import { useContext } from 'react';
-
 import { Box, BottomNavigation, BottomNavigationAction, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom"
 
@@ -13,8 +10,8 @@ import PolicyIcon from '@mui/icons-material/Policy';
 import HomeIcon from '@mui/icons-material/Home';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 
-import { appContext } from '../../../common/app.context';
 import { AUTHOR_GITHUB_URL, Path } from '../../../constants';
+import { useUser } from '../../../common';
 
 const NavigationItem = ({ label, icon, to }) => {
   const navigate = useNavigate();
@@ -44,7 +41,7 @@ const NavigationItem = ({ label, icon, to }) => {
 }
 
 export const Footer = () => {
-  const { user } = useContext(appContext);
+  const { user } = useUser()
 
   return (
     <Box sx={{

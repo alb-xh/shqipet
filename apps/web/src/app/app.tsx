@@ -9,7 +9,7 @@ import { ChatEvent, Message } from "@shqipet/common";
 import { appContext, chatSocket  } from './common';
 
 import { Path } from "./constants";
-import { RootLayout, Root, PrivacyPolicy, Login, Logout, Chess, Games } from "./routes";
+import { RootLayout, Root, PrivacyPolicy, Login, Logout, Games, Rooms } from "./routes";
 import { Error, ComingSoon } from './pages'
 
 const router = createBrowserRouter([
@@ -35,6 +35,10 @@ const router = createBrowserRouter([
         element: <Games />,
       },
       {
+        path: Path.Rooms,
+        element: <Rooms />
+      },
+      {
         path: Path.PrivacyPolicy,
         element: <PrivacyPolicy />,
       },
@@ -49,7 +53,6 @@ const router = createBrowserRouter([
     element: <ComingSoon />,
   },
 ]);
-
 
 export const App = () => {
   const [user, setUser] = useState(undefined);

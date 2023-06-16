@@ -1,46 +1,60 @@
-import { useRef, useEffect, useContext } from 'react';
-
-import { appContext } from '../../common/app.context';
-import { userClient } from '../../common/user.client';
+import { useRef, useEffect } from 'react';
+import { Box } from '@mui/material';
 
 import { GOOGLE_CLIENT_ID } from '../../config';
-import { Box } from '@mui/material';
+import { userClient } from '../../common/user.client';
 import { isSmallDevice } from '../../helpers';
+import { useAlerts, useGoHome, useUser } from '../../common';
 
 export const GoogleSignIn = () => {
   const ref = useRef(null);
+  const goHome = useGoHome();
 
-  const { setUser, setAlert } = useContext(appContext);
-
-  const callback = async (res: any, error: any) => {
-    if (error) {
-      setAlert({ severity: 'error',  text: 'Something went wrong!' });
-      setUser(null);
-    } else {
-      try {
-        const user = await userClient.signIn(res.credential)
-        setUser(user);
-      } catch {
-        setAlert({ severity: 'error',  text: 'Something went wrong!' });
-        setUser(null);
-      }
-    }
-  };
+  const { user, setUser } = useUser();
+  const { unexpectedAlert } = useAlerts();
 
   useEffect(() => {
-      if (ref.current) {
-        const win = (window as any);
-        win.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback });
-        win.google.accounts.id.renderButton(ref.current, {
-          shape: 'circle',
-          theme: 'filled_blue',
-          type: 'standard',
-          size: isSmallDevice() ? 'medium' : 'large',
-        });
-      }
-  }, [ ref.current ]);
+    if (user) {
+      goHome();
+      return;
+    }
 
-  return (
-    <Box className='google-sign-in-panel' ref={ref} />
-  )
+    if (!ref.current) {
+      return;
+    }
+
+    const handleError = () => {
+      unexpectedAlert();
+      setUser(null);
+    }
+
+    const callback = (res, error) => {
+      if (error) {
+        handleError();
+        return;
+      }
+
+      return userClient.signIn(res.credential)
+        .then(setUser)
+        .catch(handleError);
+    };
+
+    const w = (window as any);
+    w.google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback });
+    w.google.accounts.id.renderButton(ref.current, {
+      shape: 'circle',
+      theme: 'filled_blue',
+      type: 'standard',
+      size: isSmallDevice() ? 'medium' : 'large',
+    });
+
+  }, [ ref.current, user, setUser, unexpectedAlert ]);
+
+  if (!user) {
+    return (
+      <Box className='google-sign-in-panel' ref={ref} />
+    )
+  }
+
+  return null;
 }

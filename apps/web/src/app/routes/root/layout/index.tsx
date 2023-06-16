@@ -3,13 +3,23 @@ import { Box } from "@mui/material";
 
 import { NavBar } from './nav-bar.component';
 import { Footer } from './footer.component';
+import { Loading, useUser } from "../../../common";
 
-export const RootLayout = () => (
-  <Box>
-    <NavBar />
-    <Box sx={{ marginBottom: '50px' }}>
-      <Outlet />
+export const RootLayout = () => {
+  const { isLoading } = useUser();
+
+  return (
+    <Box>
+      <NavBar />
+      <Box sx={{ marginBottom: '50px' }}>
+        {
+          isLoading
+            ? <Loading />
+            : <Outlet />
+        }
+      </Box>
+      <Footer />
     </Box>
-    <Footer />
-  </Box>
-);
+  );
+}
+

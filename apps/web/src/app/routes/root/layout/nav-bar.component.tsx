@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { useContext } from 'react';
 import { Grid, Box, Avatar }  from '@mui/material';
 
 import logo from '../../../../assets/logo.png';
-import { appContext } from '../../../common/app.context';
 
 import { Alert } from './alert.component';
+import { useUser } from '../../../common';
 
 const GridItem = (props) => {
   return (
@@ -25,7 +24,7 @@ const GridItem = (props) => {
 }
 
 export const NavBar = () => {
-  const { user } = useContext(appContext);
+  const { user } = useUser();
 
   return (
     <Grid

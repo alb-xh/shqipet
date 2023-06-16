@@ -1,47 +1,31 @@
 import Avatar from '@mui/material/Avatar';
 import { Box, Button, Paper, TextField } from '@mui/material';
-import { KeyboardEventHandler, useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
-import { Path } from '../../constants';
-import { appContext } from '../../common/app.context';
+import { useMessages, useGoHome } from '../../common';
 
 const messagesPanelId = 'message-panel';
 
-export const GroupChat = () => {
-  const navigate = useNavigate();
 
-  const { user, messages, sendMessage, setAlert } = useContext(appContext);
-  const [newMessage, setNewMessage] = useState<string>('');
+export const GroupChat = () => {
+  const goHome = useGoHome();
+
+  const {
+    messages,
+    message,
+    send,
+    type,
+    submit,
+  } = useMessages();
 
   useEffect(() => {
     const panel = document.getElementById(messagesPanelId);
+
     if (panel) {
       panel.scrollTop = panel.scrollHeight;
     }
+
   }, [ messages ]);
-
-  const handleSend = () => {
-    if (newMessage) {
-      if (!user) {
-        setAlert({ text: 'You must login first', severity: 'warning' });
-      } else {
-        sendMessage({ user, text: newMessage });
-        setNewMessage('');
-      }
-    }
-  };
-
-  const handleSubmit: KeyboardEventHandler = (e) => {
-    if (e?.key === 'Enter') {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
-  const handleHide = () => {
-    navigate(Path.Root);
-  };
 
   return (
     <Paper className='group-chat'>
@@ -85,14 +69,14 @@ export const GroupChat = () => {
           }}
           InputLabelProps={{ id: "message-label" }}
           InputProps={{ id: 'message-box'}}
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={handleSubmit}
+          value={message}
+          onChange={type}
+          onKeyDown={submit}
         />
-        <Button variant="contained" className='messages-button send-button' onClick={handleSend} >
+        <Button variant="contained" className='messages-button send-button' onClick={send} >
           Send
         </Button>
-        <Button variant="contained" className='messages-button hide-button' onClick={handleHide}>
+        <Button variant="contained" className='messages-button hide-button' onClick={goHome}>
           Hide
         </Button>
       </Box>
