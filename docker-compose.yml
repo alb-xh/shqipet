@@ -42,7 +42,7 @@ services:
         COPY ./dist/apps/web .
         RUN npm install --global serve
         EXPOSE 4200
-        CMD [ "serve", ".", "-p", "4200" ]
+        CMD [ "serve", ".", "-p", "4200", "-s" ]
     ports:
       - "4200:4200"
     restart: always
