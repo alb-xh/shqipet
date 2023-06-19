@@ -4,12 +4,12 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-import { ChatEvent, Message } from "@shqipet/common";
+import { ChatEvent, CreateRoomMessage, JoinRoomMessage, Message, RoomInfo } from "@shqipet/common";
 
 import { appContext, chatSocket  } from './common';
 
 import { Path } from "./constants";
-import { RootLayout, Root, PrivacyPolicy, Login, Logout, Games, Rooms } from "./routes";
+import { RootLayout, Root, PrivacyPolicy, Login, Logout, Games, Rooms, Chess } from "./routes";
 import { Error, ComingSoon } from './pages'
 
 const router = createBrowserRouter([
@@ -35,7 +35,11 @@ const router = createBrowserRouter([
         element: <Games />,
       },
       {
-        path: Path.Rooms,
+        path: Path.Chess,
+        element: <Chess />,
+      },
+      {
+        path: Path.Room,
         element: <Rooms />
       },
       {
@@ -59,9 +63,11 @@ export const App = () => {
   const [alert, setAlert] = useState(null);
   const [geoMap, setGeoMap ] = useState({});
   const [messages, setMessages] = useState([]);
+  const [room, setRoom] = useState(null);
 
   useEffect(() => {
     chatSocket.on(ChatEvent.UpdateGeoMap, setGeoMap);
+    chatSocket.on(ChatEvent.UpdateRoom, setRoom);
     chatSocket.on(ChatEvent.BroadcastMessage, (message: Message) => {
       setMessages((messages: Message[]) => [ ...messages, message ].slice(-100));
     });
@@ -78,6 +84,14 @@ export const App = () => {
     chatSocket.emit(ChatEvent.CreateMessage, message);
   };
 
+  const createRoom = (message: CreateRoomMessage) => {
+    chatSocket.emit(ChatEvent.CreateRoom, message);
+  };
+
+  const joinRoom = (message: JoinRoomMessage) => {
+    chatSocket.emit(ChatEvent.JoinRoom, message);
+  };
+
   const value = useMemo(() => ({
     user,
     setUser,
@@ -88,8 +102,10 @@ export const App = () => {
     sendMessage,
     alert,
     setAlert,
-  }),[ user, geoMap, messages, alert ]);
-
+    room,
+    createRoom,
+    joinRoom,
+  }),[ user, geoMap, messages, alert, room ]);
 
   return (
     <appContext.Provider value={value}>

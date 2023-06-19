@@ -9,13 +9,14 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { GeoService } from '@shqipet/geo';
-import { ChatEvent, Message } from '@shqipet/common';
+import { ChatEvent, CreateRoomMessage, JoinRoomMessage, Message } from '@shqipet/common';
 import { ConfigService } from '@nestjs/config';
 import { Server, Socket } from 'socket.io';
+import { GoogleAuthService } from '@shqipet/auth';
 
 import { GeoMap } from './geo.map';
 import { MessageFormatter } from './message-formatter';
-import { GoogleAuthService } from '@shqipet/auth';
+import { RoomMap } from './room.map';
 
 const cors: Record<string, unknown> = {
   credentials: true,
@@ -27,6 +28,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
   private readonly verifiedClients = new Set<string>();
+
   private readonly cookieName: string;
   private readonly domain: string;
   private readonly devIp = '91.82.156.27';
@@ -34,6 +36,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor (
     private readonly googleAuthService: GoogleAuthService,
     private readonly geoMap: GeoMap,
+    private readonly roomMap: RoomMap,
     private readonly geoService: GeoService,
     private readonly messageFormatter: MessageFormatter,
     configService: ConfigService,
@@ -69,37 +72,94 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleConnection (client: Socket) {
     const ip = this.getIp(client);
-
-    if (ip) {
-      const geoInfo = this.geoService.getInfo(ip);
-
-      this.server.emit(
-        ChatEvent.UpdateGeoMap,
-        this.geoMap.add(client.id, geoInfo)
-          .getAll()
-      );
+    if (!ip) {
+      return;
     }
-  }
+
+    const geoInfo = this.geoService.getInfo(ip);
+
+    this.server.emit(
+      ChatEvent.UpdateGeoMap,
+      this.geoMap.add(client.id, geoInfo)
+        .getAll()
+    );
+}
 
   async handleDisconnect(client: Socket) {
-    if (this.geoMap.exists(client.id)) {
-      this.server.emit(
-        ChatEvent.UpdateGeoMap,
-        this.geoMap.remove(client.id)
-          .getAll()
-      );
+    if (!this.geoMap.exists(client.id)) {
+      return;
+    }
+
+    this.server.emit(
+      ChatEvent.UpdateGeoMap,
+      this.geoMap.remove(client.id)
+        .getAll()
+    );
+
+    for (const roomId in this.roomMap.getAll()) {
+      const room = this.roomMap.get(roomId);
+
+      for (const memberId in room.members) {
+        if (memberId !== client.id) {
+          continue;
+        }
+
+        room.removeMember(memberId);
+
+        this.server.to(roomId)
+          .emit(ChatEvent.UpdateRoom, this.roomMap.getInfo(room));
+      }
     }
   }
 
   @SubscribeMessage(ChatEvent.CreateMessage)
-  async handleCreateMessage(@MessageBody() message: Message, @ConnectedSocket() client: Socket) {
-    if (await this.isLoggedIn(client)) {
-      const { user, text } = message;
-      const formattedText = this.messageFormatter.format(text);
+  async handleCreateMessage(
+    @MessageBody() { user, text }: Message,
+    @ConnectedSocket() client: Socket,
+  ) {
+    if (!await this.isLoggedIn(client)) {
+      return;
+    }
 
-      if (formattedText) {
-        this.server.emit(ChatEvent.BroadcastMessage, { user, text: formattedText });
-      }
+    const formattedText = this.messageFormatter.format(text);
+    if (!formattedText) {
+      return;
+    }
+
+    this.server.emit(ChatEvent.BroadcastMessage, { user, text: formattedText });
+  }
+
+  @SubscribeMessage(ChatEvent.CreateRoom)
+  async handleCreateRoom(
+    @MessageBody() { id, size, meta }: CreateRoomMessage,
+    @ConnectedSocket() client: Socket,
+  ) {
+    if (!await this.isLoggedIn(client)) {
+      return;
+    }
+
+    this.roomMap.set({ id, size, meta });
+  }
+
+  @SubscribeMessage(ChatEvent.JoinRoom)
+  async handleJoinRoom(
+    @MessageBody() { id, user }: JoinRoomMessage,
+    @ConnectedSocket() client: Socket
+  ) {
+    if (!await this.isLoggedIn(client)) {
+      return;
+    }
+
+    const room = this.roomMap.get(id);
+    if (room.memberExists(client.id)) {
+      return;
+    }
+
+    room.setMember({ id: client.id, user });
+
+    for (const id in room.members) {
+      this.server.to(id)
+        .emit(ChatEvent.UpdateRoom, this.roomMap.getInfo(room));
     }
   }
 }

@@ -5,8 +5,18 @@ import { appContext } from "../app.context";
 export const useAlerts = () => {
   const { setAlert } = useContext(appContext);
 
+  const spawnAlert = (severity: 'success' | 'info' | 'warning' | 'error') => (text: string) => setAlert({ text, severity });
+  const errorAlert = spawnAlert('error');
+  const warningAlert = spawnAlert('warning');
+  const successAlert = spawnAlert('success');
+  const unexpectedAlert = () => errorAlert('Unexpected error!');
+  const mustLoginAlert = () => warningAlert('You must login!');
+
   return {
-    unexpectedAlert: () => setAlert({ text: 'Something went wrong', severity: 'error' }),
-    mustLoginAlert: () => setAlert({ text: 'You must login!', severity: 'warning' }),
-  }
+    errorAlert,
+    warningAlert,
+    successAlert,
+    unexpectedAlert,
+    mustLoginAlert,
+  };
 }

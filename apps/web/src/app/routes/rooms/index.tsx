@@ -1,46 +1,47 @@
 import { Box, AvatarGroup, Avatar, IconButton, TextField, Tooltip } from "@mui/material"
-import shortUniqId from 'short-unique-id';
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import LinkIcon from '@mui/icons-material/Link';
 
-import { appContext, useGoHome, useQueryParam } from "../../common";
-import { Games, Path } from "../../constants";
+import { appContext, useGoHome, useUser } from "../../common";
+import { Path } from "../../constants";
 
-const uid = new shortUniqId({ length: 10 });
-
-const playerPerGame = {
-  [Games.Chess]: 2,
-};
+const isRoomId = (id: string) =>  id.length === 10;
 
 export const Rooms = () => {
   const goHome = useGoHome();
-  const id = useQueryParam('id');
-  const game = useQueryParam('for');
-  const { user } = useContext(appContext);
+  const navigate = useNavigate();
+  const { user } = useUser();
+  const { id } = useParams();
+  const { room, joinRoom } = useContext(appContext);
 
-  const validGame = game && !!playerPerGame[game];
-  const noAccess = !user || (!id && !validGame);
+  const noAccess = !user || !isRoomId(id);
+  const joining = !room || !room || room.id !== id;
+  const roomIsReady = room && room.members.length === room.size;
 
-  console.log('user', user);
-  console.log('id', id);
-  console.log('game', game);
-  console.log('validGame', validGame);
-  console.log('noAccess', noAccess);
-
-  const currentId = id || uid.randomUUID();
   const handleCopy = () => {
-    navigator.clipboard.writeText(`${window.location.origin}${Path.Rooms}?id=${currentId}`)
-  }
+    navigator.clipboard.writeText(`${window.location.origin}${Path.Room.replace(':id', room.id)}`)
+  };
 
   useEffect(() => {
     if (noAccess) {
       goHome();
+
       return;
     }
 
-  }, [ noAccess, goHome ]);
+    if (joining) {
+      joinRoom({ id, user });
+      return;
+    }
 
-  if (noAccess) {
+    if (roomIsReady) {
+      navigate(room.meta?.path || Path.Root);
+      return;
+    }
+  }, [ id, user, noAccess, joining, goHome, joinRoom, roomIsReady, navigate, room ]);
+
+  if (noAccess || joining) {
     return null;
   }
 
@@ -55,8 +56,12 @@ export const Rooms = () => {
     >
       <AvatarGroup max={6}>
         {
-          Array.from({ length: playerPerGame[game]  }).map((_, index) => (
-            <Avatar key={index} alt="Remy Sharp" src="https://lh3.googleusercontent.com/a/AAcHTteGse2obkpmEoYu07EK-pQ7YFIXy1rD6i1wy3Zu2Q=s96-c" />
+          room && Array.from({ length: room.size }).map((_, i) => (
+            <Avatar
+              key={i}
+              alt={room.members[i]?.name || 'user'}
+              src={room.members[i]?.avatar}
+            />
           ))
         }
       </AvatarGroup>
@@ -73,7 +78,7 @@ export const Rooms = () => {
           }}
           inputProps={{ style: { color: "white" } }}
           autoComplete="off"
-          value={currentId}
+          value={id}
         />
         <Tooltip title="Copy room link" placement='right-end'>
           <IconButton

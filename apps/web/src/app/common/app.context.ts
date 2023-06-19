@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { GeoMap, UserInfo, Message } from '@shqipet/common';
+import { GeoMap, UserInfo, Message, CreateRoomMessage, JoinRoomMessage, RoomInfo } from '@shqipet/common';
 
 import { AlertSettings } from "../types";
 
@@ -12,7 +12,10 @@ export interface AppContextInterface {
   setMessages: (messages: Message[]) => void,
   sendMessage: (message: Message) => void,
   alert: AlertSettings | null,
+  room: RoomInfo | null,
   setAlert: (settings: AlertSettings | null) => void,
+  createRoom: (message: CreateRoomMessage) => void,
+  joinRoom: (message: JoinRoomMessage) => void,
 };
 
 export const appContext = createContext<AppContextInterface>({
@@ -25,5 +28,8 @@ export const appContext = createContext<AppContextInterface>({
   sendMessage: () => undefined,
   alert: null,
   setAlert: () => undefined,
+  room: null,
+  createRoom: () => undefined,
+  joinRoom: () => undefined,
 });
 

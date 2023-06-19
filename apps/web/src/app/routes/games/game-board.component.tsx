@@ -7,7 +7,7 @@ import { Games } from "../../constants";
 
 export const GameBoard = () => (
   <ImageList sx={{ width: 400, height: 330 }} cols={2} rowHeight={300} gap={20}>
-    <GameItem title={Games.Chess} img={chessImg} />
-    <GameItem title={Games.Murlan} img={jokerImg} disable />
+    <GameItem title={Games.Chess} players={2} img={chessImg} />
+    <GameItem title={Games.Murlan} players={4} img={jokerImg} disable />
   </ImageList>
 );

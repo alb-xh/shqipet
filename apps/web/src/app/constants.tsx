@@ -3,8 +3,9 @@ export const AUTHOR_GITHUB_URL = 'https://github.com/alb-xh';
 export enum Path {
   Root = '/',
   Games = '/games',
+  Chess = '/games/chess',
   Chat = '/chat',
-  Rooms = '/rooms',
+  Room = '/rooms/:id',
   Login = '/login',
   Logout = '/logout',
   PrivacyPolicy = '/privacy-policy',

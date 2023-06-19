@@ -26,14 +26,15 @@ const config_1 = __webpack_require__(5);
 const geo_1 = __webpack_require__(8);
 const geo_map_1 = __webpack_require__(14);
 const chat_gateway_1 = __webpack_require__(15);
-const message_formatter_1 = __webpack_require__(21);
-const auth_1 = __webpack_require__(25);
+const message_formatter_1 = __webpack_require__(27);
+const auth_1 = __webpack_require__(23);
+const room_map_1 = __webpack_require__(31);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
     (0, common_1.Module)({
         imports: [config_1.ConfigModule, auth_1.AuthModule, geo_1.GeoModule],
-        providers: [geo_map_1.GeoMap, message_formatter_1.MessageFormatter, chat_gateway_1.ChatGateway],
+        providers: [geo_map_1.GeoMap, room_map_1.RoomMap, message_formatter_1.MessageFormatter, chat_gateway_1.ChatGateway],
     })
 ], AppModule);
 exports.AppModule = AppModule;
@@ -219,7 +220,7 @@ exports.GeoMap = GeoMap;
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f, _g, _h;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChatGateway = void 0;
 const tslib_1 = __webpack_require__(1);
@@ -228,18 +229,20 @@ const websockets_1 = __webpack_require__(17);
 const geo_1 = __webpack_require__(8);
 const common_1 = __webpack_require__(18);
 const config_1 = __webpack_require__(7);
-const socket_io_1 = __webpack_require__(20);
+const socket_io_1 = __webpack_require__(22);
+const auth_1 = __webpack_require__(23);
 const geo_map_1 = __webpack_require__(14);
-const message_formatter_1 = __webpack_require__(21);
-const auth_1 = __webpack_require__(25);
+const message_formatter_1 = __webpack_require__(27);
+const room_map_1 = __webpack_require__(31);
 const cors = {
     credentials: true,
     origin: '*',
 };
 let ChatGateway = class ChatGateway {
-    constructor(googleAuthService, geoMap, geoService, messageFormatter, configService) {
+    constructor(googleAuthService, geoMap, roomMap, geoService, messageFormatter, configService) {
         this.googleAuthService = googleAuthService;
         this.geoMap = geoMap;
+        this.roomMap = roomMap;
         this.geoService = geoService;
         this.messageFormatter = messageFormatter;
         this.verifiedClients = new Set();
@@ -271,48 +274,102 @@ let ChatGateway = class ChatGateway {
     handleConnection(client) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const ip = this.getIp(client);
-            if (ip) {
-                const geoInfo = this.geoService.getInfo(ip);
-                this.server.emit(common_1.ChatEvent.UpdateGeoMap, this.geoMap.add(client.id, geoInfo)
-                    .getAll());
+            if (!ip) {
+                return;
             }
+            const geoInfo = this.geoService.getInfo(ip);
+            this.server.emit(common_1.ChatEvent.UpdateGeoMap, this.geoMap.add(client.id, geoInfo)
+                .getAll());
         });
     }
     handleDisconnect(client) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            if (this.geoMap.exists(client.id)) {
-                this.server.emit(common_1.ChatEvent.UpdateGeoMap, this.geoMap.remove(client.id)
-                    .getAll());
+            if (!this.geoMap.exists(client.id)) {
+                return;
+            }
+            this.server.emit(common_1.ChatEvent.UpdateGeoMap, this.geoMap.remove(client.id)
+                .getAll());
+            for (const roomId in this.roomMap.getAll()) {
+                const room = this.roomMap.get(roomId);
+                for (const memberId in room.members) {
+                    if (memberId !== client.id) {
+                        continue;
+                    }
+                    room.removeMember(memberId);
+                    this.server.to(roomId)
+                        .emit(common_1.ChatEvent.UpdateRoom, this.roomMap.getInfo(room));
+                }
             }
         });
     }
-    handleCreateMessage(message, client) {
+    handleCreateMessage({ user, text }, client) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            if (yield this.isLoggedIn(client)) {
-                const { user, text } = message;
-                const formattedText = this.messageFormatter.format(text);
-                if (formattedText) {
-                    this.server.emit(common_1.ChatEvent.BroadcastMessage, { user, text: formattedText });
-                }
+            if (!(yield this.isLoggedIn(client))) {
+                return;
+            }
+            const formattedText = this.messageFormatter.format(text);
+            if (!formattedText) {
+                return;
+            }
+            this.server.emit(common_1.ChatEvent.BroadcastMessage, { user, text: formattedText });
+        });
+    }
+    handleCreateRoom({ id, size, meta }, client) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            if (!(yield this.isLoggedIn(client))) {
+                return;
+            }
+            this.roomMap.set({ id, size, meta });
+        });
+    }
+    handleJoinRoom({ id, user }, client) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            if (!(yield this.isLoggedIn(client))) {
+                return;
+            }
+            const room = this.roomMap.get(id);
+            if (room.memberExists(client.id)) {
+                return;
+            }
+            room.setMember({ id: client.id, user });
+            for (const id in room.members) {
+                this.server.to(id)
+                    .emit(common_1.ChatEvent.UpdateRoom, this.roomMap.getInfo(room));
             }
         });
     }
 };
 tslib_1.__decorate([
     (0, websockets_1.WebSocketServer)(),
-    tslib_1.__metadata("design:type", typeof (_f = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _f : Object)
+    tslib_1.__metadata("design:type", typeof (_g = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _g : Object)
 ], ChatGateway.prototype, "server", void 0);
 tslib_1.__decorate([
     (0, websockets_1.SubscribeMessage)(common_1.ChatEvent.CreateMessage),
     tslib_1.__param(0, (0, websockets_1.MessageBody)()),
     tslib_1.__param(1, (0, websockets_1.ConnectedSocket)()),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_g = typeof common_1.Message !== "undefined" && common_1.Message) === "function" ? _g : Object, typeof (_h = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _h : Object]),
+    tslib_1.__metadata("design:paramtypes", [typeof (_h = typeof common_1.Message !== "undefined" && common_1.Message) === "function" ? _h : Object, typeof (_j = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _j : Object]),
     tslib_1.__metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "handleCreateMessage", null);
+tslib_1.__decorate([
+    (0, websockets_1.SubscribeMessage)(common_1.ChatEvent.CreateRoom),
+    tslib_1.__param(0, (0, websockets_1.MessageBody)()),
+    tslib_1.__param(1, (0, websockets_1.ConnectedSocket)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [typeof (_k = typeof common_1.CreateRoomMessage !== "undefined" && common_1.CreateRoomMessage) === "function" ? _k : Object, typeof (_l = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _l : Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], ChatGateway.prototype, "handleCreateRoom", null);
+tslib_1.__decorate([
+    (0, websockets_1.SubscribeMessage)(common_1.ChatEvent.JoinRoom),
+    tslib_1.__param(0, (0, websockets_1.MessageBody)()),
+    tslib_1.__param(1, (0, websockets_1.ConnectedSocket)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [typeof (_m = typeof common_1.JoinRoomMessage !== "undefined" && common_1.JoinRoomMessage) === "function" ? _m : Object, typeof (_o = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _o : Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], ChatGateway.prototype, "handleJoinRoom", null);
 ChatGateway = tslib_1.__decorate([
     (0, websockets_1.WebSocketGateway)({ path: '/chat', cors }),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof auth_1.GoogleAuthService !== "undefined" && auth_1.GoogleAuthService) === "function" ? _a : Object, typeof (_b = typeof geo_map_1.GeoMap !== "undefined" && geo_map_1.GeoMap) === "function" ? _b : Object, typeof (_c = typeof geo_1.GeoService !== "undefined" && geo_1.GeoService) === "function" ? _c : Object, typeof (_d = typeof message_formatter_1.MessageFormatter !== "undefined" && message_formatter_1.MessageFormatter) === "function" ? _d : Object, typeof (_e = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _e : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof auth_1.GoogleAuthService !== "undefined" && auth_1.GoogleAuthService) === "function" ? _a : Object, typeof (_b = typeof geo_map_1.GeoMap !== "undefined" && geo_map_1.GeoMap) === "function" ? _b : Object, typeof (_c = typeof room_map_1.RoomMap !== "undefined" && room_map_1.RoomMap) === "function" ? _c : Object, typeof (_d = typeof geo_1.GeoService !== "undefined" && geo_1.GeoService) === "function" ? _d : Object, typeof (_e = typeof message_formatter_1.MessageFormatter !== "undefined" && message_formatter_1.MessageFormatter) === "function" ? _e : Object, typeof (_f = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _f : Object])
 ], ChatGateway);
 exports.ChatGateway = ChatGateway;
 
@@ -337,6 +394,7 @@ module.exports = require("@nestjs/websockets");
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
 tslib_1.__exportStar(__webpack_require__(19), exports);
+tslib_1.__exportStar(__webpack_require__(20), exports);
 
 
 /***/ }),
@@ -351,6 +409,10 @@ var ChatEvent;
     ChatEvent["UpdateGeoMap"] = "update_geo_map";
     ChatEvent["CreateMessage"] = "create_message";
     ChatEvent["BroadcastMessage"] = "broadcast_message";
+    ChatEvent["CreateRoom"] = "create_room";
+    ChatEvent["CreatedRoom"] = "created_room";
+    ChatEvent["JoinRoom"] = "join_room";
+    ChatEvent["UpdateRoom"] = "update_room";
 })(ChatEvent = exports.ChatEvent || (exports.ChatEvent = {}));
 ;
 ;
@@ -359,67 +421,44 @@ var ChatEvent;
 
 /***/ }),
 /* 20 */
-/***/ ((module) => {
-
-module.exports = require("socket.io");
-
-/***/ }),
-/* 21 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MessageFormatter = void 0;
+exports.delay = exports.randomId = void 0;
 const tslib_1 = __webpack_require__(1);
-const dompurify_1 = tslib_1.__importDefault(__webpack_require__(22));
-const jsdom_1 = __webpack_require__(23);
-const marked_1 = __webpack_require__(24);
-const window = new jsdom_1.JSDOM('').window;
-const { sanitize } = (0, dompurify_1.default)(window);
-class MessageFormatter {
-    format(text) {
-        return marked_1.marked.parseInline(sanitize(text), {
-            headerIds: false,
-            mangle: false,
-            highlight: null,
-            langPrefix: null,
-        });
-    }
-}
-exports.MessageFormatter = MessageFormatter;
+const short_unique_id_1 = tslib_1.__importDefault(__webpack_require__(21));
+const randomId = (length = 10) => new short_unique_id_1.default({ length }).randomUUID();
+exports.randomId = randomId;
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+exports.delay = delay;
 
+
+/***/ }),
+/* 21 */
+/***/ ((module) => {
+
+module.exports = require("short-unique-id");
 
 /***/ }),
 /* 22 */
 /***/ ((module) => {
 
-module.exports = require("dompurify");
+module.exports = require("socket.io");
 
 /***/ }),
 /* 23 */
-/***/ ((module) => {
-
-module.exports = require("jsdom");
-
-/***/ }),
-/* 24 */
-/***/ ((module) => {
-
-module.exports = require("marked");
-
-/***/ }),
-/* 25 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(26), exports);
-tslib_1.__exportStar(__webpack_require__(27), exports);
+tslib_1.__exportStar(__webpack_require__(24), exports);
+tslib_1.__exportStar(__webpack_require__(25), exports);
 
 
 /***/ }),
-/* 26 */
+/* 24 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -428,7 +467,7 @@ exports.AuthModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
 const config_1 = __webpack_require__(5);
-const google_auth_service_1 = __webpack_require__(27);
+const google_auth_service_1 = __webpack_require__(25);
 let AuthModule = class AuthModule {
 };
 AuthModule = tslib_1.__decorate([
@@ -442,7 +481,7 @@ exports.AuthModule = AuthModule;
 
 
 /***/ }),
-/* 27 */
+/* 25 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -452,7 +491,7 @@ exports.GoogleAuthService = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
 const config_1 = __webpack_require__(7);
-const google_auth_library_1 = __webpack_require__(28);
+const google_auth_library_1 = __webpack_require__(26);
 let GoogleAuthService = class GoogleAuthService {
     constructor(configService) {
         const clientId = configService.getOrThrow('GOOGLE_CLIENT_ID');
@@ -501,10 +540,149 @@ exports.GoogleAuthService = GoogleAuthService;
 
 
 /***/ }),
-/* 28 */
+/* 26 */
 /***/ ((module) => {
 
 module.exports = require("google-auth-library");
+
+/***/ }),
+/* 27 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MessageFormatter = void 0;
+const tslib_1 = __webpack_require__(1);
+const dompurify_1 = tslib_1.__importDefault(__webpack_require__(28));
+const jsdom_1 = __webpack_require__(29);
+const marked_1 = __webpack_require__(30);
+const window = new jsdom_1.JSDOM('').window;
+const { sanitize } = (0, dompurify_1.default)(window);
+class MessageFormatter {
+    format(text) {
+        return marked_1.marked.parseInline(sanitize(text), {
+            headerIds: false,
+            mangle: false,
+            highlight: null,
+            langPrefix: null,
+        });
+    }
+}
+exports.MessageFormatter = MessageFormatter;
+
+
+/***/ }),
+/* 28 */
+/***/ ((module) => {
+
+module.exports = require("dompurify");
+
+/***/ }),
+/* 29 */
+/***/ ((module) => {
+
+module.exports = require("jsdom");
+
+/***/ }),
+/* 30 */
+/***/ ((module) => {
+
+module.exports = require("marked");
+
+/***/ }),
+/* 31 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RoomMap = void 0;
+const common_1 = __webpack_require__(4);
+class Room {
+    constructor(id, size, members, meta = {}) {
+        this.id = id;
+        this.size = size;
+        this.members = members;
+        this.meta = meta;
+        this.createdAt = Date.now();
+    }
+    memberExists(id) {
+        return !!this.members[id];
+    }
+    getMember(id) {
+        if (!this.memberExists(id)) {
+            throw new common_1.ForbiddenException();
+        }
+        return this.members[id];
+    }
+    setMember(member) {
+        if (this.memberExists(member.id)) {
+            throw new common_1.ForbiddenException();
+        }
+        if (Object.keys(this.members).length >= this.size) {
+            throw new common_1.ForbiddenException();
+        }
+        this.members[member.id] = member;
+        return this;
+    }
+    removeMember(id) {
+        const member = this.getMember(id);
+        delete this.members[member.id];
+        return this;
+    }
+}
+(0, common_1.Injectable)();
+class RoomMap {
+    constructor() {
+        this.roomMap = {};
+        this.ttl = 1000 * 60 * 10;
+        this.interval = setInterval(() => this.clearStaleRooms(), this.ttl);
+    }
+    clearStaleRooms() {
+        const now = Date.now();
+        for (const id in this.roomMap) {
+            const { createdAt } = this.roomMap[id];
+            if (now > createdAt + this.ttl) {
+                this.remove(id);
+            }
+        }
+    }
+    exists(id) {
+        return !!this.roomMap[id];
+    }
+    get(id) {
+        if (!this.exists(id)) {
+            throw new common_1.ForbiddenException();
+        }
+        return this.roomMap[id];
+    }
+    getAll() {
+        return this.roomMap;
+    }
+    set(room) {
+        const { id, size, meta } = room;
+        if (this.exists(id)) {
+            throw new common_1.ForbiddenException();
+        }
+        this.roomMap[id] = new Room(id, size, {}, meta);
+        return this;
+    }
+    remove(id) {
+        const room = this.get(id);
+        delete this.roomMap[room.id];
+        return this;
+    }
+    getInfo(room) {
+        const { id, size, members, meta } = room;
+        return {
+            id,
+            size,
+            members: Object.values(members).map(({ user }) => user),
+            meta,
+        };
+    }
+}
+exports.RoomMap = RoomMap;
+
 
 /***/ })
 /******/ 	]);
