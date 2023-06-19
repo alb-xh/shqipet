@@ -9,7 +9,7 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { GeoService } from '@shqipet/geo';
-import { ChatEvent, CreateRoomMessage, JoinRoomMessage, Message } from '@shqipet/common';
+import { ChatEvent, CreateRoomMessage, JoinRoomMessage, Message, SendToRoomMessage } from '@shqipet/common';
 import { ConfigService } from '@nestjs/config';
 import { Server, Socket } from 'socket.io';
 import { GoogleAuthService } from '@shqipet/auth';
@@ -160,6 +160,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     for (const id in room.members) {
       this.server.to(id)
         .emit(ChatEvent.UpdateRoom, this.roomMap.getInfo(room));
+    }
+  }
+
+  @SubscribeMessage(ChatEvent.SendToRoom)
+  async handleSendToRoom(
+    @MessageBody() { id, state }: SendToRoomMessage,
+    @ConnectedSocket() client: Socket,
+  ) {
+    if (!await this.isLoggedIn(client)) {
+      return;
+    }
+
+    const room = this.roomMap.get(id);
+    if (!room.memberExists(client.id)) {
+      return;
+    }
+
+    for (const id in room.members) {
+      this.server.to(id)
+        .emit(ChatEvent.BroadcastToRoom, state);
     }
   }
 }

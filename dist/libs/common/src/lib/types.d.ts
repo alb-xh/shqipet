@@ -5,7 +5,9 @@ export declare enum ChatEvent {
     CreateRoom = "create_room",
     CreatedRoom = "created_room",
     JoinRoom = "join_room",
-    UpdateRoom = "update_room"
+    UpdateRoom = "update_room",
+    SendToRoom = "send_to_room",
+    BroadcastToRoom = "broadcast_to_room"
 }
 export interface GeoInfo {
     name?: string;
@@ -37,4 +39,8 @@ export interface CreateRoomMessage {
 export interface JoinRoomMessage {
     id: string;
     user: UserInfo;
+}
+export interface SendToRoomMessage {
+    id: string;
+    state: Record<string, any>;
 }

@@ -220,7 +220,7 @@ exports.GeoMap = GeoMap;
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChatGateway = void 0;
 const tslib_1 = __webpack_require__(1);
@@ -338,6 +338,21 @@ let ChatGateway = class ChatGateway {
             }
         });
     }
+    handleSendToRoom({ id, state }, client) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            if (!(yield this.isLoggedIn(client))) {
+                return;
+            }
+            const room = this.roomMap.get(id);
+            if (!room.memberExists(client.id)) {
+                return;
+            }
+            for (const id in room.members) {
+                this.server.to(id)
+                    .emit(common_1.ChatEvent.BroadcastToRoom, state);
+            }
+        });
+    }
 };
 tslib_1.__decorate([
     (0, websockets_1.WebSocketServer)(),
@@ -367,6 +382,14 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:paramtypes", [typeof (_m = typeof common_1.JoinRoomMessage !== "undefined" && common_1.JoinRoomMessage) === "function" ? _m : Object, typeof (_o = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _o : Object]),
     tslib_1.__metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "handleJoinRoom", null);
+tslib_1.__decorate([
+    (0, websockets_1.SubscribeMessage)(common_1.ChatEvent.SendToRoom),
+    tslib_1.__param(0, (0, websockets_1.MessageBody)()),
+    tslib_1.__param(1, (0, websockets_1.ConnectedSocket)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [typeof (_p = typeof common_1.SendToRoomMessage !== "undefined" && common_1.SendToRoomMessage) === "function" ? _p : Object, typeof (_q = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _q : Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], ChatGateway.prototype, "handleSendToRoom", null);
 ChatGateway = tslib_1.__decorate([
     (0, websockets_1.WebSocketGateway)({ path: '/chat', cors }),
     tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof auth_1.GoogleAuthService !== "undefined" && auth_1.GoogleAuthService) === "function" ? _a : Object, typeof (_b = typeof geo_map_1.GeoMap !== "undefined" && geo_map_1.GeoMap) === "function" ? _b : Object, typeof (_c = typeof room_map_1.RoomMap !== "undefined" && room_map_1.RoomMap) === "function" ? _c : Object, typeof (_d = typeof geo_1.GeoService !== "undefined" && geo_1.GeoService) === "function" ? _d : Object, typeof (_e = typeof message_formatter_1.MessageFormatter !== "undefined" && message_formatter_1.MessageFormatter) === "function" ? _e : Object, typeof (_f = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _f : Object])
@@ -413,7 +436,10 @@ var ChatEvent;
     ChatEvent["CreatedRoom"] = "created_room";
     ChatEvent["JoinRoom"] = "join_room";
     ChatEvent["UpdateRoom"] = "update_room";
+    ChatEvent["SendToRoom"] = "send_to_room";
+    ChatEvent["BroadcastToRoom"] = "broadcast_to_room";
 })(ChatEvent = exports.ChatEvent || (exports.ChatEvent = {}));
+;
 ;
 ;
 ;
