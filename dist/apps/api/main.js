@@ -341,7 +341,7 @@ function bootstrap() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const app = yield core_1.NestFactory.create(app_module_1.AppModule);
         const port = 3000;
-        const prefix = 'users';
+        const prefix = 'api';
         const configService = app.get(config_1.ConfigService);
         const origin = configService.getOrThrow('DOMAIN');
         app.enableCors({ credentials: true, origin: new RegExp(origin) });

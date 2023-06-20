@@ -1,8 +1,8 @@
 const isProd = process.env['NODE_ENV'] === 'production';
 
-export const USERS_ENDPOINT_URL = isProd
-  ? `https://${process.env['DOMAIN']}/users`
-  : 'http://localhost:3000/users';
+export const API_ENDPOINT_URL = isProd
+  ? `https://${process.env['DOMAIN']}/api`
+  : 'http://localhost:3000/api';
 
 export const CHAT_ENDPOINT_URL = isProd
   ? `https://${process.env['DOMAIN']}/chat`

@@ -6,7 +6,7 @@
     "nx": "nx",
     "start": "nx serve",
     "build:prod": "NODE_ENV=production nx build --prod --skip-nx-cache",
-    "build:all": "npm run build:prod users && npm run build:prod chat && npm run build:prod web"
+    "build:all": "npm run build:prod api && npm run build:prod chat && npm run build:prod web"
   },
   "private": true,
   "dependencies": {

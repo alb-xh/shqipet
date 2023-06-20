@@ -1,12 +1,12 @@
 import axios from 'axios';
 import { UserInfo } from '@shqipet/common';
 
-import { USERS_ENDPOINT_URL } from '../config';
+import { API_ENDPOINT_URL } from '../config';
 
 class UserClient {
   private readonly meEndpoint: string;
-  constructor (usersEndpoint: string) {
-    this.meEndpoint = `${usersEndpoint}/me`;
+  constructor (apiEndpoint: string) {
+    this.meEndpoint = `${apiEndpoint}/me`;
   };
 
   async signIn (token: string): Promise<UserInfo> {
@@ -24,4 +24,4 @@ class UserClient {
   }
 }
 
-export const userClient = new UserClient(USERS_ENDPOINT_URL);
+export const userClient = new UserClient(API_ENDPOINT_URL);

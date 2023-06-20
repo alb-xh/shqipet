@@ -14,7 +14,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const port = 3000;
-  const prefix = 'users';
+  const prefix = 'api';
 
   const configService = app.get(ConfigService);
   const origin = configService.getOrThrow('DOMAIN');
