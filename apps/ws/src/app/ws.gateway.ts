@@ -14,9 +14,8 @@ import { ConfigService } from '@nestjs/config';
 import { Server, Socket } from 'socket.io';
 import { GoogleAuthService } from '@shqipet/auth';
 
-import { GeoMap } from './maps/geo.map';
-import { MessageFormatter } from './components/message-formatter';
-import { RoomMap } from './maps/room.map';
+import { GeoMap, RoomMap } from './maps/';
+import { MessageFormatter } from './components';
 
 const cors: Record<string, unknown> = {
   credentials: true,
@@ -27,11 +26,6 @@ const cors: Record<string, unknown> = {
 export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
-  private readonly verifiedClients = new Set<string>();
-
-  private readonly cookieName: string;
-  private readonly domain: string;
-  private readonly devIp = '91.82.156.27';
 
   constructor (
     private readonly googleAuthService: GoogleAuthService,
@@ -86,28 +80,25 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 }
 
   async handleDisconnect(client: Socket) {
-    if (!this.geoMap.exists(client.id)) {
-      return;
+    // Disconnect from geo map
+    if (this.geoMap.exists(client.id)) {
+      this.server.emit(
+        WsEvent.UpdateGeoMap,
+        this.geoMap.remove(client.id)
+          .getAll()
+      );
     }
 
-    this.server.emit(
-      WsEvent.UpdateGeoMap,
-      this.geoMap.remove(client.id)
-        .getAll()
-    );
+    // Disconnect from room map
+    for (const room of await this.roomMap.getAll()) {
+      for (const clientId of room.members.keys()) {
 
-    for (const roomId in this.roomMap.getAll()) {
-      const room = this.roomMap.get(roomId);
+        if (clientId === client.id) {
+          room.removeMember(clientId);
 
-      for (const memberId in room.members) {
-        if (memberId !== client.id) {
-          continue;
+          this.server.to(room.id)
+            .emit(WsEvent.UpdateRoom, room.getInfo());
         }
-
-        room.removeMember(memberId);
-
-        this.server.to(roomId)
-          .emit(WsEvent.UpdateRoom, this.roomMap.getInfo(room));
       }
     }
   }
@@ -137,6 +128,8 @@ export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!await this.isLoggedIn(client)) {
       return;
     }
+
+    client.
 
     this.roomMap.set({ id, size, meta });
   }

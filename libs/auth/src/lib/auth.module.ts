@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@shqipet/config';
-import { GoogleAuthService } from './google-auth.service';
+
+import { GoogleAuthService } from './services';
 
 @Module({
   imports: [ConfigModule],

@@ -21,15 +21,16 @@ export interface GeoInfo {
 export type GeoMap = Record<string, GeoInfo>;
 
 export interface UserInfo {
+  id: string,
   avatar?: string,
   name: string,
 }
 
 export interface RoomInfo {
   id: string,
-  size: number,
+  title: string,
+  size?: number,
   members: UserInfo[],
-  meta?: Record<string, any>,
 }
 
 export interface Message {

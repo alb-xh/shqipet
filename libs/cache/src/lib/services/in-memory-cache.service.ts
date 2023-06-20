@@ -21,8 +21,8 @@ export class InMemoryCacheService implements CacheService {
     return Date.now() > createAt + ttl;
   }
 
-  async set<T>(key: string, value: T, options: CacheOptions): Promise<void> {
-    const { ttl = DEFAULT_TTL } = options;
+  async set<T>(key: string, value: T, options?: CacheOptions): Promise<void> {
+    const { ttl = DEFAULT_TTL } = options || {};
 
     this.map.set(key, {
       createAt: Date.now(),
@@ -45,12 +45,23 @@ export class InMemoryCacheService implements CacheService {
     return value;
   }
 
-
   async remove (key: string): Promise<void> {
     if (!await this.has(key)) {
       return;
     }
 
     this.map.delete(key);
+  }
+
+  getAll<T>(prefix: string): Promise<T[]> {
+    const result: T[] = [];
+
+    for (const [key, entry] of this.map.entries()) {
+      if (key.startsWith(prefix) && !this.isExpired(entry)) {
+        result.push(entry.value);
+      }
+    }
+
+    return Promise.resolve(result);
   }
 }

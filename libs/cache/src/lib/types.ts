@@ -18,4 +18,6 @@ export interface CacheService {
   has(key: string): Promise<boolean>;
 
   remove(key: string): Promise<void>;
+
+  getAll<T>(prefix: string): Promise<T[]>;
 };

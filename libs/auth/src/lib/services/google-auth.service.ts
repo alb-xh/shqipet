@@ -35,7 +35,7 @@ export class GoogleAuthService {
   async getUser (token: string): Promise<UserInfo> {
     const ticket = await this.getTicket(token);
 
-    const { picture, name, given_name, family_name } = ticket.getPayload();
+    const { sub, picture, name, given_name, family_name } = ticket.getPayload();
 
     const userName = name || [ given_name, family_name ].join(' ');
     if (!userName) {
@@ -43,6 +43,7 @@ export class GoogleAuthService {
     }
 
     return {
+      id: sub,
       name: userName,
       avatar: picture,
     };
