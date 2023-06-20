@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@shqipet/config';
 import { GeoModule } from '@shqipet/geo';
-
-import { GeoMap } from './geo.map';
-import { ChatGateway } from './chat.gateway';
-import { MessageFormatter } from './message-formatter';
 import { AuthModule } from '@shqipet/auth';
-import { RoomMap } from './room.map';
+
+
+import { WsGateway } from './ws.gateway';
+import { GeoMap, RoomMap } from './maps';
+import { MessageFormatter } from './components';
 
 @Module({
   imports: [ ConfigModule, AuthModule, GeoModule ],
-  providers: [ GeoMap, RoomMap, MessageFormatter, ChatGateway ],
+  providers: [ GeoMap, RoomMap, MessageFormatter, WsGateway ],
 })
 export class AppModule {}

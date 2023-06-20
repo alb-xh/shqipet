@@ -1,4 +1,4 @@
-export enum ChatEvent {
+export enum WsEvent {
   UpdateGeoMap = 'update_geo_map',
   CreateMessage = 'create_message',
   BroadcastMessage = 'broadcast_message',

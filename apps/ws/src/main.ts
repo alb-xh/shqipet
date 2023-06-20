@@ -6,7 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(5000);
 
-  Logger.log(`🚀 Application is running on: http://localhost:5000/chat`);
+  Logger.log(`🚀 Application is running on: http://localhost:5000/ws`);
 }
 
 bootstrap();

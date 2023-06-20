@@ -2,10 +2,10 @@ import { useContext, useEffect, useState } from "react";
 import { Chess as ChessJs } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { Box } from "@mui/material";
-import { isEqual, set } from 'lodash';
+import { isEqual } from 'lodash';
+import { WsEvent, delay } from "@shqipet/common";
 
-import { chatSocket, appContext, useGoHome, useUser, useAlerts } from "../../common";
-import { ChatEvent, delay } from "@shqipet/common";
+import { wsSocket, appContext, useGoHome, useUser, useAlerts } from "../../common";
 
 export const Chess = () => {
   const goHome = useGoHome();
@@ -45,12 +45,12 @@ export const Chess = () => {
       return;
     }
 
-    if (!chatSocket.listeners(ChatEvent.BroadcastToRoom).length) {
-      chatSocket.on(ChatEvent.BroadcastToRoom, setFen);
+    if (!wsSocket.listeners(WsEvent.BroadcastToRoom).length) {
+      wsSocket.on(WsEvent.BroadcastToRoom, setFen);
     }
 
     return () => {
-      chatSocket.off(ChatEvent.BroadcastToRoom);
+      wsSocket.off(WsEvent.BroadcastToRoom);
     };
   }, [ user, room, fen ]);
 
@@ -68,7 +68,7 @@ export const Chess = () => {
       const newFen = game.fen();
 
       setFen(newFen);
-      chatSocket.emit(ChatEvent.SendToRoom, { id: room.id, state: newFen });
+      wsSocket.emit(WsEvent.SendToRoom, { id: room.id, state: newFen });
 
       return true;
     } catch {

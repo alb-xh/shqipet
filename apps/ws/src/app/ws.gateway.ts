@@ -9,22 +9,22 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { GeoService } from '@shqipet/geo';
-import { ChatEvent, CreateRoomMessage, JoinRoomMessage, Message, SendToRoomMessage } from '@shqipet/common';
+import { WsEvent, CreateRoomMessage, JoinRoomMessage, Message, SendToRoomMessage } from '@shqipet/common';
 import { ConfigService } from '@nestjs/config';
 import { Server, Socket } from 'socket.io';
 import { GoogleAuthService } from '@shqipet/auth';
 
-import { GeoMap } from './geo.map';
-import { MessageFormatter } from './message-formatter';
-import { RoomMap } from './room.map';
+import { GeoMap } from './maps/geo.map';
+import { MessageFormatter } from './components/message-formatter';
+import { RoomMap } from './maps/room.map';
 
 const cors: Record<string, unknown> = {
   credentials: true,
   origin: '*',
 };
 
-@WebSocketGateway({ path: '/chat', cors })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+@WebSocketGateway({ path: '/ws', cors })
+export class WsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
   private readonly verifiedClients = new Set<string>();
@@ -79,7 +79,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const geoInfo = this.geoService.getInfo(ip);
 
     this.server.emit(
-      ChatEvent.UpdateGeoMap,
+      WsEvent.UpdateGeoMap,
       this.geoMap.add(client.id, geoInfo)
         .getAll()
     );
@@ -91,7 +91,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     this.server.emit(
-      ChatEvent.UpdateGeoMap,
+      WsEvent.UpdateGeoMap,
       this.geoMap.remove(client.id)
         .getAll()
     );
@@ -107,12 +107,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         room.removeMember(memberId);
 
         this.server.to(roomId)
-          .emit(ChatEvent.UpdateRoom, this.roomMap.getInfo(room));
+          .emit(WsEvent.UpdateRoom, this.roomMap.getInfo(room));
       }
     }
   }
 
-  @SubscribeMessage(ChatEvent.CreateMessage)
+  @SubscribeMessage(WsEvent.CreateMessage)
   async handleCreateMessage(
     @MessageBody() { user, text }: Message,
     @ConnectedSocket() client: Socket,
@@ -126,10 +126,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-    this.server.emit(ChatEvent.BroadcastMessage, { user, text: formattedText });
+    this.server.emit(WsEvent.BroadcastMessage, { user, text: formattedText });
   }
 
-  @SubscribeMessage(ChatEvent.CreateRoom)
+  @SubscribeMessage(WsEvent.CreateRoom)
   async handleCreateRoom(
     @MessageBody() { id, size, meta }: CreateRoomMessage,
     @ConnectedSocket() client: Socket,
@@ -141,7 +141,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.roomMap.set({ id, size, meta });
   }
 
-  @SubscribeMessage(ChatEvent.JoinRoom)
+  @SubscribeMessage(WsEvent.JoinRoom)
   async handleJoinRoom(
     @MessageBody() { id, user }: JoinRoomMessage,
     @ConnectedSocket() client: Socket
@@ -159,11 +159,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     for (const id in room.members) {
       this.server.to(id)
-        .emit(ChatEvent.UpdateRoom, this.roomMap.getInfo(room));
+        .emit(WsEvent.UpdateRoom, this.roomMap.getInfo(room));
     }
   }
 
-  @SubscribeMessage(ChatEvent.SendToRoom)
+  @SubscribeMessage(WsEvent.SendToRoom)
   async handleSendToRoom(
     @MessageBody() { id, state }: SendToRoomMessage,
     @ConnectedSocket() client: Socket,
@@ -179,7 +179,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     for (const id in room.members) {
       this.server.to(id)
-        .emit(ChatEvent.BroadcastToRoom, state);
+        .emit(WsEvent.BroadcastToRoom, state);
     }
   }
 }

@@ -4,9 +4,9 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-import { ChatEvent, CreateRoomMessage, JoinRoomMessage, Message, RoomInfo } from "@shqipet/common";
+import { WsEvent, CreateRoomMessage, JoinRoomMessage, Message } from "@shqipet/common";
 
-import { appContext, chatSocket  } from './common';
+import { appContext, wsSocket } from './common';
 
 import { Path } from "./constants";
 import { RootLayout, Root, PrivacyPolicy, Login, Logout, Games, Rooms, Chess } from "./routes";
@@ -66,30 +66,30 @@ export const App = () => {
   const [room, setRoom] = useState(null);
 
   useEffect(() => {
-    chatSocket.on(ChatEvent.UpdateGeoMap, setGeoMap);
-    chatSocket.on(ChatEvent.UpdateRoom, setRoom);
-    chatSocket.on(ChatEvent.BroadcastMessage, (message: Message) => {
+    wsSocket.on(WsEvent.UpdateGeoMap, setGeoMap);
+    wsSocket.on(WsEvent.UpdateRoom, setRoom);
+    wsSocket.on(WsEvent.BroadcastMessage, (message: Message) => {
       setMessages((messages: Message[]) => [ ...messages, message ].slice(-100));
     });
 
-    chatSocket.connect();
+    wsSocket.connect();
 
     return () => {
-      chatSocket.off();
-      chatSocket.disconnect();
+      wsSocket.off();
+      wsSocket.disconnect();
     };
   }, [user]);
 
   const sendMessage = (message: Message) => {
-    chatSocket.emit(ChatEvent.CreateMessage, message);
+    wsSocket.emit(WsEvent.CreateMessage, message);
   };
 
   const createRoom = (message: CreateRoomMessage) => {
-    chatSocket.emit(ChatEvent.CreateRoom, message);
+    wsSocket.emit(WsEvent.CreateRoom, message);
   };
 
   const joinRoom = (message: JoinRoomMessage) => {
-    chatSocket.emit(ChatEvent.JoinRoom, message);
+    wsSocket.emit(WsEvent.JoinRoom, message);
   };
 
   const value = useMemo(() => ({

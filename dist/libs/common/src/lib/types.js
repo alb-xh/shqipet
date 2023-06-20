@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ChatEvent = void 0;
-var ChatEvent;
-(function (ChatEvent) {
-    ChatEvent["UpdateGeoMap"] = "update_geo_map";
-    ChatEvent["CreateMessage"] = "create_message";
-    ChatEvent["BroadcastMessage"] = "broadcast_message";
-    ChatEvent["CreateRoom"] = "create_room";
-    ChatEvent["CreatedRoom"] = "created_room";
-    ChatEvent["JoinRoom"] = "join_room";
-    ChatEvent["UpdateRoom"] = "update_room";
-    ChatEvent["SendToRoom"] = "send_to_room";
-    ChatEvent["BroadcastToRoom"] = "broadcast_to_room";
-})(ChatEvent = exports.ChatEvent || (exports.ChatEvent = {}));
+exports.WsEvent = void 0;
+var WsEvent;
+(function (WsEvent) {
+    WsEvent["UpdateGeoMap"] = "update_geo_map";
+    WsEvent["CreateMessage"] = "create_message";
+    WsEvent["BroadcastMessage"] = "broadcast_message";
+    WsEvent["CreateRoom"] = "create_room";
+    WsEvent["CreatedRoom"] = "created_room";
+    WsEvent["JoinRoom"] = "join_room";
+    WsEvent["UpdateRoom"] = "update_room";
+    WsEvent["SendToRoom"] = "send_to_room";
+    WsEvent["BroadcastToRoom"] = "broadcast_to_room";
+})(WsEvent = exports.WsEvent || (exports.WsEvent = {}));
 ;
 ;
 ;

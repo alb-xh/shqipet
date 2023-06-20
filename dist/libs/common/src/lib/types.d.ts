@@ -1,4 +1,4 @@
-export declare enum ChatEvent {
+export declare enum WsEvent {
     UpdateGeoMap = "update_geo_map",
     CreateMessage = "create_message",
     BroadcastMessage = "broadcast_message",

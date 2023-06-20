@@ -15,15 +15,15 @@ services:
     ports:
       - "3000:3000"
     restart: always
-  chat:
-    container_name: chat
+  ws:
+    container_name: ws
     build:
       context: .
       dockerfile_inline: |
         FROM node:18.16.0-alpine
         WORKDIR /usr/src/app
         COPY ./node_modules ./node_modules
-        COPY ./dist/apps/chat package.json .prod.env .
+        COPY ./dist/apps/ws package.json .prod.env .
         ENV NODE_ENV production
         EXPOSE 5000
         CMD [ "node", "main.js" ]
