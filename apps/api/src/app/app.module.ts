@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@shqipet/config';
 import { AuthModule } from '@shqipet/auth';
 
-import { MeController } from './me';
+import { MeController } from './users/me';
 
 @Module({
   imports: [ ConfigModule, AuthModule ],

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 
 import { appContext } from "../app.context";
-import { userClient } from "../user.client";
+import { apiClient } from "../api-client";
 
 export const useUser = () => {
   const { user, setUser } = useContext(appContext);
@@ -11,7 +11,7 @@ export const useUser = () => {
     if (user === undefined) {
       setIsLoading(true);
 
-      userClient.getMe()
+      apiClient.getMe()
         .then((userInfo) => {
           setUser(userInfo);
         })

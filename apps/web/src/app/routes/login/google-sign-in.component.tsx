@@ -2,9 +2,8 @@ import { useRef, useEffect } from 'react';
 import { Box } from '@mui/material';
 
 import { GOOGLE_CLIENT_ID } from '../../config';
-import { userClient } from '../../common/user.client';
 import { isSmallDevice } from '../../helpers';
-import { useAlerts, useGoHome, useUser } from '../../common';
+import { useAlerts, useGoHome, useUser, apiClient } from '../../common';
 
 export const GoogleSignIn = () => {
   const ref = useRef(null);
@@ -34,7 +33,7 @@ export const GoogleSignIn = () => {
         return;
       }
 
-      return userClient.signIn(res.credential)
+      return apiClient.signIn(res.credential)
         .then(setUser)
         .catch(handleError);
     };

@@ -3,7 +3,7 @@ import { Body, Controller, Delete, ForbiddenException, Get, Post, Req, Res } fro
 import { ConfigService } from '@nestjs/config';
 import { GoogleAuthService } from '@shqipet/auth';
 
-@Controller('/me')
+@Controller('users/me')
 export class MeController {
   private readonly cookieName;
   private readonly cookieOptions: CookieOptions = {

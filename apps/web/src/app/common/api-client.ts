@@ -3,10 +3,10 @@ import { UserInfo } from '@shqipet/common';
 
 import { API_ENDPOINT_URL } from '../config';
 
-class UserClient {
+class ApiClient {
   private readonly meEndpoint: string;
   constructor (apiEndpoint: string) {
-    this.meEndpoint = `${apiEndpoint}/me`;
+    this.meEndpoint = `${apiEndpoint}/users/me`;
   };
 
   async signIn (token: string): Promise<UserInfo> {
@@ -24,4 +24,4 @@ class UserClient {
   }
 }
 
-export const userClient = new UserClient(API_ENDPOINT_URL);
+export const apiClient = new ApiClient(API_ENDPOINT_URL);

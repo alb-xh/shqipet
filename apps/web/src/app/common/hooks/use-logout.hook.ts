@@ -3,14 +3,14 @@ import { useContext, useEffect } from "react";
 
 import { Path } from '../../constants';
 import { appContext } from '../app.context';
-import { userClient } from "../user.client";
+import { apiClient } from "../api-client";
 
 export const useLogout = () => {
   const navigate = useNavigate();
   const { setUser } = useContext(appContext);
 
   useEffect(() => {
-    userClient.logOut()
+    apiClient.logOut()
       .then(() => {
         setUser(null);
         navigate(Path.Root);

@@ -192,9 +192,8 @@ module.exports = require("google-auth-library");
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MeController = void 0;
-var controller_1 = __webpack_require__(14);
-Object.defineProperty(exports, "MeController", ({ enumerable: true, get: function () { return controller_1.MeController; } }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(14), exports);
 
 
 /***/ }),
@@ -281,7 +280,7 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:returntype", void 0)
 ], MeController.prototype, "removeMe", null);
 MeController = tslib_1.__decorate([
-    (0, common_1.Controller)('/me'),
+    (0, common_1.Controller)('users/me'),
     tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof auth_1.GoogleAuthService !== "undefined" && auth_1.GoogleAuthService) === "function" ? _a : Object, typeof (_b = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _b : Object])
 ], MeController);
 exports.MeController = MeController;
