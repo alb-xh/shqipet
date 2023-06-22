@@ -61,7 +61,7 @@ const router = createBrowserRouter([
 export const App = () => {
   const [user, setUser] = useState(undefined);
   const [alert, setAlert] = useState(null);
-  const [geoMap, setGeoMap ] = useState({});
+  const [geoMap, setGeoMap ] = useState([]);
   const [messages, setMessages] = useState([]);
   const [room, setRoom] = useState(null);
 

@@ -36,7 +36,7 @@ export const Rooms = () => {
     }
 
     if (roomIsReady) {
-      navigate(room.meta?.path || Path.Root);
+      navigate(`${Path.Games}/${room.title}`);
       return;
     }
   }, [ id, user, noAccess, joining, goHome, joinRoom, roomIsReady, navigate, room ]);

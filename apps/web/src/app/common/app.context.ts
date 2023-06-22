@@ -1,13 +1,13 @@
 import { createContext } from "react";
-import { GeoMap, UserInfo, Message, CreateRoomMessage, JoinRoomMessage, RoomInfo } from '@shqipet/common';
+import { UserInfo, Message, CreateRoomMessage, JoinRoomMessage, RoomInfo, GeoInfo } from '@shqipet/common';
 
 import { AlertSettings } from "../types";
 
 export interface AppContextInterface {
   user: UserInfo | null,
   setUser: (user: UserInfo | null) => void,
-  geoMap: GeoMap,
-  setGeoMap: (geoMap: GeoMap) => void,
+  geoMap: GeoInfo[],
+  setGeoMap: (geoMap: GeoInfo[]) => void,
   messages: Message[],
   setMessages: (messages: Message[]) => void,
   sendMessage: (message: Message) => void,
@@ -21,7 +21,7 @@ export interface AppContextInterface {
 export const appContext = createContext<AppContextInterface>({
   user: null,
   setUser: () => undefined,
-  geoMap: {},
+  geoMap: [],
   setGeoMap: () => undefined,
   messages: [],
   setMessages: () => undefined,

@@ -9,7 +9,6 @@ export class Room {
     readonly size?: number
   ) {}
 
-
   hasMember (id: string): boolean {
     return this.members.has(id);
   }
@@ -20,7 +19,7 @@ export class Room {
       : null;
   }
 
-  setUser (id: string, user: UserInfo): this {
+  setMember (id: string, user: UserInfo): this {
     this.members.set(id, user);
     return this;
   }

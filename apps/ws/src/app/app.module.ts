@@ -5,13 +5,17 @@ import { AuthModule, GoogleAuthService } from '@shqipet/auth';
 import { CacheModule } from '@shqipet/cache';
 import { ConfigService } from '@nestjs/config';
 
-
+import { AuthManager, IpExtractor, CorsManager, MessageFormatter } from './components';
+import { GeoMap, GeoHandler, RoomMap, RoomHandler, MessagesHandler } from './handlers';
 import { WsGateway } from './ws.gateway';
-import { GeoMap, RoomMap } from './maps';
-import { AuthManager, IpExtractor, MessageFormatter } from './components';
 
 @Module({
-  imports: [ ConfigModule, AuthModule, GeoModule, CacheModule ],
+  imports: [
+    ConfigModule,
+    AuthModule,
+    GeoModule,
+    CacheModule,
+  ],
   providers: [
     {
       provide: AuthManager,
@@ -29,10 +33,21 @@ import { AuthManager, IpExtractor, MessageFormatter } from './components';
       },
       inject: [ ConfigService ],
     },
-    GeoMap,
-    RoomMap,
+    {
+      provide: CorsManager,
+      useFactory: (configService) => {
+        const domain = configService.getOrThrow('DOMAIN');
+        return new CorsManager(domain);
+      },
+      inject: [ ConfigService ],
+    },
     MessageFormatter,
-    WsGateway
+    GeoMap,
+    GeoHandler,
+    RoomMap,
+    RoomHandler,
+    MessagesHandler,
+    WsGateway,
   ],
 })
 export class AppModule {}

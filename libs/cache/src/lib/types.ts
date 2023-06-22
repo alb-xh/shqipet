@@ -9,7 +9,6 @@ export type InMemoryCacheEntry = {
   createAt: number;
 };
 
-
 export interface CacheService {
   get<T>(key: string): Promise<T | null>;
 

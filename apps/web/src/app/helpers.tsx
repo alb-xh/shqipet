@@ -1,12 +1,12 @@
-import { GeoMap } from "@shqipet/common";
+import { GeoInfo } from "@shqipet/common";
 
 import { Marker } from "./types";
 import { markerIcon } from "./constants";
 
-export const getMarkersFromGeoMap = (geoMap: GeoMap): Marker[] => {
+export const getMarkersFromGeoMap = (geoMap: GeoInfo[]): Marker[] => {
   const markers = [];
 
-  for (const { lat, lng, name, city } of Object.values(geoMap)) {
+  for (const { lat, lng, name, city } of geoMap) {
     if (!lat || !lng || !name) {
       continue;
     }

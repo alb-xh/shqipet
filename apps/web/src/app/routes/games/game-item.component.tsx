@@ -25,7 +25,7 @@ export const GameItem = ({ title, img, players, disable = false }) => {
 
     const id = randomId();
 
-    createRoom({ id, size: players, meta: { path: Path.Chess }});
+    createRoom({ id, title, size: players });
     navigate(Path.Room.replace(':id', id));
   }
 

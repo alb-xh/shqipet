@@ -18,8 +18,6 @@ export interface GeoInfo {
   lng?: number,
 };
 
-export type GeoMap = Record<string, GeoInfo>;
-
 export interface UserInfo {
   id: string,
   avatar?: string,
@@ -40,8 +38,8 @@ export interface Message {
 
 export interface CreateRoomMessage {
   id: string,
-  size: number,
-  meta?: Record<string, any>,
+  title: string,
+  size?: number,
 }
 
 export interface JoinRoomMessage {

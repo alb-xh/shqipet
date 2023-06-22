@@ -36,7 +36,7 @@ const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(6);
 const auth_1 = __webpack_require__(9);
-const me_1 = __webpack_require__(13);
+const me_1 = __webpack_require__(14);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
@@ -108,14 +108,14 @@ exports.AuthModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(6);
-const google_auth_service_1 = __webpack_require__(11);
+const services_1 = __webpack_require__(11);
 let AuthModule = class AuthModule {
 };
 AuthModule = tslib_1.__decorate([
     (0, common_1.Module)({
         imports: [config_1.ConfigModule],
-        providers: [google_auth_service_1.GoogleAuthService],
-        exports: [google_auth_service_1.GoogleAuthService],
+        providers: [services_1.GoogleAuthService],
+        exports: [services_1.GoogleAuthService],
     })
 ], AuthModule);
 exports.AuthModule = AuthModule;
@@ -126,13 +126,23 @@ exports.AuthModule = AuthModule;
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(12), exports);
+
+
+/***/ }),
+/* 12 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GoogleAuthService = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(8);
-const google_auth_library_1 = __webpack_require__(12);
+const google_auth_library_1 = __webpack_require__(13);
 let GoogleAuthService = class GoogleAuthService {
     constructor(configService) {
         const clientId = configService.getOrThrow('GOOGLE_CLIENT_ID');
@@ -161,12 +171,13 @@ let GoogleAuthService = class GoogleAuthService {
     getUser(token) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const ticket = yield this.getTicket(token);
-            const { picture, name, given_name, family_name } = ticket.getPayload();
+            const { sub, picture, name, given_name, family_name } = ticket.getPayload();
             const userName = name || [given_name, family_name].join(' ');
             if (!userName) {
                 throw new common_1.ForbiddenException('User must have a name!');
             }
             return {
+                id: sub,
                 name: userName,
                 avatar: picture,
             };
@@ -181,23 +192,23 @@ exports.GoogleAuthService = GoogleAuthService;
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ ((module) => {
 
 module.exports = require("google-auth-library");
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(14), exports);
+tslib_1.__exportStar(__webpack_require__(15), exports);
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -205,7 +216,7 @@ var _a, _b, _c, _d, _e, _f;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MeController = void 0;
 const tslib_1 = __webpack_require__(1);
-const express_1 = __webpack_require__(15);
+const express_1 = __webpack_require__(16);
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(8);
 const auth_1 = __webpack_require__(9);
@@ -287,7 +298,7 @@ exports.MeController = MeController;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ ((module) => {
 
 module.exports = require("express");

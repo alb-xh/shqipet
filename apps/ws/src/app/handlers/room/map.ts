@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import { InMemoryCacheService } from "@shqipet/cache";
 
 import { Room } from "./room";
@@ -9,6 +9,7 @@ export class RoomMap {
   private readonly ttl = 1000 * 60 * 60;
 
   constructor (
+    @Inject(InMemoryCacheService)
     private readonly cache: InMemoryCacheService,
   ) {}
 
@@ -39,5 +40,4 @@ export class RoomMap {
 
     return this;
   }
-
 }
