@@ -6,7 +6,6 @@ import { RootLayout } from './layout';
 import { Earth } from './earth.component';
 import { GroupChat } from './group-chat.component';;
 
-
 const Root = () => {
   const openChat = useMatch(Path.Chat);
 

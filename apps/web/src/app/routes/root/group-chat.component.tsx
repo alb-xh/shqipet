@@ -6,7 +6,6 @@ import { useMessages, useGoHome } from '../../common';
 
 const messagesPanelId = 'message-panel';
 
-
 export const GroupChat = () => {
   const goHome = useGoHome();
 

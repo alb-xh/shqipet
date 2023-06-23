@@ -1,17 +1,16 @@
 import { ImageListItem, ImageListItemBar } from "@mui/material"
 import { useNavigate } from "react-router-dom";
-import { useContext } from "react";
 import { randomId } from "@shqipet/common";
 
 import { capOnlyFirst } from "../../helpers";
-import { useUser, useAlerts, appContext } from "../../common";
+import { useUser, useAlerts, useRoom } from "../../common";
 import { Path } from "../../constants";
 
 export const GameItem = ({ title, img, players, disable = false }) => {
   const navigate = useNavigate();
   const { user } = useUser();
   const { mustLoginAlert } = useAlerts();
-  const { createRoom } = useContext(appContext);
+  const { createRoom } = useRoom()
 
   const onClick = () => {
     if (disable) {

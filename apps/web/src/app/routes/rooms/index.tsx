@@ -1,9 +1,9 @@
 import { Box, AvatarGroup, Avatar, IconButton, TextField, Tooltip } from "@mui/material"
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import LinkIcon from '@mui/icons-material/Link';
 
-import { appContext, useGoHome, useUser } from "../../common";
+import { useAlerts, useGoHome, useRoom, useUser } from "../../common";
 import { Path } from "../../constants";
 
 const isRoomId = (id: string) =>  id.length === 10;
@@ -11,9 +11,10 @@ const isRoomId = (id: string) =>  id.length === 10;
 export const Rooms = () => {
   const goHome = useGoHome();
   const navigate = useNavigate();
+  const { mustLoginAlert } = useAlerts();
   const { user } = useUser();
   const { id } = useParams();
-  const { room, joinRoom } = useContext(appContext);
+  const { room, joinRoom } = useRoom();
 
   const noAccess = !user || !isRoomId(id);
   const joining = !room || !room || room.id !== id;
@@ -25,6 +26,7 @@ export const Rooms = () => {
 
   useEffect(() => {
     if (noAccess) {
+      mustLoginAlert();
       goHome();
 
       return;
@@ -39,7 +41,7 @@ export const Rooms = () => {
       navigate(`${Path.Games}/${room.title}`);
       return;
     }
-  }, [ id, user, noAccess, joining, goHome, joinRoom, roomIsReady, navigate, room ]);
+  }, [ id, user, noAccess, joining, roomIsReady ]);
 
   if (noAccess || joining) {
     return null;
