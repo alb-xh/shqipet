@@ -1,6 +1,6 @@
 # Todo
 
-## TODO
+## Must
 * Add chat as a separate page
 * Add posts page
 * Make chess clickable not dragable
