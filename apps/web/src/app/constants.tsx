@@ -8,8 +8,8 @@ export enum Path {
   Room = '/rooms/:id',
   Login = '/login',
   Logout = '/logout',
-  PrivacyPolicy = '/privacy-policy',
   Posts = '/posts',
+  About = '/about',
 };
 
 export enum Games {

@@ -1,16 +1,14 @@
 import { Box, BottomNavigation, BottomNavigationAction, Tooltip } from "@mui/material";
 import { useNavigate } from "react-router-dom"
-
-import BookIcon from '@mui/icons-material/Book';
+;
 import GamesIcon from '@mui/icons-material/Games';
 import ChatIcon from '@mui/icons-material/Chat';
 import LoginIcon from '@mui/icons-material/Login';
 import LogoutIcon from '@mui/icons-material/Logout';
-import PolicyIcon from '@mui/icons-material/Policy';
 import HomeIcon from '@mui/icons-material/Home';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 
-import { AUTHOR_GITHUB_URL, Path } from '../../../constants';
+import { Path } from '../../../constants';
 import { useUser } from '../../../common';
 
 const NavigationItem = ({ label, icon, to }) => {
@@ -59,9 +57,9 @@ export const Footer = () => {
           to={Path.Root}
         />
         <NavigationItem
-          label="Author"
-          icon={<BookIcon />}
-          to={AUTHOR_GITHUB_URL}
+          label="Posts"
+          icon={<ListAltIcon />}
+          to={Path.Posts}
         />
         <NavigationItem
           label="Games"
@@ -69,19 +67,9 @@ export const Footer = () => {
           to={Path.Games}
         />
         <NavigationItem
-          label="Posts"
-          icon={<ListAltIcon />}
-          to={Path.Posts}
-        />
-        <NavigationItem
           label="Chat"
           icon={<ChatIcon />}
           to={Path.Chat}
-        />
-        <NavigationItem
-          label="Privacy Policy"
-          icon={<PolicyIcon />}
-          to={Path.PrivacyPolicy}
         />
         {
           user
