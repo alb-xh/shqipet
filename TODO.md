@@ -3,9 +3,11 @@
 ## Must
 * Add chat as a separate page
 * Add posts page
-* Make chess clickable not dragable
 * Add some border highlighting for chess turn
 * Implement murlan game
+* Bug sometime room doesn't show after login
+* Disconnect user when his opponent disconnects chess
+* Make logging longer
 
 ## Maybe
 * Maybe replace alert with component in mui
@@ -13,3 +15,5 @@
 
 ## Last
 * Make sure google login works (dev console)
+
+## In progress
