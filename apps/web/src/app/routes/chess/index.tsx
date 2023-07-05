@@ -163,7 +163,9 @@ export const Chess = () => {
           onPromotionPieceSelect={onPromotionPieceSelect}
           customBoardStyle={{
             borderRadius: "4px",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+            boxShadow: myTurn
+              ? "0px 1px 30px #888888"
+              : "0 2px 10px rgba(0, 0, 0, 0.5)",
           }}
           customSquareStyles={{ ...optionSquares }}
         />;

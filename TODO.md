@@ -3,7 +3,6 @@
 ## Must
 * Add chat as a separate page
 * Add posts page
-* Add some border highlighting for chess turn
 * Implement murlan game
 * Bug sometime room doesn't show after login
 * Disconnect user when his opponent disconnects chess
@@ -17,3 +16,4 @@
 * Make sure google login works (dev console)
 
 ## In progress
+* Add some border highlighting for chess turn
