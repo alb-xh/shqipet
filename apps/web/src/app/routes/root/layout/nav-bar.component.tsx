@@ -36,7 +36,7 @@ export const NavBar = () => {
       sx={{
         width: '100%',
         position: 'sticky',
-        backgroundColor: '#ffffff26',
+        backgroundColor: '#2b2b2b',
         margin: 0,
       }} >
       <GridItem xs={1} >

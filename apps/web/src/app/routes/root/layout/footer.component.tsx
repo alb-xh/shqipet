@@ -48,7 +48,7 @@ export const Footer = () => {
       bottom: 0,
     }}>
       <BottomNavigation
-        sx={{ backgroundColor: '#f9f9f933', color: 'white' }}
+        sx={{ backgroundColor: '#2b2b2b', color: 'white' }}
         showLabels
       >
         <NavigationItem
