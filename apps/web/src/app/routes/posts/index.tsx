@@ -12,19 +12,29 @@ import Avatar from '@mui/material/Avatar';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+
 import { red } from '@mui/material/colors';
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import CommentIcon from '@mui/icons-material/Comment';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Popover from '@mui/material/Popover';
 
 import { Box, CircularProgress, List, ListItem, Button } from '@mui/material';
 
 import Divider from '@mui/material/Divider';
-import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Textarea from '@mui/joy/Textarea';
+
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
+
+import InboxIcon from '@mui/icons-material/Inbox';
+import DraftsIcon from '@mui/icons-material/Drafts';
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const fetchComments = async (postId, timeout = 2000) => {
@@ -50,6 +60,42 @@ const fetchComments = async (postId, timeout = 2000) => {
       date: '13-12-2022',
     },
   ]
+}
+
+
+export default function BasicPopover() {
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
+  return (
+    <div>
+      <Button aria-describedby={id} variant="contained" onClick={handleClick}>
+        Open Popover
+      </Button>
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <Typography sx={{ p: 2 }}>The content of the Popover.</Typography>
+      </Popover>
+    </div>
+  );
 }
 
 export const Comment = ({
@@ -155,6 +201,18 @@ export function Post({
   const [isLiked, setIsLiked] = useState(liked);
   const [likedCount, setLikedCount] = useState(likes);
   const [showComments, setShowComments] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  const open = Boolean(anchorEl);
+  const popoverId = open ? 'simple-popover' : undefined;
+
+  const handleOpenOptions = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseOptions = () => {
+    setAnchorEl(null);
+  };
 
   const handleCommentsClick = () => {
     setShowComments(!showComments);
@@ -175,7 +233,50 @@ export function Post({
             alt={author}
           />
         }
-        action={<IconButton><MoreVertIcon /></IconButton>}
+        action={
+          <Box>
+            <IconButton onClick={handleOpenOptions}>
+              <MoreVertIcon />
+            </IconButton>
+            <Popover
+              id={popoverId}
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleCloseOptions}
+              anchorOrigin={{
+                vertical: 'center',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+            >
+              <List>
+                <ListItem disablePadding>
+                  <ListItemButton>
+                    <ListItemText primary="Edit" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton>
+                    <ListItemText primary="Delete" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton>
+                    <ListItemText primary="Hide" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton>
+                    <ListItemText primary="Report" />
+                  </ListItemButton>
+                </ListItem>
+              </List>
+            </Popover>
+          </Box>
+        }
         title={title}
         subheader={`${author} on ${date}`}
       />
@@ -287,6 +388,11 @@ export const Posts = () => {
           />
         </ListItem>
       </List>
+      <Box position="fixed" bottom={75} right={39}>
+        <Fab size='large' color="primary" aria-label="add">
+          <AddIcon />
+        </Fab>
+      </Box>
     </Box>
   );
 }
