@@ -57,3 +57,5 @@ export const getEarthDimensions = () => ({
 });
 
 export const capOnlyFirst = (str: string) => str[0].toUpperCase() + str.slice(1).toLowerCase();
+
+export const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));

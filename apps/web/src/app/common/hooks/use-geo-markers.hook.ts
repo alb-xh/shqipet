@@ -1,10 +1,10 @@
-import { useContext, useMemo } from "react"
+import { useMemo } from "react"
 
 import {  getMarkersFromGeoMap} from '../../helpers';
-import { appContext } from "../app.context"
+import { useAppContext } from "./use-app-context.hook";
 
 export const useGeoMarkers = () => {
-  const { geoMap } = useContext(appContext);
+  const { geoMap } = useAppContext();
   const markers = useMemo(() => getMarkersFromGeoMap(geoMap), [ geoMap ]);
 
   return markers;

@@ -1,9 +1,7 @@
-import { useContext } from "react";
-
-import { appContext } from "../app.context";
+import { useAppContext } from "./use-app-context.hook";
 
 export const useAlerts = () => {
-  const { setAlert } = useContext(appContext);
+  const { setAlert } = useAppContext();
 
   const spawnAlert = (severity: 'success' | 'info' | 'warning' | 'error') => (text: string) => setAlert({ text, severity });
   const errorAlert = spawnAlert('error');

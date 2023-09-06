@@ -7,3 +7,13 @@ export interface AlertSettings {
   severity: 'error' | 'warning' | 'info' | 'success',
   timeout?: number,
 }
+
+export interface SearchValue {
+  value: string,
+  category: string,
+}
+
+export interface SearchOptions {
+  show: boolean,
+  categories: string[],
+}

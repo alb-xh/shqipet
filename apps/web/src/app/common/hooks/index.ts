@@ -8,3 +8,5 @@ export * from './use-messages.hook';
 export * from './use-go-home.hook';
 export * from './use-query-param.hook';
 export * from './use-room.hook';
+export * from './use-search.hook';
+export * from './use-app-context.hook';

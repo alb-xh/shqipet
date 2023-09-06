@@ -61,6 +61,8 @@ const router = createBrowserRouter([
 export const App = () => {
   const [user, setUser] = useState(undefined);
   const [alert, setAlert] = useState(null);
+  const [searchValue, setSearchValue] = useState({ value: '', category: '' });
+  const [searchOptions, setSearchOptions] = useState({ show: false, categories: [] });
   const [geoMap, setGeoMap ] = useState([]);
   const [messages, setMessages] = useState([]);
   const [room, setRoom] = useState(null);
@@ -105,7 +107,11 @@ export const App = () => {
     room,
     createRoom,
     joinRoom,
-  }),[ user, geoMap, messages, alert, room ]);
+    searchValue,
+    setSearchValue,
+    searchOptions,
+    setSearchOptions,
+  }),[ user, geoMap, messages, alert, room, searchValue, searchOptions ]);
 
   return (
     <appContext.Provider value={value}>

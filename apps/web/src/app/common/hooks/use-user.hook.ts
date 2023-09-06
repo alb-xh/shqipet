@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { appContext } from "../app.context";
 import { apiClient } from "../api-client";
+import { useAppContext } from "./use-app-context.hook";
 
 export const useUser = () => {
-  const { user, setUser } = useContext(appContext);
+  const { user, setUser } = useAppContext();
   const [ isLoading, setIsLoading ] = useState(user === undefined);
 
   useEffect(() => {

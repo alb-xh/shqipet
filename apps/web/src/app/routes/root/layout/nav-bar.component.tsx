@@ -7,6 +7,7 @@ import { Alert } from './alert.component';
 import { useUser } from '../../../common';
 import { useNavigate } from 'react-router-dom';
 import { Path } from '../../../constants';
+import { Search } from './search.component';
 
 const GridItem = (props) => {
   return (
@@ -48,7 +49,9 @@ export const NavBar = () => {
           onClick={() => navigate(Path.About)}
         />
       </GridItem>
-      <GridItem xs={4} />
+      <GridItem xs={4}>
+        <Search  />
+      </GridItem>
       <GridItem xs={2} >
         <Alert />
       </GridItem>

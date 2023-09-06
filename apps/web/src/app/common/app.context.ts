@@ -1,7 +1,7 @@
 import { createContext } from "react";
 import { UserInfo, Message, CreateRoomMessage, JoinRoomMessage, RoomInfo, GeoInfo } from '@shqipet/common';
 
-import { AlertSettings } from "../types";
+import { AlertSettings, SearchOptions, SearchValue } from "../types";
 
 export interface AppContextInterface {
   user: UserInfo | null,
@@ -16,6 +16,10 @@ export interface AppContextInterface {
   setAlert: (settings: AlertSettings | null) => void,
   createRoom: (message: CreateRoomMessage) => void,
   joinRoom: (message: JoinRoomMessage) => void,
+  searchValue: SearchValue,
+  setSearchValue: (value: SearchValue) => void,
+  searchOptions: SearchOptions,
+  setSearchOptions: (options: SearchOptions) => void,
 };
 
 export const appContext = createContext<AppContextInterface>({
@@ -31,5 +35,9 @@ export const appContext = createContext<AppContextInterface>({
   room: null,
   createRoom: () => undefined,
   joinRoom: () => undefined,
+  searchValue: null,
+  setSearchValue: () => undefined,
+  searchOptions: null,
+  setSearchOptions: () => undefined,
 });
 

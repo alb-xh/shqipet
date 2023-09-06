@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 
 import { Path } from '../../constants';
-import { appContext } from '../app.context';
 import { apiClient } from "../api-client";
+import { useAppContext } from "./use-app-context.hook";
 
 export const useLogout = () => {
   const navigate = useNavigate();
-  const { setUser } = useContext(appContext);
+  const { setUser } = useAppContext();
 
   useEffect(() => {
     apiClient.logOut()

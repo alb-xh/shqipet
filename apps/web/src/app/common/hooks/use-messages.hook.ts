@@ -1,14 +1,14 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 
 import { useUser } from './use-user.hook';
 import { useAlerts } from './use-alerts.hook';
-import { appContext } from '../app.context';
+import { useAppContext } from './use-app-context.hook';
 
 export const useMessages = () => {
   const { user } = useUser();
   const { mustLoginAlert } = useAlerts();
+  const {  messages, sendMessage } = useAppContext();
 
-  const { messages, sendMessage } = useContext(appContext);
   const [ message, setMessage ] = useState('');
 
   const clear = () => setMessage('');

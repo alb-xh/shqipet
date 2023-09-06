@@ -1,8 +1,6 @@
-import { useContext } from "react"
-
-import { appContext } from "../app.context"
+import { useAppContext } from "./use-app-context.hook";
 
 export const useRoom = () => {
-  const { room, createRoom, joinRoom } = useContext(appContext)
+  const { room, createRoom, joinRoom } = useAppContext()
   return { room, createRoom, joinRoom};
 }
