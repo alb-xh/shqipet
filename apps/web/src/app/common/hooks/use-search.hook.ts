@@ -7,9 +7,9 @@ import { SearchValue } from "../../types";
 export const useSearch = (categories: string[] = []) => {
   const { searchOptions, setSearchOptions } = useAppContext();
 
-
   useEffect(() => {
     const newSearchOptions = {
+      ...searchOptions,
       show: true,
       categories,
     };
@@ -19,11 +19,17 @@ export const useSearch = (categories: string[] = []) => {
     }
   });
 
-  const useSearchValue = (cb: (value: SearchValue) => void) => {
-    const { searchValue, setSearchOptions } = useAppContext();
+  const useSearchValue = (cb: (value: SearchValue) => Promise<void>) => {
+    const { searchValue, setSearchValue, setSearchOptions } = useAppContext();
 
     useEffect(() => {
-      cb(searchValue);
+      if (!searchValue.isSearching) {
+        return;
+      }
+
+      cb(searchValue).then(() => {
+        setSearchValue({ ...searchValue, isSearching: false });
+      });
 
       return () => {
         setSearchOptions({ show: false, categories: [] });

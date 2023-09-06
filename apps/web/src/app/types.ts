@@ -11,6 +11,7 @@ export interface AlertSettings {
 export interface SearchValue {
   value: string,
   category: string,
+  isSearching: boolean,
 }
 
 export interface SearchOptions {

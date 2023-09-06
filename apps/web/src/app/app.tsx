@@ -61,7 +61,7 @@ const router = createBrowserRouter([
 export const App = () => {
   const [user, setUser] = useState(undefined);
   const [alert, setAlert] = useState(null);
-  const [searchValue, setSearchValue] = useState({ value: '', category: '' });
+  const [searchValue, setSearchValue] = useState({ value: '', category: '', isSearching: true });
   const [searchOptions, setSearchOptions] = useState({ show: false, categories: [] });
   const [geoMap, setGeoMap ] = useState([]);
   const [messages, setMessages] = useState([]);

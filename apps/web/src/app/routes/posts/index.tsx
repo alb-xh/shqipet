@@ -7,13 +7,15 @@ import AddIcon from '@mui/icons-material/Add';
 
 import { useSearch } from '../../common';
 import { Post } from './post.component';
+import { sleep } from '../../helpers';
 
 export const Posts = () => {
-  const { useSearchValue } = useSearch([]);
+  const { useSearchValue } = useSearch([ 'Title', 'Author']);
 
-  useSearchValue((value) => {
+  useSearchValue(async (value) => {
+    await sleep(5000);
     console.log(value);
-  })
+  });
 
   return (
     <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'100%'}>
