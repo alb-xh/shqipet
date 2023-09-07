@@ -37,5 +37,14 @@ export const useSearch = (categories: string[] = []) => {
     }, [ searchValue ]);
   };
 
-  return { useSearchValue };
+  const useLoadMore = (cb: (value) => Promise<void>) => {
+    const { searchValue, setSearchValue } = useAppContext();
+
+    return async () => {
+      setSearchValue({ ...searchValue, isSearching: true });
+      await cb(searchValue);
+    };
+  }
+
+  return { useSearchValue, useLoadMore };
 };

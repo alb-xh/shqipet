@@ -8,6 +8,8 @@ import ListItem from '@mui/material/ListItem';
 
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import IconButton from '@mui/material/IconButton';
 
 import { useSearch } from '../../common';
 import { Post } from './post.component';
@@ -16,7 +18,7 @@ import { sleep } from '../../helpers';
 const fetchPosts = async () => {
   await sleep(faker.number.int({ min: 1000, max: 3000 }));
 
-  return [ ...Array(faker.number.int(10)) ].map(() => ({
+  return [ ...Array(10) ].map(() => ({
     id: faker.string.uuid(),
     title: faker.lorem.sentence(),
     author: faker.person.fullName(),
@@ -33,15 +35,28 @@ const fetchPosts = async () => {
 
 export const Posts = () => {
   const [posts, setPosts] = useState([]);
-  const { useSearchValue } = useSearch([ 'Title', 'Author']);
+  const { useSearchValue, useLoadMore } = useSearch([ 'Title', 'Author']);
 
-  useSearchValue(async (value) => {
-    const posts = await fetchPosts();
-    setPosts(posts);
-  });
+  const fetchAndSetPosts = async () => {
+    if (posts.length) {
+      setPosts([]);
+    }
+
+    const newPosts = await fetchPosts();
+    setPosts(newPosts);
+  };
+
+  useSearchValue(fetchAndSetPosts);
+  const loadMore = useLoadMore(fetchAndSetPosts);
 
   return (
-    <Box display={'flex'} justifyContent={'center'} alignItems={'center'} height={'100%'}>
+    <Box
+      display={'flex'}
+      flexDirection={'column'}
+      justifyContent={'center'}
+      alignItems={'center'}
+      height={'100%'}
+    >
       <List>
         {
           posts.map((post, index) => (
@@ -63,6 +78,20 @@ export const Posts = () => {
           ))
         }
       </List>
+      {
+        posts.length > 0 && (
+          <IconButton
+            sx={{
+              bgcolor: '#818181',
+              marginBottom: 3,
+              "&:hover": { bgcolor: "white" }
+            }}
+            onClick={loadMore}
+          >
+            <MoreHorizIcon />
+          </IconButton>
+        )
+      }
       <Box position="fixed" bottom={75} right={39}>
         <Fab size='large' color="primary" aria-label="add">
           <AddIcon />

@@ -121,6 +121,11 @@ export function Post({
                 </ListItem>
                 <ListItem disablePadding>
                   <ListItemButton>
+                    <ListItemText primary="Share" />
+                  </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding>
+                  <ListItemButton>
                     <ListItemText primary="Hide" />
                   </ListItemButton>
                 </ListItem>
