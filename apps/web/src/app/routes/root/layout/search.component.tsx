@@ -43,7 +43,7 @@ export const Search = () => {
     }
 
     if (searchedAt && (Date.now() - searchedAt) < 2000) {
-      warningAlert('Please slow down :)');
+      warningAlert('Please slow down');
 
       return;
     }
@@ -51,6 +51,7 @@ export const Search = () => {
     setSearchedAt(Date.now());
     setPlaceholder(`Results for ${value}`);
     setSearchValue({ category, value, isSearching: true });
+    setValue('');
 
     e.preventDefault();
   };
@@ -58,14 +59,17 @@ export const Search = () => {
   const handleDropdownChange = (e) => {
     setCategory(e.target.value);
     setValue('');
-    setSearchValue({ category: e.target.value, value: '', isSearching: true });
+    setSearchValue({ category: e.target.value, value: '', isSearching: false });
   };
 
-  const handleCancel = () => {
-    setCategory('');
-    setValue('');
-    setPlaceholder('Search');
+  const handleCancel = (e) => {
+    if (placeholder.startsWith('Results for')) {
+      setSearchValue({ category: '', value: '', isSearching: true });
+    }
 
+    setPlaceholder('Search...');
+    setValue('');
+    setCategory('');
   }
 
   return (
@@ -122,6 +126,7 @@ export const Search = () => {
           color: 'white',
           borderRadius: 10,
         }}
+        value={value}
         placeholder={placeholder}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
