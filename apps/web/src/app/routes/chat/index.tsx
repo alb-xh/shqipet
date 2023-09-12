@@ -20,14 +20,20 @@ const fetchEntities = async () => {
 }
 
 export const Chat = () => {
+  const [loadingEntities, setLoadingEntities] = useState(true);
   const [entities, setEntities] = useState([]);
   const { useSearchValue } = useSearch([ 'User', 'Group']);
 
   useSearchValue(async () => {
+    setLoadingEntities(true);
+
     await sleep(1000);
 
     const entities = await fetchEntities();
     setEntities(entities);
+
+    await sleep(1000);
+    setLoadingEntities(false);
   });
 
   return (
@@ -53,10 +59,10 @@ export const Chat = () => {
           variant={'h5'}
           color="white"
           marginY={2}
-          >
-            Chats
+        >
+          Chats
         </Typography>
-        <ChatList entities={entities} />
+        <ChatList entities={entities} loading={loadingEntities} />
       </Box>
     </Grid>
     <Grid

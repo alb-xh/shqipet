@@ -1,6 +1,6 @@
-import { Typography, Avatar, List, ListItem, ListItemAvatar, ListItemText } from "@mui/material"
+import { Typography, Avatar, List, ListItem, ListItemAvatar, ListItemText, Skeleton } from "@mui/material"
 
-export const ChatList = ({ entities }) => {
+export const ChatList = ({ entities, loading }) => {
   return (
     <List sx={{
       width: '100%',
@@ -11,6 +11,17 @@ export const ChatList = ({ entities }) => {
       marginBottom: 8,
     }}>
       {
+        loading && [ ...Array(6) ].map((_, index) => (
+          <Skeleton
+            key={index}
+            variant="rounded"
+            width={'90%'}
+            height='100px'
+            sx={{ marginY: 1, bgcolor: '#698169' }}
+          />
+        ))
+      }
+      {
         entities.map((entity, index) => (
           <ListItem
             key={index}
@@ -18,7 +29,7 @@ export const ChatList = ({ entities }) => {
               width: '90%',
               bgcolor: '#718f71',
               borderRadius: 2,
-              display: 'flex',
+              display: loading ? 'none' : 'flex',
               flexDirection: 'row',
               padding: 1.5,
               marginY: 1,
