@@ -11,7 +11,10 @@ export const RootLayout = () => {
   return (
     <Box>
       <NavBar />
-      <Box sx={{ marginBottom: '50px' }}>
+      <Box sx={{
+        paddingTop: '90px',
+        paddingBottom: '50px',
+      }}>
         {
           isLoading
             ? <Loading />

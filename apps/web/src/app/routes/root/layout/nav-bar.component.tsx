@@ -36,7 +36,8 @@ export const NavBar = () => {
       spacing={2}
       sx={{
         width: '100%',
-        position: 'sticky',
+        position: 'fixed',
+        zIndex: 1,
         backgroundColor: '#2b2b2b',
         margin: 0,
       }} >

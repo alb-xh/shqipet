@@ -15,7 +15,7 @@ import { useState } from 'react';
 
 export const Search = () => {
   const { warningAlert } = useAlerts();
-  const { searchValue, searchOptions, setSearchValue, } = useAppContext();
+  const { searchValue, searchOptions, setSearchValue } = useAppContext();
 
   const { isSearching } = searchValue;
   const { show, categories } = searchOptions;

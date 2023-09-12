@@ -10,3 +10,4 @@ export * from './use-query-param.hook';
 export * from './use-room.hook';
 export * from './use-search.hook';
 export * from './use-app-context.hook';
+export * from './use-page-change.hook';

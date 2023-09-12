@@ -14,6 +14,8 @@ import IconButton from '@mui/material/IconButton';
 import { useSearch } from '../../common';
 import { Post } from './post.component';
 import { sleep } from '../../helpers';
+import { Skeleton } from '@mui/material';
+
 
 const fetchPosts = async () => {
   await sleep(faker.number.int({ min: 1000, max: 3000 }));
@@ -35,19 +37,28 @@ const fetchPosts = async () => {
 
 export const Posts = () => {
   const [posts, setPosts] = useState([]);
+  const [ showSkeleton, setShowSkeleton ] = useState(true);
   const { useSearchValue, useLoadMore } = useSearch([ 'Title', 'Author']);
 
-  const fetchAndSetPosts = async () => {
-    if (posts.length) {
-      setPosts([]);
-    }
+  useSearchValue(async () => {
+    setShowSkeleton(true);
 
     const newPosts = await fetchPosts();
     setPosts(newPosts);
-  };
 
-  useSearchValue(fetchAndSetPosts);
-  const loadMore = useLoadMore(fetchAndSetPosts);
+    await sleep(1000);
+    setShowSkeleton(false);
+  });
+
+  const loadMore = useLoadMore(async () => {
+    setShowSkeleton(true);
+
+    const newPosts = await fetchPosts();
+    setPosts([ ...posts, ...newPosts ].slice(-30));
+
+    await sleep(1000);
+    setShowSkeleton(false);
+  });
 
   return (
     <Box
@@ -60,23 +71,27 @@ export const Posts = () => {
       <List>
         {
           posts.map((post, index) => (
+            <ListItem
+              sx={{ display: showSkeleton  ? 'none' : 'flex' }}
+              key={index}
+            >
+              <Post {...post} />
+            </ListItem>
+          ))
+        }
+        {
+          showSkeleton && [ ...Array(10) ].map((_, index) => (
             <ListItem key={index}>
-              <Post
-                id={post.id}
-                title={post.title}
-                author={post.author}
-                date={post.date}
-                avatarSrc={post.avatarSrc}
-                imageSrc={post.imageSrc}
-                alt={post.alt}
-                text={post.text}
-                likes={post.likes}
-                comments={post.comments}
-                liked={post.liked}
+              <Skeleton
+                variant="rounded"
+                width={600}
+                height={500}
+                sx={{ bgcolor: '#2b2b2b' }}
               />
             </ListItem>
           ))
         }
+
       </List>
       {
         posts.length > 0 && (
