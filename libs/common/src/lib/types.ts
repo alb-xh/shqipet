@@ -51,3 +51,12 @@ export interface SendToRoomMessage {
   id: string,
   state: Record<string, any>,
 };
+
+export interface GetUserByUsernameResponse {
+  id: number,
+  username: string,
+  firstName: string,
+  lastName: string,
+  profilePictureUrl?: string,
+  bio?: string,
+}

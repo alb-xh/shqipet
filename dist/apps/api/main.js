@@ -35,14 +35,19 @@ exports.AppModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(6);
-const auth_1 = __webpack_require__(9);
-const me_1 = __webpack_require__(14);
+const db_1 = __webpack_require__(9);
+const controllers_1 = __webpack_require__(15);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule, auth_1.AuthModule],
-        controllers: [me_1.MeController],
+        imports: [
+            config_1.ConfigModule,
+            db_1.DbModule,
+        ],
+        controllers: [
+            controllers_1.UsersController,
+        ],
     })
 ], AppModule);
 exports.AppModule = AppModule;
@@ -95,7 +100,7 @@ module.exports = require("@nestjs/config");
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
 tslib_1.__exportStar(__webpack_require__(10), exports);
-tslib_1.__exportStar(__webpack_require__(11), exports);
+tslib_1.__exportStar(__webpack_require__(12), exports);
 
 
 /***/ }),
@@ -104,204 +109,180 @@ tslib_1.__exportStar(__webpack_require__(11), exports);
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AuthModule = void 0;
+exports.DbModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(6);
-const services_1 = __webpack_require__(11);
-let AuthModule = class AuthModule {
+const typeorm_1 = __webpack_require__(11);
+const config_2 = __webpack_require__(8);
+const entitiesObj = tslib_1.__importStar(__webpack_require__(12));
+const entities = Object.values(entitiesObj);
+let DbModule = class DbModule {
 };
-AuthModule = tslib_1.__decorate([
+DbModule = tslib_1.__decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule],
-        providers: [services_1.GoogleAuthService],
-        exports: [services_1.GoogleAuthService],
+        imports: [
+            typeorm_1.TypeOrmModule.forRootAsync({
+                imports: [config_1.ConfigModule],
+                useFactory: (configService) => ({
+                    type: configService.getOrThrow('DB_TYPE'),
+                    host: configService.getOrThrow('DB_HOST'),
+                    port: configService.getOrThrow('DB_PORT'),
+                    username: configService.getOrThrow('DB_USERNAME'),
+                    password: configService.getOrThrow('DB_PASSWORD'),
+                    database: configService.getOrThrow('DB_DATABASE'),
+                    entities,
+                    synchronize: false,
+                }),
+                inject: [config_2.ConfigService],
+            }),
+            typeorm_1.TypeOrmModule.forFeature(entities),
+        ],
+        exports: [typeorm_1.TypeOrmModule]
     })
-], AuthModule);
-exports.AuthModule = AuthModule;
+], DbModule);
+exports.DbModule = DbModule;
 
 
 /***/ }),
 /* 11 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((module) => {
 
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(12), exports);
-
+module.exports = require("@nestjs/typeorm");
 
 /***/ }),
 /* 12 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GoogleAuthService = void 0;
 const tslib_1 = __webpack_require__(1);
-const common_1 = __webpack_require__(3);
-const config_1 = __webpack_require__(8);
-const google_auth_library_1 = __webpack_require__(13);
-let GoogleAuthService = class GoogleAuthService {
-    constructor(configService) {
-        const clientId = configService.getOrThrow('GOOGLE_CLIENT_ID');
-        this.clientId = clientId;
-        this.oAuthClient = new google_auth_library_1.OAuth2Client(clientId);
-    }
-    getTicket(token) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return this.oAuthClient.verifyIdToken({
-                idToken: token,
-                audience: this.clientId
-            });
-        });
-    }
-    isValid(token) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            try {
-                yield this.getTicket(token);
-                return true;
-            }
-            catch (_a) {
-                return false;
-            }
-        });
-    }
-    getUser(token) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const ticket = yield this.getTicket(token);
-            const { sub, picture, name, given_name, family_name } = ticket.getPayload();
-            const userName = name || [given_name, family_name].join(' ');
-            if (!userName) {
-                throw new common_1.ForbiddenException('User must have a name!');
-            }
-            return {
-                id: sub,
-                name: userName,
-                avatar: picture,
-            };
-        });
-    }
-};
-GoogleAuthService = tslib_1.__decorate([
-    (0, common_1.Injectable)(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _a : Object])
-], GoogleAuthService);
-exports.GoogleAuthService = GoogleAuthService;
+tslib_1.__exportStar(__webpack_require__(13), exports);
 
 
 /***/ }),
 /* 13 */
-/***/ ((module) => {
-
-module.exports = require("google-auth-library");
-
-/***/ }),
-/* 14 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
+var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.User = void 0;
 const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(15), exports);
+const typeorm_1 = __webpack_require__(14);
+let User = class User {
+};
+tslib_1.__decorate([
+    (0, typeorm_1.PrimaryGeneratedColumn)(),
+    tslib_1.__metadata("design:type", Number)
+], User.prototype, "id", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.Column)({ unique: true, length: 32 }),
+    (0, typeorm_1.Index)({ unique: true }),
+    tslib_1.__metadata("design:type", String)
+], User.prototype, "username", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.Column)(),
+    tslib_1.__metadata("design:type", String)
+], User.prototype, "firstName", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.Column)(),
+    tslib_1.__metadata("design:type", String)
+], User.prototype, "lastName", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    tslib_1.__metadata("design:type", String)
+], User.prototype, "profilePictureUrl", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.Column)({ length: 150, nullable: true }),
+    tslib_1.__metadata("design:type", String)
+], User.prototype, "bio", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.Column)(),
+    tslib_1.__metadata("design:type", String)
+], User.prototype, "password", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.Column)(),
+    tslib_1.__metadata("design:type", String)
+], User.prototype, "resetPasswordCode", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.CreateDateColumn)(),
+    tslib_1.__metadata("design:type", typeof (_a = typeof Date !== "undefined" && Date) === "function" ? _a : Object)
+], User.prototype, "createdAt", void 0);
+tslib_1.__decorate([
+    (0, typeorm_1.UpdateDateColumn)(),
+    tslib_1.__metadata("design:type", typeof (_b = typeof Date !== "undefined" && Date) === "function" ? _b : Object)
+], User.prototype, "updateAt", void 0);
+User = tslib_1.__decorate([
+    (0, typeorm_1.Entity)()
+], User);
+exports.User = User;
 
+
+/***/ }),
+/* 14 */
+/***/ ((module) => {
+
+module.exports = require("typeorm");
 
 /***/ }),
 /* 15 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MeController = void 0;
 const tslib_1 = __webpack_require__(1);
-const express_1 = __webpack_require__(16);
-const common_1 = __webpack_require__(3);
-const config_1 = __webpack_require__(8);
-const auth_1 = __webpack_require__(9);
-let MeController = class MeController {
-    constructor(googleAuthService, configService) {
-        this.googleAuthService = googleAuthService;
-        this.cookieOptions = {
-            httpOnly: true,
-            sameSite: true,
-        };
-        const cookieName = configService.getOrThrow('COOKIE');
-        const domain = configService.getOrThrow('DOMAIN');
-        this.cookieName = cookieName;
-        this.cookieOptions.domain = domain;
-        this.cookieOptions.secure = domain !== 'localhost';
-    }
-    getMe(req) {
-        const cookie = req.cookies[this.cookieName];
-        if (!cookie) {
-            throw new common_1.ForbiddenException();
-        }
-        try {
-            const user = this.googleAuthService.getUser(cookie);
-            return user;
-        }
-        catch (_a) {
-            throw new common_1.ForbiddenException();
-        }
-    }
-    createMe(token, res) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            if (!token) {
-                throw new common_1.ForbiddenException();
-            }
-            try {
-                const meData = yield this.googleAuthService.getUser(token);
-                res
-                    .cookie(this.cookieName, token, this.cookieOptions)
-                    .send(meData);
-            }
-            catch (_a) {
-                throw new common_1.ForbiddenException();
-            }
-        });
-    }
-    removeMe(res) {
-        res
-            .clearCookie(this.cookieName, this.cookieOptions)
-            .send({ ok: true });
-    }
-};
-tslib_1.__decorate([
-    (0, common_1.Get)(),
-    tslib_1.__param(0, (0, common_1.Req)()),
-    tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_c = typeof express_1.Request !== "undefined" && express_1.Request) === "function" ? _c : Object]),
-    tslib_1.__metadata("design:returntype", void 0)
-], MeController.prototype, "getMe", null);
-tslib_1.__decorate([
-    (0, common_1.Post)(),
-    tslib_1.__param(0, (0, common_1.Body)('token')),
-    tslib_1.__param(1, (0, common_1.Res)()),
-    tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [String, typeof (_d = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _d : Object]),
-    tslib_1.__metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
-], MeController.prototype, "createMe", null);
-tslib_1.__decorate([
-    (0, common_1.Delete)(),
-    tslib_1.__param(0, (0, common_1.Res)()),
-    tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_f = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _f : Object]),
-    tslib_1.__metadata("design:returntype", void 0)
-], MeController.prototype, "removeMe", null);
-MeController = tslib_1.__decorate([
-    (0, common_1.Controller)('users/me'),
-    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof auth_1.GoogleAuthService !== "undefined" && auth_1.GoogleAuthService) === "function" ? _a : Object, typeof (_b = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _b : Object])
-], MeController);
-exports.MeController = MeController;
+tslib_1.__exportStar(__webpack_require__(16), exports);
 
 
 /***/ }),
 /* 16 */
-/***/ ((module) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-module.exports = require("express");
+
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UsersController = void 0;
+const tslib_1 = __webpack_require__(1);
+const common_1 = __webpack_require__(3);
+const typeorm_1 = __webpack_require__(11);
+const db_1 = __webpack_require__(9);
+const typeorm_2 = __webpack_require__(14);
+let UsersController = class UsersController {
+    constructor(userRepository) {
+        this.userRepository = userRepository;
+    }
+    getUserByUsername(username) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const user = yield this.userRepository.findOneBy({ username });
+            if (!user) {
+                throw new common_1.NotFoundException();
+            }
+            return {
+                id: user.id,
+                username: user.username,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                profilePictureUrl: user.profilePictureUrl,
+                bio: user.bio,
+            };
+        });
+    }
+};
+tslib_1.__decorate([
+    (0, common_1.Get)(':username'),
+    tslib_1.__param(0, (0, common_1.Param)('username')),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String]),
+    tslib_1.__metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
+], UsersController.prototype, "getUserByUsername", null);
+UsersController = tslib_1.__decorate([
+    (0, common_1.Controller)('users'),
+    tslib_1.__param(0, (0, typeorm_1.InjectRepository)(db_1.User)),
+    tslib_1.__metadata("design:paramtypes", [typeof (_a = typeof typeorm_2.Repository !== "undefined" && typeorm_2.Repository) === "function" ? _a : Object])
+], UsersController);
+exports.UsersController = UsersController;
+
 
 /***/ })
 /******/ 	]);
@@ -350,9 +331,9 @@ const config_1 = __webpack_require__(8);
 function bootstrap() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const app = yield core_1.NestFactory.create(app_module_1.AppModule);
-        const port = 3000;
-        const prefix = 'api';
         const configService = app.get(config_1.ConfigService);
+        const port = configService.getOrThrow('PORT');
+        const prefix = configService.getOrThrow('PREFIX');
         const origin = configService.getOrThrow('DOMAIN');
         app.enableCors({ credentials: true, origin: new RegExp(origin) });
         app.use((0, cookie_parser_1.default)());

@@ -13,10 +13,9 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const port = 3000;
-  const prefix = 'api';
-
   const configService = app.get(ConfigService);
+  const port = configService.getOrThrow('PORT');
+  const prefix = configService.getOrThrow('PREFIX');
   const origin = configService.getOrThrow('DOMAIN');
 
   app.enableCors({ credentials: true, origin: new RegExp(origin) });
