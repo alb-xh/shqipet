@@ -36,7 +36,7 @@ const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
 const config_1 = __webpack_require__(6);
 const db_1 = __webpack_require__(9);
-const controllers_1 = __webpack_require__(15);
+const controllers_1 = __webpack_require__(18);
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
@@ -100,7 +100,7 @@ module.exports = require("@nestjs/config");
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
 tslib_1.__exportStar(__webpack_require__(10), exports);
-tslib_1.__exportStar(__webpack_require__(12), exports);
+tslib_1.__exportStar(__webpack_require__(16), exports);
 
 
 /***/ }),
@@ -112,30 +112,17 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DbModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
-const config_1 = __webpack_require__(6);
 const typeorm_1 = __webpack_require__(11);
-const config_2 = __webpack_require__(8);
-const entitiesObj = tslib_1.__importStar(__webpack_require__(12));
+const lodash_1 = __webpack_require__(12);
+const dataSource_1 = __webpack_require__(13);
+const entitiesObj = tslib_1.__importStar(__webpack_require__(16));
 const entities = Object.values(entitiesObj);
 let DbModule = class DbModule {
 };
 DbModule = tslib_1.__decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forRootAsync({
-                imports: [config_1.ConfigModule],
-                useFactory: (configService) => ({
-                    type: configService.getOrThrow('DB_TYPE'),
-                    host: configService.getOrThrow('DB_HOST'),
-                    port: configService.getOrThrow('DB_PORT'),
-                    username: configService.getOrThrow('DB_USERNAME'),
-                    password: configService.getOrThrow('DB_PASSWORD'),
-                    database: configService.getOrThrow('DB_DATABASE'),
-                    entities,
-                    synchronize: false,
-                }),
-                inject: [config_2.ConfigService],
-            }),
+            typeorm_1.TypeOrmModule.forRoot(Object.assign(Object.assign({}, (0, lodash_1.omit)(dataSource_1.options, ['entities', 'migrations'])), { entities })),
             typeorm_1.TypeOrmModule.forFeature(entities),
         ],
         exports: [typeorm_1.TypeOrmModule]
@@ -152,16 +139,64 @@ module.exports = require("@nestjs/typeorm");
 
 /***/ }),
 /* 12 */
+/***/ ((module) => {
+
+module.exports = require("lodash");
+
+/***/ }),
+/* 13 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.options = void 0;
+const tslib_1 = __webpack_require__(1);
+const dotenv = tslib_1.__importStar(__webpack_require__(14));
+const typeorm_1 = __webpack_require__(15);
+const isProduction = process.env.NODE_ENV === 'production';
+const envFile = isProduction ? '.prod.env' : '.dev.env';
+const entitiesPath = isProduction ? 'dist/libs/db/src/lib/entities/*.entity.js' : 'libs/db/src/lib/entities/*.entity.ts';
+const migrationsPath = isProduction ? 'dist/libs/db/src/lib/migrations/*.js' : 'libs/db/src/lib/migrations/*.ts';
+dotenv.config({ path: envFile });
+exports.options = {
+    type: process.env.DB_TYPE,
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT, 10),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
+    entities: [entitiesPath],
+    migrations: [migrationsPath],
+    migrationsTableName: "migrations",
+    synchronize: false,
+};
+exports["default"] = new typeorm_1.DataSource(exports.options);
+
+
+/***/ }),
+/* 14 */
+/***/ ((module) => {
+
+module.exports = require("dotenv");
+
+/***/ }),
+/* 15 */
+/***/ ((module) => {
+
+module.exports = require("typeorm");
+
+/***/ }),
+/* 16 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(13), exports);
+tslib_1.__exportStar(__webpack_require__(17), exports);
 
 
 /***/ }),
-/* 13 */
+/* 17 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -169,7 +204,7 @@ var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.User = void 0;
 const tslib_1 = __webpack_require__(1);
-const typeorm_1 = __webpack_require__(14);
+const typeorm_1 = __webpack_require__(15);
 let User = class User {
 };
 tslib_1.__decorate([
@@ -220,34 +255,29 @@ exports.User = User;
 
 
 /***/ }),
-/* 14 */
-/***/ ((module) => {
-
-module.exports = require("typeorm");
-
-/***/ }),
-/* 15 */
+/* 18 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(16), exports);
+tslib_1.__exportStar(__webpack_require__(19), exports);
 
 
 /***/ }),
-/* 16 */
+/* 19 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b;
+var _a, _b, _c, _d;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UsersController = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(3);
 const typeorm_1 = __webpack_require__(11);
+const common_2 = __webpack_require__(20);
 const db_1 = __webpack_require__(9);
-const typeorm_2 = __webpack_require__(14);
+const typeorm_2 = __webpack_require__(15);
 let UsersController = class UsersController {
     constructor(userRepository) {
         this.userRepository = userRepository;
@@ -268,6 +298,19 @@ let UsersController = class UsersController {
             };
         });
     }
+    createUser(createUserDto) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { username, firstName, lastName } = createUserDto;
+            if (!username || !firstName || !lastName) {
+                throw new common_1.BadRequestException();
+            }
+            if (this.userRepository.exist({ where: { username } })) {
+                throw new common_1.ForbiddenException('User already exists');
+            }
+            const user = this.userRepository.create(createUserDto);
+            yield this.userRepository.save(user);
+        });
+    }
 };
 tslib_1.__decorate([
     (0, common_1.Get)(':username'),
@@ -276,6 +319,13 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
 ], UsersController.prototype, "getUserByUsername", null);
+tslib_1.__decorate([
+    (0, common_1.Post)(),
+    tslib_1.__param(0, (0, common_1.Body)()),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [typeof (_c = typeof common_2.CreateUserDto !== "undefined" && common_2.CreateUserDto) === "function" ? _c : Object]),
+    tslib_1.__metadata("design:returntype", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
+], UsersController.prototype, "createUser", null);
 UsersController = tslib_1.__decorate([
     (0, common_1.Controller)('users'),
     tslib_1.__param(0, (0, typeorm_1.InjectRepository)(db_1.User)),
@@ -283,6 +333,63 @@ UsersController = tslib_1.__decorate([
 ], UsersController);
 exports.UsersController = UsersController;
 
+
+/***/ }),
+/* 20 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(21), exports);
+tslib_1.__exportStar(__webpack_require__(22), exports);
+
+
+/***/ }),
+/* 21 */
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.WsEvent = void 0;
+var WsEvent;
+(function (WsEvent) {
+    WsEvent["UpdateGeoMap"] = "update_geo_map";
+    WsEvent["CreateMessage"] = "create_message";
+    WsEvent["BroadcastMessage"] = "broadcast_message";
+    WsEvent["CreateRoom"] = "create_room";
+    WsEvent["CreatedRoom"] = "created_room";
+    WsEvent["JoinRoom"] = "join_room";
+    WsEvent["UpdateRoom"] = "update_room";
+    WsEvent["SendToRoom"] = "send_to_room";
+    WsEvent["BroadcastToRoom"] = "broadcast_to_room";
+})(WsEvent = exports.WsEvent || (exports.WsEvent = {}));
+;
+;
+;
+;
+
+
+/***/ }),
+/* 22 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.delay = exports.randomId = void 0;
+const tslib_1 = __webpack_require__(1);
+const short_unique_id_1 = tslib_1.__importDefault(__webpack_require__(23));
+const randomId = (length = 10) => new short_unique_id_1.default({ length }).randomUUID();
+exports.randomId = randomId;
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+exports.delay = delay;
+
+
+/***/ }),
+/* 23 */
+/***/ ((module) => {
+
+module.exports = require("short-unique-id");
 
 /***/ })
 /******/ 	]);

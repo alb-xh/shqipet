@@ -60,3 +60,9 @@ export interface GetUserByUsernameResponse {
   profilePictureUrl?: string,
   bio?: string,
 }
+
+export interface CreateUser {
+  username: string,
+  firstName: string,
+  lastName: string,
+}
