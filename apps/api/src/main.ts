@@ -1,8 +1,6 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import csurf from 'csurf';
 
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -22,6 +20,9 @@ async function bootstrap() {
 
   app.enableCors({ credentials: true, origin: new RegExp(origin) });
   app.use(cookieParser());
+  app.use(helmet());
+  // app.use(csurf()); // TODO: investigate in future
+
   app.setGlobalPrefix(prefix);
   app.useGlobalPipes(new ValidationPipe())
 

@@ -27,6 +27,9 @@ export class User {
   @Column()
   resetPasswordCode: string;
 
+  @Column({ type: 'smallint', default: 0 })
+  resetPasswordAttempts = 0;
+
   @CreateDateColumn()
   createdAt: Date;
 

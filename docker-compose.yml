@@ -72,7 +72,7 @@ services:
     ports:
       - ${DB_PORT}:5432
     volumes:
-      - ~/storage/db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
@@ -90,3 +90,5 @@ services:
       - PGADMIN_DEFAULT_EMAIL=admin@admin.com
       - PGADMIN_DEFAULT_PASSWORD=admin
       - PGADMIN_SERVER_JSON_FILE=//data/pgadmin.servers.json
+volumes:
+  db:
