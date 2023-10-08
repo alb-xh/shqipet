@@ -52,13 +52,17 @@ export interface SendToRoomMessage {
   state: Record<string, any>,
 };
 
-export interface UserResponse {
+export interface PublicUser {
   id: number,
   username: string,
   firstName: string,
   lastName: string,
   profilePictureUrl?: string,
   bio?: string,
+}
+
+export interface CreateUserResponse extends PublicUser {
+  resetPasswordCode: string,
 }
 
 export interface CreateUser {

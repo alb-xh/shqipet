@@ -21,7 +21,8 @@
     "orm:mig:run": "npm run orm -- migration:run",
     "orm:mig:revert": "npm run orm -- migration:revert",
     "orm:mig:gen": "npm run orm -- migration:generate ./libs/db/src/lib/migrations/${npm_config_name}",
-    "crypto:salt:gen": "node ./scripts/js/generate-salt.script.js"
+    "salt:round:gen": "node ./scripts/js/generate-round-salt.script.js",
+    "salt:gen": "node ./scripts/js/generate-salt.script.js"
   },
   "private": true,
   "dependencies": {
@@ -35,6 +36,7 @@
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
+    "@nestjs/jwt": "^10.1.1",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/platform-socket.io": "^9.4.0",
     "@nestjs/swagger": "^7.1.13",

@@ -1,7 +1,7 @@
 const argv = require('minimist')(process.argv.slice(2));
-const { genSaltSync } = require('bcrypt');
+const shortUniqId = require('short-unique-id');
 
-const rounds = argv.r || argv.rounds || 10;
-const salt = genSaltSync(rounds);
+const length = argv.l || argv.length || 10;
+const salt = new shortUniqId({ length }).randomUUID();
 
 console.log(`Salt: ${salt}`);
