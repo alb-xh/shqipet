@@ -52,7 +52,7 @@ export interface SendToRoomMessage {
   state: Record<string, any>,
 };
 
-export interface GetUserByUsernameResponse {
+export interface UserResponse {
   id: number,
   username: string,
   firstName: string,
@@ -65,4 +65,5 @@ export interface CreateUser {
   username: string,
   firstName: string,
   lastName: string,
+  password: string,
 }

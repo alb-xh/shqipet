@@ -1,4 +1,4 @@
-import { RoomInfo, UserInfo } from "@shqipet/common";
+import { RoomInfo, UserInfo } from "@shqipet/common/backend";
 
 export class Room {
   readonly members = new Map<string, UserInfo>();

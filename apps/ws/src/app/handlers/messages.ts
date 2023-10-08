@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { WsEvent, Message } from "@shqipet/common";
+import { WsEvent, Message } from "@shqipet/common/backend";
 import { Server, Socket } from "socket.io";
 
 import { AuthManager, MessageFormatter } from "../components";

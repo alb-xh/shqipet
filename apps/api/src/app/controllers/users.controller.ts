@@ -1,9 +1,9 @@
-import { BadRequestException, Body, Controller, ForbiddenException, Get, NotFoundException, Param, Post } from "@nestjs/common";
+import { Body, Controller, ForbiddenException, Get, NotFoundException, Param, Post } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { CreateUserDto, GetUserByUsernameResponse } from '@shqipet/common';
 import { User } from "@shqipet/db";
 import { Repository } from "typeorm";
-
+import { CreateUserDto } from "./dtos";
+import { UserResponse } from "@shqipet/common";
 
 @Controller('users')
 export class UsersController {
@@ -13,7 +13,7 @@ export class UsersController {
   ) {}
 
   @Get(':username')
-  async getUserByUsername(@Param('username') username: string): Promise<GetUserByUsernameResponse> {
+  async getUserByUsername(@Param('username') username: string): Promise<UserResponse> {
     const user = await this.userRepository.findOneBy({ username });
     if (!user) {
       throw new NotFoundException();
@@ -31,13 +31,7 @@ export class UsersController {
 
   @Post()
   async createUser(@Body() createUserDto: CreateUserDto): Promise<void> {
-    const { username, firstName, lastName } = createUserDto;
-
-    if (!username || !firstName || !lastName) {
-      throw new BadRequestException();
-    }
-
-    if (this.userRepository.exist({ where: { username } })) {
+    if (await this.userRepository.exist({ where: { username: createUserDto.username } })) {
       throw new ForbiddenException('User already exists');
     }
 

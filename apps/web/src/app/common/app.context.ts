@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { UserInfo, Message, CreateRoomMessage, JoinRoomMessage, RoomInfo, GeoInfo } from '@shqipet/common';
+import { UserInfo, Message, CreateRoomMessage, JoinRoomMessage, RoomInfo, GeoInfo } from '@shqipet/common/frontend';
 
 import { AlertSettings, SearchOptions, SearchValue } from "../types";
 

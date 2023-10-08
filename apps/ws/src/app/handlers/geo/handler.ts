@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { GeoInfo, WsEvent } from "@shqipet/common";
+import { WsEvent } from "@shqipet/common";
 import { Server, Socket } from "socket.io";
 import { GeoService } from "@shqipet/geo";
 
