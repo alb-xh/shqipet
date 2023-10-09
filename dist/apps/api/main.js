@@ -86,7 +86,7 @@ const randomId = (length = 10) => new short_unique_id_1.default({ length }).rand
 exports.randomId = randomId;
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 exports.delay = delay;
-const isProduction = () => process.env['NODE' + '_ENV'] === 'production';
+const isProduction = () => [process.env['NODE' + '_ENV'], process.env['NODE_ENV']].includes('production');
 exports.isProduction = isProduction;
 const getEnvFile = () => (0, exports.isProduction)() ? '.prod.env' : '.dev.env';
 exports.getEnvFile = getEnvFile;
