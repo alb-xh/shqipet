@@ -1,6 +1,6 @@
 import { ImageListItem, ImageListItemBar } from "@mui/material"
 import { useNavigate } from "react-router-dom";
-import { randomId } from "@shqipet/common/frontend";
+import { randomId } from "@shqipet/common";
 
 import { capOnlyFirst } from "../../helpers";
 import { useUser, useAlerts, useRoom } from "../../common";

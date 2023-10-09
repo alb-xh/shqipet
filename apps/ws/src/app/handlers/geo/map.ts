@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { GeoInfo } from "@shqipet/common/backend";
+import { GeoInfo } from "@shqipet/common";
 
 Injectable()
 export class GeoMap {

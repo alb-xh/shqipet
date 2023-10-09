@@ -4,7 +4,7 @@ import { DbModule } from '@shqipet/db';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { JwtModule } from '@nestjs/jwt';
 
-import { UsersController } from './controllers';
+import { MeController, UsersController } from './controllers';
 import { UsersService, AuthService } from './services';
 import { PasswordHasher } from './components';
 import { ConfigService } from '@nestjs/config';
@@ -31,6 +31,7 @@ import { ConfigService } from '@nestjs/config';
     AuthService,
   ],
   controllers: [
+    MeController,
     UsersController,
   ],
 })

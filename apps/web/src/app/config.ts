@@ -1,4 +1,4 @@
-import { isProduction } from '@shqipet/common/frontend';
+import { isProduction } from '@shqipet/common';
 
 export const API_ENDPOINT_URL = isProduction()
   ? `https://${process.env['DOMAIN']}/api`

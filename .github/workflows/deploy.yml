@@ -24,4 +24,5 @@ jobs:
           npm install --omit=dev
           docker kill $(docker ps -q) 2>&1 >/dev/null || true
           docker system prune -a -f
-          docker compose up -d --force-recreate --build
+          docker compose --profile prod --env-file .prod.env up -d --force-recreate --build
+          npm run orm:mig:run

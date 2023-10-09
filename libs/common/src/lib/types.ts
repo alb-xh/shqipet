@@ -71,3 +71,12 @@ export interface CreateUser {
   lastName: string,
   password: string,
 }
+
+export interface UserSignIn {
+  password: string,
+}
+
+export interface ChangePassword {
+  oldPassword: string,
+  newPassword: string,
+}

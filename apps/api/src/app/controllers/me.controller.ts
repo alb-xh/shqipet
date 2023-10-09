@@ -5,6 +5,7 @@ import { PublicUser } from "@shqipet/common";
 
 import { UseAuth, UseThrottle, GetUser } from "../decorators";
 import { AuthService, UsersService } from "../services";
+import { ChangePasswordDto } from "../dtos";
 
 @Controller('me')
 @UseAuth()
@@ -40,13 +41,12 @@ export class MeController {
   @UseThrottle(1, 60)
   async updateMyPassword(
     @GetUser() user: Partial<User>,
-    @Body('currentPassword') currentPassword: string,
-    @Body('newPassword') newPassword: string,
+    @Body() body: ChangePasswordDto,
   ): Promise<void> {
-    if (!await this.usersService.isUserPasswordValid(user.id, currentPassword)) {
+    if (!await this.usersService.isUserPasswordValid(user.id, body.oldPassword)) {
       throw new ForbiddenException('Invalid password');
     }
 
-    await this.usersService.updateUserPassword(user.id, newPassword);
+    await this.usersService.updateUserPassword(user.id, body.newPassword);
   }
 }

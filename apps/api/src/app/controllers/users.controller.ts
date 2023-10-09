@@ -1,11 +1,10 @@
-import { Body, Controller, Delete, ForbiddenException, Get, NotFoundException, Param, Post, Res } from "@nestjs/common";
+import { Body, Controller, ForbiddenException, Get, NotFoundException, Param, Post, Res } from "@nestjs/common";
 import { CreateUserResponse, PublicUser } from "@shqipet/common";
 import { Response } from 'express';
 
-import { CreateUserDto } from "../dtos";
-import { UseAuth, UseThrottle, GetUser } from "../decorators";
+import { CreateUserDto, UserSignInDto } from "../dtos";
+import { UseThrottle } from "../decorators";
 import { AuthService, UsersService } from "../services";
-import { User } from "@shqipet/db";
 
 @Controller('users')
 export class UsersController {
@@ -49,7 +48,7 @@ export class UsersController {
   @UseThrottle(3, 60)
   async signIn(
     @Param('username') username: string,
-    @Body('password') password: string,
+    @Body() body: UserSignInDto,
     @Res() response: Response,
   ): Promise<void> {
     const user = await this.usersService.getUser(username);
@@ -57,7 +56,7 @@ export class UsersController {
       throw new NotFoundException('User not found');
     }
 
-    if (!await this.usersService.isUserPasswordValid(user, password)) {
+    if (!await this.usersService.isUserPasswordValid(user, body.password)) {
       throw new ForbiddenException('Invalid password');
     }
 
@@ -68,20 +67,4 @@ export class UsersController {
       .send();
   }
 
-  @Delete('me')
-  @UseAuth()
-  @UseThrottle(3, 60)
-  async deleteMe(@GetUser() user: Partial<User>): Promise<void> {
-    await this.usersService.deleteUser(user.id);
-  }
-
-  @Post('me/sign-out')
-  @UseThrottle(3, 60)
-  async signMeOut(@Res() res: Response): Promise<void> {
-    await this.authService.signOut(res);
-
-    res
-      .status(204)
-      .send();
-  }
 }

@@ -1,4 +1,4 @@
-import { GeoInfo } from "@shqipet/common/frontend"
+import { GeoInfo } from "@shqipet/common"
 
 export type Marker = GeoInfo &  { active: number };
 
