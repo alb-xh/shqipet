@@ -4,7 +4,7 @@ import { JwtService } from "@nestjs/jwt";
 import { isProduction } from "@shqipet/common";
 import { User } from "@shqipet/db";
 import { Request, Response, CookieOptions } from 'express';
-import { omit } from "lodash";
+import { pick } from "lodash";
 
 @Injectable()
 export class AuthService {
@@ -54,7 +54,7 @@ export class AuthService {
 
   async generateToken (user: User): Promise<string> {
     return this.jwtService.signAsync(
-      omit(user, this.publicUserFields),
+      pick(user, this.publicUserFields),
       { secret: this.secret },
     );
   }

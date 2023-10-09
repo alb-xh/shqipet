@@ -16,6 +16,6 @@ export class PasswordHasher {
   }
 
   hash (password: string): Promise<string> {
-    return this.hashAlgo(password, 10);
+    return this.hashAlgo(password, this.salt);
   }
 }
