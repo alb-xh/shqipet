@@ -30,14 +30,17 @@ export class UsersService {
   async getPublicUser (usernameOrId: string | number): Promise<PublicUser> {
     const user = await this.getUser(usernameOrId);
 
-    return {
-      id: user.id,
-      username: user.username,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      profilePictureUrl: user.profilePictureUrl,
-      bio: user.bio,
-    };
+    return user
+      ?
+        {
+          id: user.id,
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          profilePictureUrl: user.profilePictureUrl,
+          bio: user.bio,
+        }
+      : null;
   }
 
   async createUser (userData: CreateUser): Promise<User> {

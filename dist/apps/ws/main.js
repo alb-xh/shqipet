@@ -42,7 +42,7 @@ AppModule = tslib_1.__decorate([
             {
                 provide: components_1.AuthManager,
                 useFactory: (configService) => {
-                    const cookieName = configService.getOrThrow('COOKIE');
+                    const cookieName = configService.getOrThrow('AUTH_COOKIE_NAME');
                     return new components_1.AuthManager(cookieName);
                 },
                 inject: [config_2.ConfigService],

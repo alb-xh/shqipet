@@ -21,6 +21,7 @@ jobs:
           cd shqipet
           echo "${{ vars.CONFIG }}" >> .prod.env
           nvm install
+          npm cache clean -f
           npm install --omit=dev
           docker kill $(docker ps -q) 2>&1 >/dev/null || true
           docker system prune -a -f

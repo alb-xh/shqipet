@@ -18,7 +18,7 @@ import { WsGateway } from './ws.gateway';
     {
       provide: AuthManager,
       useFactory: (configService) => {
-        const cookieName = configService.getOrThrow('COOKIE');
+        const cookieName = configService.getOrThrow('AUTH_COOKIE_NAME');
         return new AuthManager(cookieName);
       },
       inject: [ ConfigService ],

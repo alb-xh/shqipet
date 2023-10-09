@@ -788,14 +788,17 @@ let UsersService = class UsersService {
     getPublicUser(usernameOrId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const user = yield this.getUser(usernameOrId);
-            return {
-                id: user.id,
-                username: user.username,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                profilePictureUrl: user.profilePictureUrl,
-                bio: user.bio,
-            };
+            return user
+                ?
+                    {
+                        id: user.id,
+                        username: user.username,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        profilePictureUrl: user.profilePictureUrl,
+                        bio: user.bio,
+                    }
+                : null;
         });
     }
     createUser(userData) {
