@@ -1,16 +1,34 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { omit } from 'lodash';
 
 import { options } from './dataSource';
 import * as entitiesObj from './entities';
+import { isProduction } from '@shqipet/common';
 
 const entities = Object.values(entitiesObj)
+const {
+  serviceName,
+  type,
+  host,
+  port,
+  username,
+  password,
+  database,
+  migrationsTableName,
+  synchronize,
+} = options;
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      ...omit(options, ['entities', 'migrations']),
+      type,
+      host: isProduction() ? serviceName : host,
+      port,
+      username,
+      password,
+      database,
+      migrationsTableName,
+      synchronize,
       entities,
     }),
     TypeOrmModule.forFeature(entities),

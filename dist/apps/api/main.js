@@ -115,10 +115,10 @@ const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
 const config_1 = __webpack_require__(13);
 const db_1 = __webpack_require__(15);
-const throttler_1 = __webpack_require__(24);
-const jwt_1 = __webpack_require__(25);
-const controllers_1 = __webpack_require__(26);
-const services_1 = __webpack_require__(39);
+const throttler_1 = __webpack_require__(23);
+const jwt_1 = __webpack_require__(24);
+const controllers_1 = __webpack_require__(25);
+const services_1 = __webpack_require__(38);
 const components_1 = __webpack_require__(42);
 const config_2 = __webpack_require__(6);
 let AppModule = class AppModule {
@@ -195,7 +195,7 @@ exports.ConfigModule = ConfigModule;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
 tslib_1.__exportStar(__webpack_require__(16), exports);
-tslib_1.__exportStar(__webpack_require__(22), exports);
+tslib_1.__exportStar(__webpack_require__(21), exports);
 
 
 /***/ }),
@@ -208,16 +208,27 @@ exports.DbModule = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
 const typeorm_1 = __webpack_require__(17);
-const lodash_1 = __webpack_require__(18);
-const dataSource_1 = __webpack_require__(19);
-const entitiesObj = tslib_1.__importStar(__webpack_require__(22));
+const dataSource_1 = __webpack_require__(18);
+const entitiesObj = tslib_1.__importStar(__webpack_require__(21));
+const common_2 = __webpack_require__(7);
 const entities = Object.values(entitiesObj);
+const { serviceName, type, host, port, username, password, database, migrationsTableName, synchronize, } = dataSource_1.options;
 let DbModule = class DbModule {
 };
 DbModule = tslib_1.__decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forRoot(Object.assign(Object.assign({}, (0, lodash_1.omit)(dataSource_1.options, ['entities', 'migrations'])), { entities })),
+            typeorm_1.TypeOrmModule.forRoot({
+                type,
+                host: (0, common_2.isProduction)() ? serviceName : host,
+                port,
+                username,
+                password,
+                database,
+                migrationsTableName,
+                synchronize,
+                entities,
+            }),
             typeorm_1.TypeOrmModule.forFeature(entities),
         ],
         exports: [typeorm_1.TypeOrmModule]
@@ -234,26 +245,21 @@ module.exports = require("@nestjs/typeorm");
 
 /***/ }),
 /* 18 */
-/***/ ((module) => {
-
-module.exports = require("lodash");
-
-/***/ }),
-/* 19 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.options = void 0;
 const tslib_1 = __webpack_require__(1);
-const dotenv = tslib_1.__importStar(__webpack_require__(20));
-const typeorm_1 = __webpack_require__(21);
+const dotenv = tslib_1.__importStar(__webpack_require__(19));
+const typeorm_1 = __webpack_require__(20);
 const isProduction = process.env.NODE_ENV === 'production';
 const envFile = isProduction ? '.prod.env' : '.dev.env';
 const entitiesPath = isProduction ? 'dist/libs/db/src/lib/entities/*.entity.js' : 'libs/db/src/lib/entities/*.entity.ts';
 const migrationsPath = isProduction ? 'dist/libs/db/src/lib/migrations/*.js' : 'libs/db/src/lib/migrations/*.ts';
 dotenv.config({ path: envFile });
 exports.options = {
+    serviceName: process.env.DB_SERVICE_NAME,
     type: process.env.DB_TYPE,
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT, 10),
@@ -269,29 +275,29 @@ exports["default"] = new typeorm_1.DataSource(exports.options);
 
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ ((module) => {
 
 module.exports = require("dotenv");
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ ((module) => {
 
 module.exports = require("typeorm");
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(23), exports);
+tslib_1.__exportStar(__webpack_require__(22), exports);
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -299,7 +305,7 @@ var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.User = void 0;
 const tslib_1 = __webpack_require__(1);
-const typeorm_1 = __webpack_require__(21);
+const typeorm_1 = __webpack_require__(20);
 let User = class User {
     constructor() {
         this.resetPasswordAttempts = 0;
@@ -357,30 +363,30 @@ exports.User = User;
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ ((module) => {
 
 module.exports = require("@nestjs/throttler");
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ ((module) => {
 
 module.exports = require("@nestjs/jwt");
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(27), exports);
+tslib_1.__exportStar(__webpack_require__(26), exports);
 tslib_1.__exportStar(__webpack_require__(46), exports);
 
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -389,10 +395,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UsersController = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
-const express_1 = __webpack_require__(28);
-const dtos_1 = __webpack_require__(29);
-const decorators_1 = __webpack_require__(34);
-const services_1 = __webpack_require__(39);
+const express_1 = __webpack_require__(27);
+const dtos_1 = __webpack_require__(28);
+const decorators_1 = __webpack_require__(33);
+const services_1 = __webpack_require__(38);
 let UsersController = class UsersController {
     constructor(usersService, authService) {
         this.usersService = usersService;
@@ -473,10 +479,22 @@ exports.UsersController = UsersController;
 
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ ((module) => {
 
 module.exports = require("express");
+
+/***/ }),
+/* 28 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(29), exports);
+tslib_1.__exportStar(__webpack_require__(31), exports);
+tslib_1.__exportStar(__webpack_require__(32), exports);
+
 
 /***/ }),
 /* 29 */
@@ -484,21 +502,9 @@ module.exports = require("express");
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(30), exports);
-tslib_1.__exportStar(__webpack_require__(32), exports);
-tslib_1.__exportStar(__webpack_require__(33), exports);
-
-
-/***/ }),
-/* 30 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CreateUserDto = void 0;
 const tslib_1 = __webpack_require__(1);
-const class_validator_1 = __webpack_require__(31);
+const class_validator_1 = __webpack_require__(30);
 const swagger_1 = __webpack_require__(11);
 class CreateUserDto {
 }
@@ -530,20 +536,20 @@ exports.CreateUserDto = CreateUserDto;
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ ((module) => {
 
 module.exports = require("class-validator");
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UserSignInDto = void 0;
 const tslib_1 = __webpack_require__(1);
-const class_validator_1 = __webpack_require__(31);
+const class_validator_1 = __webpack_require__(30);
 const swagger_1 = __webpack_require__(11);
 class UserSignInDto {
 }
@@ -557,7 +563,7 @@ exports.UserSignInDto = UserSignInDto;
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -565,7 +571,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ChangePasswordDto = void 0;
 const tslib_1 = __webpack_require__(1);
 const swagger_1 = __webpack_require__(11);
-const class_validator_1 = __webpack_require__(31);
+const class_validator_1 = __webpack_require__(30);
 class ChangePasswordDto {
 }
 tslib_1.__decorate([
@@ -584,15 +590,28 @@ exports.ChangePasswordDto = ChangePasswordDto;
 
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(34), exports);
 tslib_1.__exportStar(__webpack_require__(35), exports);
-tslib_1.__exportStar(__webpack_require__(36), exports);
 tslib_1.__exportStar(__webpack_require__(45), exports);
+
+
+/***/ }),
+/* 34 */
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.UseThrottle = void 0;
+const common_1 = __webpack_require__(4);
+const throttler_1 = __webpack_require__(23);
+const UseThrottle = (limit, ttl) => (0, common_1.applyDecorators)((0, common_1.UseGuards)(throttler_1.ThrottlerGuard), (0, throttler_1.Throttle)({ default: { limit, ttl: ttl * 1000 } }));
+exports.UseThrottle = UseThrottle;
 
 
 /***/ }),
@@ -601,11 +620,11 @@ tslib_1.__exportStar(__webpack_require__(45), exports);
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UseThrottle = void 0;
+exports.UseAuth = void 0;
 const common_1 = __webpack_require__(4);
-const throttler_1 = __webpack_require__(24);
-const UseThrottle = (limit, ttl) => (0, common_1.applyDecorators)((0, common_1.UseGuards)(throttler_1.ThrottlerGuard), (0, throttler_1.Throttle)({ default: { limit, ttl: ttl * 1000 } }));
-exports.UseThrottle = UseThrottle;
+const guards_1 = __webpack_require__(36);
+const UseAuth = () => (0, common_1.UseGuards)(guards_1.AuthGuard);
+exports.UseAuth = UseAuth;
 
 
 /***/ }),
@@ -614,25 +633,12 @@ exports.UseThrottle = UseThrottle;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.UseAuth = void 0;
-const common_1 = __webpack_require__(4);
-const guards_1 = __webpack_require__(37);
-const UseAuth = () => (0, common_1.UseGuards)(guards_1.AuthGuard);
-exports.UseAuth = UseAuth;
+const tslib_1 = __webpack_require__(1);
+tslib_1.__exportStar(__webpack_require__(37), exports);
 
 
 /***/ }),
 /* 37 */
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(38), exports);
-
-
-/***/ }),
-/* 38 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -641,7 +647,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AuthGuard = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
-const services_1 = __webpack_require__(39);
+const services_1 = __webpack_require__(38);
 let AuthGuard = class AuthGuard {
     constructor(authService) {
         this.authService = authService;
@@ -666,18 +672,18 @@ exports.AuthGuard = AuthGuard;
 
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__(1);
-tslib_1.__exportStar(__webpack_require__(40), exports);
+tslib_1.__exportStar(__webpack_require__(39), exports);
 tslib_1.__exportStar(__webpack_require__(41), exports);
 
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -687,10 +693,10 @@ exports.AuthService = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
 const config_1 = __webpack_require__(6);
-const jwt_1 = __webpack_require__(25);
+const jwt_1 = __webpack_require__(24);
 const common_2 = __webpack_require__(7);
 const db_1 = __webpack_require__(15);
-const lodash_1 = __webpack_require__(18);
+const lodash_1 = __webpack_require__(40);
 let AuthService = class AuthService {
     constructor(jwtService, configService) {
         this.jwtService = jwtService;
@@ -751,6 +757,12 @@ exports.AuthService = AuthService;
 
 
 /***/ }),
+/* 40 */
+/***/ ((module) => {
+
+module.exports = require("lodash");
+
+/***/ }),
 /* 41 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -763,7 +775,7 @@ const common_1 = __webpack_require__(4);
 const typeorm_1 = __webpack_require__(17);
 const common_2 = __webpack_require__(7);
 const db_1 = __webpack_require__(15);
-const typeorm_2 = __webpack_require__(21);
+const typeorm_2 = __webpack_require__(20);
 const components_1 = __webpack_require__(42);
 let UsersService = class UsersService {
     constructor(userRepository, passwordHasher, generateId = common_2.randomId) {
@@ -915,10 +927,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MeController = void 0;
 const tslib_1 = __webpack_require__(1);
 const common_1 = __webpack_require__(4);
-const express_1 = __webpack_require__(28);
-const decorators_1 = __webpack_require__(34);
-const services_1 = __webpack_require__(39);
-const dtos_1 = __webpack_require__(29);
+const express_1 = __webpack_require__(27);
+const decorators_1 = __webpack_require__(33);
+const services_1 = __webpack_require__(38);
+const dtos_1 = __webpack_require__(28);
 let MeController = class MeController {
     constructor(usersService, authService) {
         this.usersService = usersService;

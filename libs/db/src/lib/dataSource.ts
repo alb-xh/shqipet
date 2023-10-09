@@ -9,6 +9,7 @@ const migrationsPath = isProduction ? 'dist/libs/db/src/lib/migrations/*.js' : '
 dotenv.config({ path: envFile });
 
 export const options = {
+  serviceName: process.env.DB_SERVICE_NAME,
   type: process.env.DB_TYPE as any,
   host: process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT as string, 10),
