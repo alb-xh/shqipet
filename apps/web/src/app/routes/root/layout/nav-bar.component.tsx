@@ -6,7 +6,6 @@ import logo from '../../../../assets/logo.png';
 import { Alert } from './alert.component';
 import { useUser } from '../../../common';
 import { useNavigate } from 'react-router-dom';
-import { Path } from '../../../constants';
 import { Search } from './search.component';
 
 const GridItem = (props) => {
@@ -47,7 +46,6 @@ export const NavBar = () => {
           className='logo'
           alt="logo"
           src={logo}
-          onClick={() => navigate(Path.About)}
         />
       </GridItem>
       <GridItem xs={4}>

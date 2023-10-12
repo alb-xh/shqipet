@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useUser, useRedirect } from '../../common';
-import { GoogleSignIn } from './google-sign-in.component';
+import { LoginForm } from './login-form.component';
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -19,5 +19,5 @@ export const Login = () => {
     return null;
   }
 
-  return <GoogleSignIn />;
+  return <LoginForm />;
 }

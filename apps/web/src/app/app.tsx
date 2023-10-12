@@ -9,7 +9,7 @@ import { WsEvent, CreateRoomMessage, JoinRoomMessage, Message } from "@shqipet/c
 import { appContext, wsSocket } from './common';
 
 import { Path } from "./constants";
-import { RootLayout, Root, Login, Logout, Games, Rooms, Chess, About, Posts, Profile, Chat } from "./routes";
+import { RootLayout, Root, Login, Logout, Games, Rooms, Chess, Posts, Profile, Chat } from "./routes";
 import { Error } from './pages'
 
 const router = createBrowserRouter([
@@ -45,10 +45,6 @@ const router = createBrowserRouter([
       {
         path: Path.Login,
         element: <Login />,
-      },
-      {
-        path: Path.About,
-        element: <About />
       },
       {
         path: Path.Posts,

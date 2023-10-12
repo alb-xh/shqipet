@@ -9,7 +9,6 @@ export enum Path {
   Login = '/login',
   Logout = '/logout',
   Posts = '/posts',
-  About = '/about',
   Profile = '/profile',
 };
 
