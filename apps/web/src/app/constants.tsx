@@ -10,6 +10,8 @@ export enum Path {
   Logout = '/logout',
   Posts = '/posts',
   Profile = '/profile',
+  Register = '/register',
+  ResetPassword = '/reset-password',
 };
 
 export enum Games {

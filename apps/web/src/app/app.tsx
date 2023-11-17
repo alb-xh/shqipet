@@ -11,6 +11,9 @@ import { appContext, wsSocket } from './common';
 import { Path } from "./constants";
 import { RootLayout, Root, Login, Logout, Games, Rooms, Chess, Posts, Profile, Chat } from "./routes";
 import { Error } from './pages'
+import { PrivateRoute } from "./common/private-route.component";
+import { Register } from "./routes/register";
+import { ResetPassword } from "./routes/reset-password";
 
 const router = createBrowserRouter([
   {
@@ -43,18 +46,25 @@ const router = createBrowserRouter([
         element: <Rooms />
       },
       {
-        path: Path.Login,
-        element: <Login />,
-      },
-      {
         path: Path.Posts,
         element: <Posts />
       },
       {
         path: Path.Profile,
         element: <Profile />,
-
-      }
+      },
+      {
+        path: Path.Register,
+        element: <PrivateRoute><Register /></PrivateRoute>,
+      },
+      {
+        path: Path.Login,
+        element: <PrivateRoute><Login /></PrivateRoute>,
+      },
+      {
+        path: Path.ResetPassword,
+        element: <PrivateRoute><ResetPassword /></PrivateRoute>,
+      },
     ]
   },
 ]);

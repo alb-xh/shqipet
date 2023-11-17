@@ -7,7 +7,7 @@ export const useRedirect = (fallback = Path.Root) => {
   const redirect = useQueryParam('redirect');
 
   if (redirect && paths.some((path) => path.startsWith(redirect))) {
-    return redirect
+    return redirect;
   }
 
   return fallback;
