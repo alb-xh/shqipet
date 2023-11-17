@@ -12,14 +12,45 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 
 export const LoginForm = () => {
+  const [ usernameError, setUsernameError ] = React.useState('');
+  const [ passwordError, setPasswordError ] = React.useState('');
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const username = data.get('username');
+    const password = data.get('password');
 
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    let usernameError, passwordError;
+
+    if (!username) {
+      usernameError = 'Username is required';
+    } else if (username.length < 4) {
+      usernameError = 'Username must be at least 4 characters'
+    } else if (username.length > 50) {
+      usernameError = 'Username must be less than 50 characters'
+    } else {
+      usernameError = '';
+    }
+
+    if (!password) {
+      passwordError = 'Password is required';
+    } else if (password.length < 8) {
+      passwordError = 'Password must be at least 8 characters'
+    } else if (password.length > 50) {
+      passwordError = 'Password must be less than 50 characters'
+    } else {
+      passwordError = '';
+    }
+
+    setUsernameError(usernameError);
+    setPasswordError(passwordError);
+
+    if (usernameError || passwordError) {
+      return;
+    }
+
+    console.log({ username, password });
   };
 
   return (
@@ -40,35 +71,44 @@ export const LoginForm = () => {
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
-              margin="normal"
-              required
-              fullWidth
               id="username"
-              label="Username"
               name="username"
+              label="Username"
               autoComplete="username"
-              value="Sdasd"
-              autoFocus
+              variant="filled"
+              margin="normal"
+              error={!!usernameError}
+              helperText={usernameError}
               sx={{
-                "& .MuiOutlinedInput-root": {
-                  'backgroundColor': 'white',
-                },
+                backgroundColor: 'white',
+                '& .MuiFormHelperText-root': {
+                  backgroundColor: 'black',
+                  margin: '0px',
+                  padding: '2px 0px 0px 10px',
+                }
               }}
+              fullWidth
+              autoFocus
             />
             <TextField
-              margin="normal"
-              required
-              fullWidth
+              id="password"
               name="password"
               label="Password"
               type="password"
-              id="password"
-              autoComplete="current-password"
+              autoComplete="password"
+              variant="filled"
+              margin="normal"
+              error={!!passwordError}
+              helperText={passwordError}
               sx={{
-                "& .MuiOutlinedInput-root": {
-                  'backgroundColor': 'white',
-                },
+                backgroundColor: 'white',
+                '& .MuiFormHelperText-root': {
+                  backgroundColor: 'black',
+                  margin: '0px',
+                  padding: '2px 0px 0px 10px',
+                }
               }}
+              fullWidth
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
