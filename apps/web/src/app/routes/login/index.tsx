@@ -13,47 +13,25 @@ import Container from '@mui/material/Container';
 import { Link } from 'react-router-dom';
 
 import { Path } from '../../constants';
+import { useUsernameField } from '../../common/hooks/fields/use-username.field-hook';
+import { usePasswordField } from '../../common/hooks/fields/use-password.field-hook';
 
 export const Login = () => {
-  const [ usernameError, setUsernameError ] = React.useState('');
-  const [ passwordError, setPasswordError ] = React.useState('');
+  const usernameField = useUsernameField();
+  const passwordField = usePasswordField()
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
     const data = new FormData(event.currentTarget);
-    const username = data.get('username');
-    const password = data.get('password');
+    usernameField.validate(data);
+    passwordField.validate(data);
 
-    let usernameError, passwordError;
-
-    if (!username) {
-      usernameError = 'Username is required';
-    } else if (username.length < 4) {
-      usernameError = 'Username must be at least 4 characters'
-    } else if (username.length > 50) {
-      usernameError = 'Username must be less than 50 characters'
-    } else {
-      usernameError = '';
-    }
-
-    if (!password) {
-      passwordError = 'Password is required';
-    } else if (password.length < 8) {
-      passwordError = 'Password must be at least 8 characters'
-    } else if (password.length > 50) {
-      passwordError = 'Password must be less than 50 characters'
-    } else {
-      passwordError = '';
-    }
-
-    setUsernameError(usernameError);
-    setPasswordError(passwordError);
-
-    if (usernameError || passwordError) {
+    if (usernameField.error || passwordField.error) {
       return;
     }
 
-    console.log({ username, password });
+    console.log([ usernameField.value, passwordField ]);
   };
 
   return (
@@ -74,14 +52,14 @@ export const Login = () => {
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
-              id="username"
-              name="username"
+              id={usernameField.name}
+              name={usernameField.name}
+              error={!!usernameField.error}
+              helperText={usernameField.error}
               label="Username"
               autoComplete="username"
               variant="filled"
               margin="normal"
-              error={!!usernameError}
-              helperText={usernameError}
               sx={{
                 backgroundColor: 'white',
                 '& .MuiFormHelperText-root': {
@@ -94,15 +72,15 @@ export const Login = () => {
               autoFocus
             />
             <TextField
-              id="password"
-              name="password"
+              id={passwordField.name}
+              name={passwordField.name}
+              error={!!passwordField.error}
+              helperText={passwordField.error}
               label="Password"
               type="password"
               autoComplete="password"
               variant="filled"
               margin="normal"
-              error={!!passwordError}
-              helperText={passwordError}
               sx={{
                 backgroundColor: 'white',
                 '& .MuiFormHelperText-root': {

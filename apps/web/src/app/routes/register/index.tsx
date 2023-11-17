@@ -6,58 +6,28 @@ import Box from '@mui/material/Box';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import { useUsernameField } from '../../common/hooks/fields/use-username.field-hook';
+import { usePasswordField } from '../../common/hooks/fields/use-password.field-hook';
+import { useConfirmPasswordField } from '../../common/hooks/fields/use-confirm-password.field-hook';
 
 export const Register = () => {
-  const [ usernameError, setUsernameError ] = React.useState('');
-  const [ passwordError, setPasswordError ] = React.useState('');
-  const [ confirmPasswordError, setConfirmPasswordError ] = React.useState('');
+  const usernameField = useUsernameField();
+  const passwordField = usePasswordField();
+  const confirmPasswordField = useConfirmPasswordField(passwordField);
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
     const data = new FormData(event.currentTarget);
-    const username = data.get('username');
-    const password = data.get('password');
-    const confirmPassword = data.get('confirm-password');
+    usernameField.validate(data);
+    passwordField.validate(data);
+    confirmPasswordField.validate(data);
 
-    let usernameError, passwordError, confirmPasswordError;
-
-    if (!username) {
-      usernameError = 'Username is required';
-    } else if (username.length < 4) {
-      usernameError = 'Username must be at least 4 characters'
-    } else if (username.length > 50) {
-      usernameError = 'Username must be less than 50 characters'
-    } else {
-      usernameError = '';
-    }
-
-    if (!password) {
-      passwordError = 'Password is required';
-    } else if (password.length < 8) {
-      passwordError = 'Password must be at least 8 characters'
-    } else if (password.length > 50) {
-      passwordError = 'Password must be less than 50 characters'
-    } else {
-      passwordError = '';
-    }
-
-    if (!confirmPassword) {
-      confirmPasswordError = 'Confirm password is required';
-    } else if (confirmPassword !== password) {
-      confirmPasswordError = 'Passwords do not match';
-    } else {
-      confirmPasswordError = '';
-    }
-
-    setUsernameError(usernameError);
-    setPasswordError(passwordError);
-    setConfirmPasswordError(confirmPasswordError);
-
-    if (usernameError || passwordError || confirmPasswordError) {
+    if (usernameField.error || passwordField.error || confirmPasswordField.error) {
       return;
     }
 
-    console.log({ username, password, confirmPassword });
+    console.log([ usernameField.value, passwordField, confirmPasswordField.value ]);
   };
 
   return (
@@ -78,14 +48,14 @@ export const Register = () => {
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
-              id="username"
-              name="username"
+              id={usernameField.name}
+              name={usernameField.name}
+              error={!!usernameField.error}
+              helperText={usernameField.error}
               label="Username"
               autoComplete="username"
               variant="filled"
               margin="normal"
-              error={!!usernameError}
-              helperText={usernameError}
               sx={{
                 backgroundColor: 'white',
                 '& .MuiFormHelperText-root': {
@@ -98,15 +68,15 @@ export const Register = () => {
               autoFocus
             />
             <TextField
-              id="password"
-              name="password"
+              id={passwordField.name}
+              name={passwordField.name}
+              error={!!passwordField.error}
+              helperText={passwordField.error}
               label="Password"
               type="password"
               autoComplete="password"
               variant="filled"
               margin="normal"
-              error={!!passwordError}
-              helperText={passwordError}
               sx={{
                 backgroundColor: 'white',
                 '& .MuiFormHelperText-root': {
@@ -118,15 +88,15 @@ export const Register = () => {
               fullWidth
             />
             <TextField
-              id="confirm-password"
-              name="confirm-password"
+              id={confirmPasswordField.name}
+              name={confirmPasswordField.name}
+              error={!!confirmPasswordField.error}
+              helperText={confirmPasswordField.error}
               label="Confirm password"
               type="password"
               autoComplete="password"
               variant="filled"
               margin="normal"
-              error={!!confirmPasswordError}
-              helperText={confirmPasswordError}
               sx={{
                 backgroundColor: 'white',
                 '& .MuiFormHelperText-root': {
