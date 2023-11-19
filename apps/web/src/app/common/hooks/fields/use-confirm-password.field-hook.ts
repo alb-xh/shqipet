@@ -1,13 +1,13 @@
 import { useField } from "./use-field.hook";
 
-export const useConfirmPasswordField = (password: ReturnType<typeof useField>) => useField(
+export const useConfirmPasswordField = (passwordFieldName: string) => useField(
   'confirm-password',
-  (value) => {
+  (value, form) => {
     if (!value) {
       return 'Confirm password is required';
     }
 
-    if (value !== password.value) {
+    if (value !== form.get(passwordFieldName)) {
        return 'Passwords do not match';
     }
 

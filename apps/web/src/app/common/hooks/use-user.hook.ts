@@ -12,8 +12,8 @@ export const useUser = () => {
       setIsLoading(true);
 
       apiClient.getMe()
-        .then((userInfo) => {
-          setUser(userInfo);
+        .then((userData) => {
+          setUser(userData);
         })
         .catch(() => {
           setUser(null);

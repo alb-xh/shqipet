@@ -10,7 +10,7 @@ export const useLogout = () => {
   const { setUser } = useAppContext();
 
   useEffect(() => {
-    apiClient.logOut()
+    apiClient.signOut()
       .then(() => {
         setUser(null);
         navigate(Path.Root);

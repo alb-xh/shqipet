@@ -61,8 +61,8 @@ export const Rooms = () => {
           room && Array.from({ length: room.size }).map((_, i) => (
             <Avatar
               key={i}
-              alt={room.members[i]?.name || 'user'}
-              src={room.members[i]?.avatar}
+              alt={`${room.members[i]?.firstName} ${room.members[i]?.firstName}`  || 'user'}
+              src={room.members[i]?.profilePictureUrl}
             />
           ))
         }

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useRedirect, useUser } from "./hooks";
+import { useRedirect, useUser } from "../hooks";
 
 export const PrivateRoute = ({ children }) => {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
-import { RoomInfo, UserInfo } from "@shqipet/common";
+import { PublicUser, RoomInfo } from "@shqipet/common";
 
 export class Room {
-  readonly members = new Map<string, UserInfo>();
+  readonly members = new Map<string, PublicUser>();
 
   constructor (
     readonly id: string,
@@ -13,13 +13,13 @@ export class Room {
     return this.members.has(id);
   }
 
-  getMember (id: string): UserInfo | null {
+  getMember (id: string): PublicUser | null {
     return this.hasMember(id)
       ? this.members.get(id)
       : null;
   }
 
-  setMember (id: string, user: UserInfo): this {
+  setMember (id: string, user: PublicUser): this {
     this.members.set(id, user);
     return this;
   }

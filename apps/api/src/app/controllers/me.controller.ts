@@ -29,12 +29,12 @@ export class MeController {
 
   @Post('sign-out')
   @UseThrottle(10, 60)
-  async signMeOut(@Res() res: Response): Promise<void> {
-    await this.authService.signOut(res);
+  signMeOut(@Res() res: Response): void {
+    this.authService.signOut(res);
 
     res
       .status(204)
-      .send();
+      .send()
   }
 
   @Patch('update-password')

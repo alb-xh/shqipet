@@ -18,21 +18,15 @@ export interface GeoInfo {
   lng?: number,
 };
 
-export interface UserInfo {
-  id: string,
-  avatar?: string,
-  name: string,
-}
-
 export interface RoomInfo {
   id: string,
   title: string,
   size?: number,
-  members: UserInfo[],
+  members: PublicUser[],
 }
 
 export interface Message {
-  user: UserInfo,
+  user: PublicUser,
   text: string,
 };
 
@@ -44,7 +38,7 @@ export interface CreateRoomMessage {
 
 export interface JoinRoomMessage {
   id: string,
-  user: UserInfo,
+  user: PublicUser,
 }
 
 export interface SendToRoomMessage {

@@ -1,11 +1,11 @@
 import { createContext } from "react";
-import { UserInfo, Message, CreateRoomMessage, JoinRoomMessage, RoomInfo, GeoInfo } from '@shqipet/common';
+import { Message, CreateRoomMessage, JoinRoomMessage, RoomInfo, GeoInfo, PublicUser } from '@shqipet/common';
 
 import { AlertSettings, SearchOptions, SearchValue } from "../types";
 
 export interface AppContextInterface {
-  user: UserInfo | null,
-  setUser: (user: UserInfo | null) => void,
+  user: PublicUser | null,
+  setUser: (user: PublicUser | null) => void,
   geoMap: GeoInfo[],
   setGeoMap: (geoMap: GeoInfo[]) => void,
   messages: Message[],

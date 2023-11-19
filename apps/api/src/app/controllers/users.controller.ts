@@ -1,5 +1,5 @@
 import { Body, Controller, ForbiddenException, Get, NotFoundException, Param, Post, Res } from "@nestjs/common";
-import { CreateUserResponse, PublicUser } from "@shqipet/common";
+import { PublicUser } from "@shqipet/common";
 import { Response } from 'express';
 
 import { CreateUserDto, UserSignInDto } from "../dtos";
@@ -15,14 +15,17 @@ export class UsersController {
 
   @Post()
   @UseThrottle(3, 60)
-  async createUser(@Body() createUserDto: CreateUserDto): Promise<CreateUserResponse> {
+  async createUser(@Body() createUserDto: CreateUserDto, @Res() res: Response): Promise<void> {
     if (await this.usersService.userExists(createUserDto.username)) {
       throw new ForbiddenException('User already exists');
     }
 
     const user = await this.usersService.createUser(createUserDto);
+    await this.authService.signIn(user, res);
 
-    return {
+    res
+    .status(201)
+    .send({
       id: user.id,
       username: user.username,
       firstName: user.firstName,
@@ -30,7 +33,7 @@ export class UsersController {
       profilePictureUrl: user.profilePictureUrl,
       bio: user.bio,
       resetPasswordCode: user.resetPasswordCode,
-    };
+    });
   }
 
 
@@ -60,7 +63,7 @@ export class UsersController {
       throw new ForbiddenException('Invalid password');
     }
 
-    await this.authService.signIn(user, response);
+    this.authService.signIn(user, response);
 
     response
       .status(204)

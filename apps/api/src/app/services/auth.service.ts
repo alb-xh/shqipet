@@ -47,7 +47,7 @@ export class AuthService {
       Object.assign(user, userData);
 
       return user;
-    } catch {
+    } catch (error) {
       return null;
     }
   }
@@ -65,7 +65,7 @@ export class AuthService {
     res.cookie(this.cookieName, token, this.cookieOptions);
   }
 
-  async signOut (res: Response): Promise<void> {
+  signOut (res: Response): void {
     res.clearCookie(this.cookieName, this.cookieOptions);
   }
 }

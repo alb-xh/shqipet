@@ -390,7 +390,7 @@ tslib_1.__exportStar(__webpack_require__(46), exports);
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f, _g, _h;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.UsersController = void 0;
 const tslib_1 = __webpack_require__(1);
@@ -404,13 +404,16 @@ let UsersController = class UsersController {
         this.usersService = usersService;
         this.authService = authService;
     }
-    createUser(createUserDto) {
+    createUser(createUserDto, res) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             if (yield this.usersService.userExists(createUserDto.username)) {
                 throw new common_1.ForbiddenException('User already exists');
             }
             const user = yield this.usersService.createUser(createUserDto);
-            return {
+            yield this.authService.signIn(user, res);
+            res
+                .status(201)
+                .send({
                 id: user.id,
                 username: user.username,
                 firstName: user.firstName,
@@ -418,7 +421,7 @@ let UsersController = class UsersController {
                 profilePictureUrl: user.profilePictureUrl,
                 bio: user.bio,
                 resetPasswordCode: user.resetPasswordCode,
-            };
+            });
         });
     }
     getUserByUsername(username) {
@@ -439,7 +442,7 @@ let UsersController = class UsersController {
             if (!(yield this.usersService.isUserPasswordValid(user, body.password))) {
                 throw new common_1.ForbiddenException('Invalid password');
             }
-            yield this.authService.signIn(user, response);
+            this.authService.signIn(user, response);
             response
                 .status(204)
                 .send();
@@ -450,16 +453,17 @@ tslib_1.__decorate([
     (0, common_1.Post)(),
     (0, decorators_1.UseThrottle)(3, 60),
     tslib_1.__param(0, (0, common_1.Body)()),
+    tslib_1.__param(1, (0, common_1.Res)()),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_c = typeof dtos_1.CreateUserDto !== "undefined" && dtos_1.CreateUserDto) === "function" ? _c : Object]),
-    tslib_1.__metadata("design:returntype", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
+    tslib_1.__metadata("design:paramtypes", [typeof (_c = typeof dtos_1.CreateUserDto !== "undefined" && dtos_1.CreateUserDto) === "function" ? _c : Object, typeof (_d = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _d : Object]),
+    tslib_1.__metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
 ], UsersController.prototype, "createUser", null);
 tslib_1.__decorate([
     (0, common_1.Get)(':username'),
     tslib_1.__param(0, (0, common_1.Param)('username')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
-    tslib_1.__metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
+    tslib_1.__metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
 ], UsersController.prototype, "getUserByUsername", null);
 tslib_1.__decorate([
     (0, common_1.Post)(':username/sign-in'),
@@ -468,8 +472,8 @@ tslib_1.__decorate([
     tslib_1.__param(1, (0, common_1.Body)()),
     tslib_1.__param(2, (0, common_1.Res)()),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [String, typeof (_f = typeof dtos_1.UserSignInDto !== "undefined" && dtos_1.UserSignInDto) === "function" ? _f : Object, typeof (_g = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _g : Object]),
-    tslib_1.__metadata("design:returntype", typeof (_h = typeof Promise !== "undefined" && Promise) === "function" ? _h : Object)
+    tslib_1.__metadata("design:paramtypes", [String, typeof (_g = typeof dtos_1.UserSignInDto !== "undefined" && dtos_1.UserSignInDto) === "function" ? _g : Object, typeof (_h = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _h : Object]),
+    tslib_1.__metadata("design:returntype", typeof (_j = typeof Promise !== "undefined" && Promise) === "function" ? _j : Object)
 ], UsersController.prototype, "signIn", null);
 UsersController = tslib_1.__decorate([
     (0, common_1.Controller)('users'),
@@ -727,7 +731,7 @@ let AuthService = class AuthService {
                 Object.assign(user, userData);
                 return user;
             }
-            catch (_a) {
+            catch (error) {
                 return null;
             }
         });
@@ -744,9 +748,7 @@ let AuthService = class AuthService {
         });
     }
     signOut(res) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            res.clearCookie(this.cookieName, this.cookieOptions);
-        });
+        res.clearCookie(this.cookieName, this.cookieOptions);
     }
 };
 AuthService = tslib_1.__decorate([
@@ -922,7 +924,7 @@ exports.GetUser = (0, common_1.createParamDecorator)((data, ctx) => {
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MeController = void 0;
 const tslib_1 = __webpack_require__(1);
@@ -947,12 +949,10 @@ let MeController = class MeController {
         });
     }
     signMeOut(res) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            yield this.authService.signOut(res);
-            res
-                .status(204)
-                .send();
-        });
+        this.authService.signOut(res);
+        res
+            .status(204)
+            .send();
     }
     updateMyPassword(user, body) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -985,7 +985,7 @@ tslib_1.__decorate([
     tslib_1.__param(0, (0, common_1.Res)()),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [typeof (_g = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _g : Object]),
-    tslib_1.__metadata("design:returntype", typeof (_h = typeof Promise !== "undefined" && Promise) === "function" ? _h : Object)
+    tslib_1.__metadata("design:returntype", void 0)
 ], MeController.prototype, "signMeOut", null);
 tslib_1.__decorate([
     (0, common_1.Patch)('update-password'),
@@ -993,8 +993,8 @@ tslib_1.__decorate([
     tslib_1.__param(0, (0, decorators_1.GetUser)()),
     tslib_1.__param(1, (0, common_1.Body)()),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [typeof (_j = typeof Partial !== "undefined" && Partial) === "function" ? _j : Object, typeof (_k = typeof dtos_1.ChangePasswordDto !== "undefined" && dtos_1.ChangePasswordDto) === "function" ? _k : Object]),
-    tslib_1.__metadata("design:returntype", typeof (_l = typeof Promise !== "undefined" && Promise) === "function" ? _l : Object)
+    tslib_1.__metadata("design:paramtypes", [typeof (_h = typeof Partial !== "undefined" && Partial) === "function" ? _h : Object, typeof (_j = typeof dtos_1.ChangePasswordDto !== "undefined" && dtos_1.ChangePasswordDto) === "function" ? _j : Object]),
+    tslib_1.__metadata("design:returntype", typeof (_k = typeof Promise !== "undefined" && Promise) === "function" ? _k : Object)
 ], MeController.prototype, "updateMyPassword", null);
 MeController = tslib_1.__decorate([
     (0, common_1.Controller)('me'),

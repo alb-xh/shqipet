@@ -1,26 +1,36 @@
 import axios from 'axios';
-import { UserInfo } from '@shqipet/common';
+import { CreateUser, PublicUser } from '@shqipet/common';
 
 import { API_ENDPOINT_URL } from '../config';
 
 class ApiClient {
-  private readonly meEndpoint: string;
-  constructor (apiEndpoint: string) {
-    this.meEndpoint = `${apiEndpoint}/users/me`;
-  };
+  constructor (private readonly baseUrl: string) {};
 
-  async signIn (token: string): Promise<UserInfo> {
-    const { data } = await axios.post(this.meEndpoint, { token }, { withCredentials: true });
+  get usersEndpoint (): string {
+    return `${this.baseUrl}/users`;
+  }
+
+  get meEndpoint (): string {
+    return `${this.baseUrl}/me`;
+  }
+
+  async createUser (createUserDto: CreateUser): Promise<PublicUser> {
+    const { data } = await axios.post(this.usersEndpoint, createUserDto, { withCredentials: true });
     return data;
   }
 
-  async getMe (): Promise<UserInfo> {
+  async getMe (): Promise<PublicUser> {
     const { data } = await axios.get(this.meEndpoint, { withCredentials: true })
     return data;
   }
 
-  async logOut (): Promise<void> {
-    await axios.delete(this.meEndpoint, { withCredentials: true });
+  async signIn (token: string): Promise<PublicUser> {
+    const { data } = await axios.post(this.meEndpoint, { token }, { withCredentials: true });
+    return data;
+  }
+
+  async signOut (): Promise<void> {
+    await axios.post(`${this.meEndpoint}/sign-out`, null, { withCredentials: true });
   }
 }
 

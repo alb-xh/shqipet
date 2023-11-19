@@ -11,7 +11,7 @@ import { appContext, wsSocket } from './common';
 import { Path } from "./constants";
 import { RootLayout, Root, Login, Logout, Games, Rooms, Chess, Posts, Profile, Chat } from "./routes";
 import { Error } from './pages'
-import { PrivateRoute } from "./common/private-route.component";
+import { PrivateRoute } from "./common/components/private-route.component";
 import { Register } from "./routes/register";
 import { ResetPassword } from "./routes/reset-password";
 

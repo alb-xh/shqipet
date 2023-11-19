@@ -8,6 +8,10 @@ import { Loading, useUser } from "../../../common";
 export const RootLayout = () => {
   const { isLoading } = useUser();
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <Box>
       <NavBar />
@@ -15,11 +19,7 @@ export const RootLayout = () => {
         paddingTop: '90px',
         paddingBottom: '50px',
       }}>
-        {
-          isLoading
-            ? <Loading />
-            : <Outlet />
-        }
+        <Outlet />
       </Box>
       <Footer />
     </Box>

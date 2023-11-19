@@ -5,8 +5,8 @@ import logo from '../../../../assets/logo.png';
 
 import { Alert } from './alert.component';
 import { useUser } from '../../../common';
-import { useNavigate } from 'react-router-dom';
 import { Search } from './search.component';
+import { UserAvatar } from '../../../common/components/user-avatar';
 
 const GridItem = (props) => {
   return (
@@ -27,7 +27,6 @@ const GridItem = (props) => {
 
 export const NavBar = () => {
   const { user } = useUser();
-  const navigate = useNavigate();
 
   return (
     <Grid
@@ -56,7 +55,7 @@ export const NavBar = () => {
       </GridItem>
       <GridItem xs={4} />
       <GridItem xs={1} >
-        <Avatar alt="User's avatar" src={user?.avatar} />
+        <UserAvatar />
       </GridItem>
     </Grid>
   );
